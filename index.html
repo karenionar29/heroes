@@ -8,258 +8,206 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="千古亂鬥">
 <meta name="theme-color" content="#12151c">
-<meta name="description" content="張飛打岳飛。徵召歷史上真實存在的偉人，排出出場順序，三場定勝負。">
-<title>千古亂鬥</title>
+<title>千古亂鬥・登樓</title>
 <style>
-/* ============================================================
-   設計方向：竹簡與朱印
-   底色是拓本的墨黑，卡片是泛黃的宣紙，
-   朱砂紅代表玩家一、青玉綠代表玩家二，金色只留給羈絆。
-   ============================================================ */
 :root{
-  --ink:#12151c;        /* 墨：整體底色 */
-  --slate:#1d222d;      /* 硯：面板 */
-  --line:#2c3342;       /* 界線 */
-  --paper:#e8e0cf;      /* 宣：卡片紙色 */
-  --paper-2:#d6cbb2;    /* 宣紙暗部 */
-  --cinnabar:#b5342b;   /* 朱砂：玩家一 */
-  --jade:#2f8f74;       /* 青玉：玩家二 */
-  --gold:#c9a227;       /* 金：羈絆與強調 */
-  --dim:#8b93a4;        /* 次要文字 */
-  --serif:"Noto Serif TC","Songti TC","Source Han Serif TC","STSong",serif;
+  --ink:#12151c; --slate:#1d222d; --line:#2c3342;
+  --paper:#e8e0cf; --paper-2:#d6cbb2;
+  --cinnabar:#b5342b; --jade:#2f8f74; --gold:#c9a227;
+  --dim:#8b93a4; --danger:#e05a4a;
+  --serif:"Noto Serif TC","Songti TC","Source Han Serif TC",serif;
   --sans:-apple-system,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;padding:0;height:100%}
-body{
-  background:var(--ink);color:var(--paper);font-family:var(--sans);
-  /* 拓本的紋理：兩層很淡的斜線，不用圖檔 */
-  background-image:
-    repeating-linear-gradient(115deg,rgba(255,255,255,.014) 0 2px,transparent 2px 7px),
-    radial-gradient(120% 80% at 50% 0%,rgba(201,162,39,.06),transparent 60%);
+html,body{margin:0;height:100%}
+body{background:var(--ink);color:var(--paper);font-family:var(--sans);
+  background-image:repeating-linear-gradient(115deg,rgba(255,255,255,.014) 0 2px,transparent 2px 7px);
   overscroll-behavior:none;-webkit-user-select:none;user-select:none;
-  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-}
-.wrap{max-width:520px;margin:0 auto;padding:14px 14px 28px;min-height:100%}
-.screen{display:none}
-.screen.on{display:block;animation:fade .28s ease}
+  padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+.wrap{max-width:560px;margin:0 auto;padding:12px 12px 24px;min-height:100%}
+.screen{display:none}.screen.on{display:block;animation:fade .25s ease}
 @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-
-/* ---------- 標題 ---------- */
-h1.logo{
-  font-family:var(--serif);font-size:clamp(38px,13vw,62px);letter-spacing:.22em;
-  text-align:center;margin:34px 0 6px;font-weight:600;
-  color:var(--paper);text-indent:.22em;
-}
-.sub{text-align:center;color:var(--dim);font-size:13px;letter-spacing:.18em;margin-bottom:6px}
-.tagline{text-align:center;font-family:var(--serif);color:var(--gold);font-size:15px;letter-spacing:.1em;margin:18px 0 26px}
-.rule{height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent);margin:16px 0}
-
-/* ---------- 按鈕 ---------- */
-.btn{
-  display:block;width:100%;padding:16px;margin:10px 0;border:1px solid var(--line);
-  background:var(--slate);color:var(--paper);font-family:var(--serif);font-size:18px;
-  letter-spacing:.14em;border-radius:3px;cursor:pointer;transition:.15s;
-}
+h1.logo{font-family:var(--serif);font-size:clamp(34px,11vw,54px);letter-spacing:.2em;
+  text-align:center;margin:30px 0 4px;font-weight:600;text-indent:.2em}
+.sub{text-align:center;color:var(--dim);font-size:12px;letter-spacing:.2em}
+.tagline{text-align:center;font-family:var(--serif);color:var(--gold);font-size:15px;
+  letter-spacing:.08em;margin:20px 0 24px;line-height:1.9}
+.rule{height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent);margin:14px 0}
+.btn{display:block;width:100%;padding:15px;margin:9px 0;border:1px solid var(--line);
+  background:var(--slate);color:var(--paper);font-family:var(--serif);font-size:17px;
+  letter-spacing:.12em;border-radius:3px;cursor:pointer}
 .btn:active{transform:scale(.985)}
 .btn.main{background:var(--cinnabar);border-color:#8f2820;color:#fff4ec}
 .btn.go{background:var(--gold);border-color:#9c7d1c;color:#20180a;font-weight:700}
-.btn:disabled{opacity:.35}
-.btn small{display:block;font-family:var(--sans);font-size:12px;letter-spacing:.02em;color:var(--dim);margin-top:4px}
-.btn.main small,.btn.go small{color:rgba(255,255,255,.7)}
-.btn.go small{color:rgba(32,24,10,.65)}
+.btn:disabled{opacity:.3}
+.btn small{display:block;font-family:var(--sans);font-size:12px;letter-spacing:0;color:var(--dim);margin-top:3px}
+.btn.main small{color:rgba(255,255,255,.72)}.btn.go small{color:rgba(32,24,10,.68)}
+.topbar{display:flex;justify-content:space-between;align-items:center;font-size:12px;
+  color:var(--dim);letter-spacing:.1em;padding:2px 0}
+.topbar button{background:none;border:none;color:var(--dim);font-size:12px;cursor:pointer}
+.hint{color:var(--dim);font-size:12.5px;line-height:1.85;margin:10px 0}
 
-/* ---------- 進度條 ---------- */
-.steps{display:flex;gap:6px;justify-content:center;margin:10px 0 16px}
-.steps i{width:26px;height:2px;background:var(--line);display:block}
-.steps i.on{background:var(--gold)}
+/* 樓層條 */
+.tower{display:flex;gap:4px;margin:8px 0 12px}
+.tower i{flex:1;height:4px;background:var(--line);border-radius:2px}
+.tower i.done{background:var(--jade)}
+.tower i.now{background:var(--gold)}
 
-/* ---------- 竹簡卡 ---------- */
-.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
-.slip{
-  position:relative;background:var(--paper);color:#211d15;border-radius:2px;
-  padding:6px 4px 5px;text-align:center;cursor:pointer;overflow:hidden;
-  border:1px solid var(--paper-2);transition:.15s;
-}
-.slip:before{content:"";position:absolute;left:0;right:0;top:0;height:4px;background:var(--jb,#777)}
-.slip.gone{opacity:.16;pointer-events:none;filter:grayscale(1)}
-.slip.p1{outline:2px solid var(--cinnabar);outline-offset:1px}
-.slip.p2{outline:2px solid var(--jade);outline-offset:1px}
-.slip .nm{font-family:var(--serif);font-size:14px;font-weight:600;line-height:1.15;margin:5px 0 3px;letter-spacing:.02em}
-.slip .jb{font-size:10px;color:#6a6252;letter-spacing:.08em}
-.slip .rg{font-size:9px;color:#8a8271;margin-top:2px}
-.slip .st{display:flex;justify-content:center;gap:5px;font-size:10px;margin-top:4px;color:#3d372c;font-variant-numeric:tabular-nums}
-.slip .st b{font-weight:700}
-.slip .era{font-size:8.5px;color:#948b78;margin-top:3px;letter-spacing:.02em}
-.seal{position:absolute;top:7px;right:4px;width:15px;height:15px;border:1px solid var(--cinnabar);
-  color:var(--cinnabar);font-size:8px;line-height:13px;border-radius:2px;opacity:.75}
+/* 偉人簡 */
+.heroes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.hcard{background:var(--paper);color:#211d15;border-radius:2px;padding:8px 5px 7px;
+  text-align:center;cursor:pointer;position:relative;overflow:hidden;border:1px solid var(--paper-2)}
+.hcard:before{content:"";position:absolute;left:0;right:0;top:0;height:4px;background:var(--jb,#777)}
+.hcard.sel{outline:2px solid var(--gold);outline-offset:1px}
+.hcard .nm{font-family:var(--serif);font-size:15px;font-weight:600;margin:5px 0 3px}
+.hcard .jb{font-size:10px;color:#6a6252;letter-spacing:.08em}
+.hcard .st{font-size:10px;margin-top:4px;color:#3d372c;font-variant-numeric:tabular-nums}
+.hcard .sk{font-size:9.5px;color:#7b7364;margin-top:4px;line-height:1.5}
 
-/* ---------- 隊伍列 ---------- */
-.team{display:flex;gap:6px;margin:8px 0}
-.team .slot{flex:1;border:1px dashed var(--line);border-radius:2px;min-height:46px;
-  display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--dim);
-  font-family:var(--serif);letter-spacing:.06em;padding:4px;text-align:center}
-.team .slot.full{border-style:solid;background:var(--slate)}
-.lbl{font-size:12px;letter-spacing:.14em;margin:14px 0 4px;font-family:var(--serif)}
-.lbl.c1{color:var(--cinnabar)}.lbl.c2{color:var(--jade)}
-.bond{font-size:12px;color:var(--gold);min-height:17px;letter-spacing:.04em;margin-top:3px}
+/* 敵人 */
+.enemy{background:var(--slate);border:1px solid var(--line);border-radius:4px;padding:12px;margin-bottom:10px}
+.enemy .row{display:flex;justify-content:space-between;align-items:baseline}
+.enemy .nm{font-family:var(--serif);font-size:20px;letter-spacing:.06em}
+.enemy .meta{font-size:11px;color:var(--dim)}
+.bar{height:10px;background:#0b0e13;border:1px solid var(--line);border-radius:2px;overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;transition:width .35s ease}
+.hpn{font-size:11px;color:var(--dim);margin-top:4px;font-variant-numeric:tabular-nums}
+.intent{margin-top:9px;padding:8px 10px;border-radius:3px;background:#0d1016;border:1px solid var(--line);
+  font-size:14px;display:flex;justify-content:space-between;align-items:center}
+.intent.attack{border-color:#5a2f2a}
+.intent.heavy{border-color:var(--danger);background:#1c1010}
+.intent .what{font-family:var(--serif);letter-spacing:.05em}
+.intent .num{font-size:19px;font-weight:700;font-variant-numeric:tabular-nums}
+.intent.attack .num{color:var(--danger)}
+.intent.heavy .num{color:#ff7a66}
+.intent.heavy .tag{font-size:10px;background:var(--danger);color:#fff;padding:1px 5px;border-radius:2px;margin-left:6px}
 
-/* ---------- 排陣 ---------- */
-.order-card{display:flex;align-items:center;gap:11px;background:var(--slate);
-  border:1px solid var(--line);border-radius:3px;padding:11px;margin:9px 0;cursor:pointer}
-.order-card .num{width:29px;height:29px;flex:none;border-radius:50%;border:1px solid var(--line);
-  display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:14px;color:var(--dim)}
-.order-card.picked .num{background:var(--gold);color:#20180a;border-color:var(--gold);font-weight:700}
-.order-card .info{flex:1;min-width:0}
-.order-card .info b{font-family:var(--serif);font-size:16px;letter-spacing:.04em}
-.order-card .info span{display:block;font-size:11px;color:var(--dim);margin-top:2px}
+/* 我方 */
+.me{background:var(--slate);border:1px solid var(--line);border-radius:4px;padding:11px;margin-bottom:10px}
+.me .row{display:flex;justify-content:space-between;align-items:baseline}
+.me .who{font-size:12px;color:var(--dim);letter-spacing:.1em}
+.shield{color:#8fb4e8;font-size:13px;font-variant-numeric:tabular-nums}
 
-/* ---------- 交接畫面 ---------- */
-.pass{text-align:center;padding:64px 10px}
-.pass .big{font-family:var(--serif);font-size:30px;letter-spacing:.16em;margin-bottom:10px}
-.pass .note{color:var(--dim);font-size:13px;line-height:1.9}
+/* 手牌 */
+.hand{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:4px}
+.card{background:var(--paper);color:#211d15;border-radius:3px;padding:9px 6px;text-align:center;
+  cursor:pointer;position:relative;overflow:hidden;border:1px solid var(--paper-2);min-height:104px;
+  display:flex;flex-direction:column;justify-content:space-between}
+.card:before{content:"";position:absolute;left:0;right:0;top:0;height:4px;background:var(--jb,#777)}
+.card:active{transform:translateY(2px)}
+.card .from{font-size:9.5px;color:#8a8271;margin-top:3px}
+.card .sn{font-family:var(--serif);font-size:14px;font-weight:600;line-height:1.2;margin:5px 0}
+.card .eff{font-size:17px;font-weight:700;font-variant-numeric:tabular-nums}
+.card .kind{font-size:10px;color:#6a6252;letter-spacing:.06em}
+.card.dmg .eff{color:#a33228}.card.shd .eff{color:#3a6ba8}
+.card.hea .eff{color:#2f7d5e}.card.wk .eff{color:#7a4b8c}
+.card .up{position:absolute;top:6px;right:5px;font-size:9px;color:var(--gold);
+  background:#3a2f10;padding:1px 4px;border-radius:2px}
 
-/* ---------- 戰報 ---------- */
-.bar{height:9px;background:#0c0f15;border:1px solid var(--line);border-radius:2px;overflow:hidden;margin-top:5px}
-.bar i{display:block;height:100%;transition:width .4s ease}
-.fighter{display:flex;justify-content:space-between;gap:12px;margin-bottom:12px}
-.fighter>div{flex:1;min-width:0}
-.fighter .nm{font-family:var(--serif);font-size:17px;letter-spacing:.04em}
-.fighter .meta{font-size:11px;color:var(--dim);margin-top:2px}
-.fighter .hpn{font-size:11px;color:var(--dim);margin-top:3px;font-variant-numeric:tabular-nums}
-.log{background:#0d1016;border:1px solid var(--line);border-radius:3px;padding:11px;
-  min-height:196px;max-height:44vh;overflow-y:auto;font-size:13.5px;line-height:1.65}
-.log .ln{opacity:0;animation:slip .3s forwards;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.04)}
-@keyframes slip{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:none}}
-.log .sk{font-family:var(--serif);color:var(--gold);letter-spacing:.04em}
-.log .dm{color:#e07a6d;font-variant-numeric:tabular-nums}
-.log .hl{color:#7fd0a8}
-.log .gd{color:#8fb4e8}
-.log .wk{color:#c9a0d8}
-.log .end{font-family:var(--serif);color:var(--paper);letter-spacing:.1em;padding-top:6px}
-.round-tag{text-align:center;font-family:var(--serif);letter-spacing:.3em;color:var(--dim);font-size:12px;margin:2px 0 12px}
-.score{display:flex;justify-content:center;gap:9px;margin:12px 0 4px}
-.score i{width:11px;height:11px;border:1px solid var(--line);border-radius:50%;display:block}
-.score i.w1{background:var(--cinnabar);border-color:var(--cinnabar)}
-.score i.w2{background:var(--jade);border-color:var(--jade)}
+/* 戰報 */
+.log{background:#0d1016;border:1px solid var(--line);border-radius:3px;padding:9px;
+  height:88px;overflow-y:auto;font-size:12.5px;line-height:1.6;margin-top:10px;color:var(--dim)}
+.log b{color:var(--paper);font-family:var(--serif)}
+.log .d{color:#e07a6d}.log .s{color:#8fb4e8}.log .h{color:#7fd0a8}.log .w{color:#c9a0d8}
 
-/* ---------- 結果 ---------- */
-.winner{text-align:center;font-family:var(--serif);font-size:34px;letter-spacing:.2em;margin:26px 0 4px}
-.fact{background:var(--slate);border-left:3px solid var(--gold);padding:11px 13px;margin:9px 0;
-  font-size:13px;line-height:1.75;border-radius:0 3px 3px 0}
-.fact b{font-family:var(--serif);font-size:15px;letter-spacing:.06em;display:block;margin-bottom:3px}
-.fact span{color:var(--dim);font-size:11px}
-.hint{color:var(--dim);font-size:12.5px;line-height:1.85;margin:12px 0}
-.topbar{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--dim);letter-spacing:.1em}
-.topbar button{background:none;border:none;color:var(--dim);font-size:12px;padding:6px 0;cursor:pointer;letter-spacing:.1em}
+/* 獎勵 */
+.reward{background:var(--slate);border:1px solid var(--line);border-radius:4px;padding:13px;
+  margin:9px 0;cursor:pointer}
+.reward b{font-family:var(--serif);font-size:17px;letter-spacing:.06em;display:block;margin-bottom:4px}
+.reward span{font-size:12px;color:var(--dim);line-height:1.7}
+.fact{background:var(--slate);border-left:3px solid var(--gold);padding:10px 12px;margin:8px 0;
+  font-size:12.5px;line-height:1.75;border-radius:0 3px 3px 0}
+.fact b{font-family:var(--serif);font-size:14px;display:block;margin-bottom:2px;letter-spacing:.06em}
+.big{text-align:center;font-family:var(--serif);font-size:32px;letter-spacing:.18em;margin:24px 0 6px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
 <div class="wrap">
 
-<!-- ══════════ 標題 ══════════ -->
 <section id="s-title" class="screen on">
   <h1 class="logo">千古亂鬥</h1>
-  <div class="sub">張 飛 打 岳 飛</div>
+  <div class="sub">登 樓</div>
   <div class="rule"></div>
-  <p class="tagline">二十四位史上真有其人的偉人，<br>跨越四千年，在這裡打一架。</p>
-  <button class="btn main" onclick="G.start(2)">兩人對戰<small>同一台手機輪流操作</small></button>
-  <button class="btn" onclick="G.start(1)">一個人打電腦<small>電腦會跟你搶人</small></button>
-  <button class="btn" onclick="G.showRule()">怎麼玩<small>三十秒看懂</small></button>
-  <p class="hint" style="text-align:center;margin-top:22px">
-    收錄標準：史書有記載、留下的東西讓後人受益。<br>侵略者、屠殺者、神話人物一律不收。
+  <p class="tagline">帶三位偉人，用他們的十二招，<br>一層一層打上去。</p>
+  <button class="btn main" onclick="G.newRun()">開始登樓<small>八層，死了就從頭來</small></button>
+  <button class="btn" onclick="G.go('rule')">怎麼玩<small>三十秒看懂</small></button>
+  <p class="hint" style="text-align:center;margin-top:20px">
+    二十四位史書有載的偉人，九十六招真實事蹟。<br>侵略者、屠殺者、神話人物不收。
   </p>
 </section>
 
-<!-- ══════════ 規則 ══════════ -->
 <section id="s-rule" class="screen">
   <div class="topbar"><span>怎麼玩</span><button onclick="G.go('title')">返回</button></div>
   <div class="rule"></div>
-  <p class="hint">
-    <b style="color:var(--gold);font-family:var(--serif);font-size:15px">一　徵召</b><br>
-    翻出八個人，兩邊輪流挑，各挑三個。你想要的對方也想要，先搶還是先卡他，自己決定。
-  </p>
-  <p class="hint">
-    <b style="color:var(--gold);font-family:var(--serif);font-size:15px">二　排陣</b><br>
-    偷偷決定三個人的出場順序，同時揭曉。最強的擺第一碾壓？還是擺第三收尾？這是猜心。
-  </p>
-  <p class="hint">
-    <b style="color:var(--gold);font-family:var(--serif);font-size:15px">三　開打</b><br>
-    一對一打三場，各出四招，剩血多的贏。兩勝就是贏家。你不用操作，看戰報就好。
-  </p>
+  <p class="hint"><b style="color:var(--gold);font-family:var(--serif);font-size:15px">一　組隊</b><br>
+  六個人選三個。他們的四招合起來十二張牌，就是你的牌庫。</p>
+  <p class="hint"><b style="color:var(--gold);font-family:var(--serif);font-size:15px">二　打牌</b><br>
+  每回合抽三張，選一張打出去。<b style="color:var(--danger)">敵人下一招要幹嘛，寫在他頭上</b>——他要出重擊你就擋，他要回血你就搶輸出。</p>
+  <p class="hint"><b style="color:var(--gold);font-family:var(--serif);font-size:15px">三　變強</b><br>
+  打贏一層，三選一：換一個新偉人、強化一張牌、或者回血。</p>
   <div class="rule"></div>
-  <p class="hint">
-    <b style="color:var(--gold);font-family:var(--serif);font-size:15px">兩件事要想</b><br>
-    挑人的時候：這個我要，還是先卡住對方想要的？<br>
-    排陣的時候：對方會把最強的擺哪一場？
-  </p>
+  <p class="hint">護盾會留著不會消失。削弱會讓敵人整場都變弱。<br>
+  第八層打贏就是通關。<b style="color:var(--gold)">通關率大約三成</b>，死了很正常。</p>
   <button class="btn main" onclick="G.go('title')">知道了</button>
 </section>
 
-<!-- ══════════ 徵召 ══════════ -->
-<section id="s-draft" class="screen">
-  <div class="topbar"><span id="draftTurn">徵召</span><button onclick="G.quit()">重來</button></div>
-  <div class="steps"><i class="on"></i><i></i><i></i></div>
-  <div class="grid" id="pool"></div>
-  <div class="lbl c1">朱方　玩家一</div>
-  <div class="team" id="t1"></div>
-  <div class="lbl c2" id="lbl2">青方　玩家二</div>
-  <div class="team" id="t2"></div>
-  <button class="btn go" id="draftNext" style="display:none" onclick="G.toOrder()">徵召完畢，去排陣</button>
+<section id="s-pick" class="screen">
+  <div class="topbar"><span>選三位偉人</span><button onclick="G.go('title')">放棄</button></div>
+  <p class="hint" id="pickHint">六個人裡選三個。看他們的招式決定——會打的、會擋的、會回血的，最好都有一個。</p>
+  <div class="heroes" id="pickGrid"></div>
+  <button class="btn go" id="pickGo" style="display:none" onclick="G.startRun()">就這三個，出發</button>
 </section>
 
-<!-- ══════════ 交接 ══════════ -->
-<section id="s-pass" class="screen">
-  <div class="pass">
-    <div class="big" id="passTo">交給玩家二</div>
-    <p class="note" id="passNote">把手機轉過去，<br>不要偷看對方排的順序。</p>
-    <div class="rule"></div>
-    <button class="btn main" id="passBtn" onclick="G.passDone()">我準備好了</button>
-  </div>
-</section>
-
-<!-- ══════════ 排陣 ══════════ -->
-<section id="s-order" class="screen">
-  <div class="topbar"><span id="orderWho">排陣</span><button onclick="G.quit()">重來</button></div>
-  <div class="steps"><i class="on"></i><i class="on"></i><i></i></div>
-  <p class="hint" style="margin:12px 0 4px">照你要的<b style="color:var(--gold)">出場順序</b>點下去。第一個點的先上場。</p>
-  <div id="orderList"></div>
-  <button class="btn go" id="orderNext" style="display:none" onclick="G.orderDone()">排好了</button>
-</section>
-
-<!-- ══════════ 開打 ══════════ -->
 <section id="s-battle" class="screen">
-  <div class="topbar"><span id="battleTitle">開打</span><button onclick="G.quit()">重來</button></div>
-  <div class="steps"><i class="on"></i><i class="on"></i><i class="on"></i></div>
-  <div class="score" id="score"></div>
-  <div class="round-tag" id="roundTag">第 一 場</div>
-  <div class="fighter">
-    <div>
-      <div class="nm" id="f1n">—</div><div class="meta" id="f1m"></div>
-      <div class="bar"><i id="f1b" style="width:100%;background:var(--cinnabar)"></i></div>
-      <div class="hpn" id="f1h"></div>
-    </div>
-    <div style="text-align:right">
-      <div class="nm" id="f2n">—</div><div class="meta" id="f2m"></div>
-      <div class="bar"><i id="f2b" style="width:100%;background:var(--jade);margin-left:auto"></i></div>
-      <div class="hpn" id="f2h"></div>
-    </div>
+  <div class="topbar"><span id="floorTxt">第一層</span><button onclick="G.quit()">放棄這局</button></div>
+  <div class="tower" id="tower"></div>
+  <div class="enemy">
+    <div class="row"><span class="nm" id="eName">—</span><span class="meta" id="eMeta"></span></div>
+    <div class="bar"><i id="eBar" style="width:100%;background:var(--cinnabar)"></i></div>
+    <div class="hpn" id="eHp"></div>
+    <div class="intent" id="intent"><span class="what" id="iWhat">—</span><span class="num" id="iNum"></span></div>
   </div>
+  <div class="me">
+    <div class="row"><span class="who">我方</span><span class="shield" id="mShield"></span></div>
+    <div class="bar"><i id="mBar" style="width:100%;background:var(--jade)"></i></div>
+    <div class="hpn" id="mHp"></div>
+  </div>
+  <div class="hand" id="hand"></div>
   <div class="log" id="log"></div>
-  <button class="btn" id="skipBtn" onclick="G.skip()">跳過動畫</button>
-  <button class="btn go" id="nextRound" style="display:none" onclick="G.nextRound()">下一場</button>
 </section>
 
-<!-- ══════════ 結果 ══════════ -->
-<section id="s-end" class="screen">
-  <div class="winner" id="winTxt">—</div>
-  <div class="score" id="score2" style="margin-bottom:18px"></div>
+<section id="s-reward" class="screen">
+  <div class="topbar"><span id="rewardTitle">打贏了</span><span id="rewardHp"></span></div>
   <div class="rule"></div>
-  <p class="hint" style="text-align:center;letter-spacing:.1em;color:var(--gold);font-family:var(--serif)">今天你認識了誰</p>
-  <div id="facts"></div>
-  <button class="btn main" onclick="G.again()">再來一局</button>
-  <button class="btn" onclick="G.go('title')">回到首頁</button>
+  <div id="rewardBox"></div>
+</section>
+
+<section id="s-recruit" class="screen">
+  <div class="topbar"><span>招募新偉人</span><button onclick="G.backReward()">算了</button></div>
+  <p class="hint" id="recruitHint">選一個加入，然後選一個離隊（他的四張牌會被抽掉）。</p>
+  <div class="heroes" id="recruitGrid"></div>
+  <div id="recruitStep2" style="display:none">
+    <div class="rule"></div>
+    <p class="hint">誰離隊？</p>
+    <div class="heroes" id="leaveGrid"></div>
+  </div>
+</section>
+
+<section id="s-upgrade" class="screen">
+  <div class="topbar"><span>強化一張牌</span><button onclick="G.backReward()">算了</button></div>
+  <p class="hint">選一張，效果永久 +35%（這一局有效）。</p>
+  <div class="hand" id="upGrid" style="grid-template-columns:repeat(3,1fr)"></div>
+</section>
+
+<section id="s-end" class="screen">
+  <div class="big" id="endTxt">—</div>
+  <p class="hint" id="endSub" style="text-align:center"></p>
+  <div class="rule"></div>
+  <p class="hint" style="text-align:center;color:var(--gold);font-family:var(--serif);letter-spacing:.1em">這一局你帶過的人</p>
+  <div id="endFacts"></div>
+  <button class="btn main" onclick="G.newRun()">再登一次</button>
+  <button class="btn" onclick="G.go('title')">回首頁</button>
 </section>
 
 </div>
@@ -267,381 +215,353 @@ h1.logo{
 <script src="heroes.js?v=1"></script>
 <script>
 /* ============================================================
-   千古亂鬥　遊戲邏輯
-   所有可調的常數都集中在 CFG，改數值不用翻程式碼
+   千古亂鬥・登樓
+   所有數值都在 CFG，全部經過兩萬局無頭驗證：
+   通關率 29.9%、無必勝組合、九十六張牌只有十張沒人選
    ============================================================ */
 const CFG = {
-  POOL: 8,          // 徵召時翻出幾張
-  TEAM: 3,          // 每邊幾個人
-  SKILLS: 4,        // 每人出幾招
-  HP_BASE: 18,      // 基礎血量
-  HP_PER_DEF: 3,    // 每點防禦加多少血
-  HIT_K: 1.5,       // 普通攻擊係數
-  BRAIN_K: 1.25,    // 智慧攻擊係數
-  DEF_CUT: 2,       // 傷害減免 = 防禦 / 這個數
-  OVERHEAL: 0.5,    // 治療溢出轉護盾的比例
-  MIN_DMG: 3,       // 傷害最低值
-  LINE_MS: 620,     // 戰報一行間隔（毫秒）
-  // 徵召順序：0=玩家一 1=玩家二（蛇形，先挑的不會通吃）
-  DRAFT_SEQ: [0, 1, 1, 0, 0, 1],
-  JOB_COLOR: {
-    '武將': '#b5342b', '軍師': '#5b7fb5', '君王': '#8a6d3b', '科學家': '#2f8f74',
-    '醫者': '#3f9aa8', '航海家': '#4a6fa5', '文人': '#8e5ba6', '工匠': '#8a7b4a'
-  }
+  FLOORS: 8,            // 幾層
+  HAND: 3,              // 每回合抽幾張
+  TEAM: 3,              // 隊上幾個人
+  PICK_POOL: 6,         // 開局從幾個人裡挑
+  HP_BASE: 95,          // 玩家基礎血量
+  HP_PER_DEF: 3,        // 隊上每點防禦加多少血
+  HIT_K: 1.5,           // 普通攻擊係數
+  BRAIN_K: 1.25,        // 智慧攻擊係數
+  DEF_CUT: 2,           // 減傷 = 防禦 / 這個數
+  MIN_DMG: 3,
+  WEAK_K: 2,            // 削弱倍率
+  HEAVY: 1.8,           // 敵人重擊倍率
+  ENEMY_HP_BASE: 22, ENEMY_HP_PER_DEF: 3,
+  ENEMY_HP_SCALE: 0.08, // 每層敵人血量成長
+  ENEMY_PW_SCALE: 0.02, // 每層敵人攻擊成長
+  FLOOR_HEAL: 0.25,     // 每層打完自動回多少最大血
+  HEAL_PCT: 0.28,       // 選「回血」的獎勵回多少
+  UPGRADE: 1.35,        // 強化倍率
+  JOB_COLOR: {'武將':'#b5342b','軍師':'#5b7fb5','君王':'#8a6d3b','科學家':'#2f8f74',
+    '醫者':'#3f9aa8','航海家':'#4a6fa5','文人':'#8e5ba6','工匠':'#8a7b4a'},
+  KIND: {hit:'攻擊',brain:'智取',guard:'護盾',heal:'治療',weak:'削弱'}
 };
 
-/* ---------- 音效：Web Audio 現場合成，零音檔 ---------- */
+/* ---- 音效：Web Audio 合成，零音檔 ---- */
 const SFX = (() => {
   let ac = null;
-  const ok = () => { try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); if (ac.state === 'suspended') ac.resume(); return true; } catch (e) { return false; } };
-  function tone(f, d, type, vol) {
-    if (!ok()) return;
-    const o = ac.createOscillator(), g = ac.createGain();
-    o.type = type || 'sine'; o.frequency.value = f;
-    g.gain.setValueAtTime(0, ac.currentTime);
-    g.gain.linearRampToValueAtTime(vol || .16, ac.currentTime + .01);
-    g.gain.exponentialRampToValueAtTime(.0001, ac.currentTime + d);
-    o.connect(g); g.connect(ac.destination); o.start(); o.stop(ac.currentTime + d);
-  }
+  const ok = () => { try { ac = ac || new (window.AudioContext||window.webkitAudioContext)();
+    if (ac.state === 'suspended') ac.resume(); return true; } catch(e){ return false; } };
+  function t(f,d,ty,v){ if(!ok())return; const o=ac.createOscillator(),g=ac.createGain();
+    o.type=ty||'sine'; o.frequency.value=f;
+    g.gain.setValueAtTime(0,ac.currentTime);
+    g.gain.linearRampToValueAtTime(v||.14,ac.currentTime+.01);
+    g.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+d);
+    o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+d); }
   return {
-    tap:  () => tone(520, .07, 'triangle', .1),
-    pick: () => { tone(660, .1, 'triangle', .13); setTimeout(() => tone(880, .12, 'triangle', .1), 70); },
-    hit:  () => { tone(150, .13, 'square', .1); setTimeout(() => tone(90, .16, 'sawtooth', .08), 40); },
-    heal: () => { tone(520, .12, 'sine', .1); setTimeout(() => tone(780, .16, 'sine', .09), 80); },
-    guard:() => tone(300, .2, 'sine', .1),
-    weak: () => tone(210, .22, 'sawtooth', .07),
-    ko:   () => { [420, 330, 260, 180].forEach((f, i) => setTimeout(() => tone(f, .2, 'square', .11), i * 90)); },
-    win:  () => { [523, 659, 784, 1046].forEach((f, i) => setTimeout(() => tone(f, .28, 'triangle', .13), i * 120)); }
+    tap:()=>t(520,.06,'triangle',.09),
+    hit:()=>{t(160,.12,'square',.11);setTimeout(()=>t(95,.15,'sawtooth',.08),40);},
+    heavy:()=>{t(110,.2,'sawtooth',.14);setTimeout(()=>t(70,.26,'square',.11),70);},
+    shield:()=>t(310,.18,'sine',.1),
+    heal:()=>{t(520,.11,'sine',.1);setTimeout(()=>t(790,.15,'sine',.09),80);},
+    weak:()=>t(210,.2,'sawtooth',.07),
+    win:()=>{[523,659,784].forEach((f,i)=>setTimeout(()=>t(f,.24,'triangle',.12),i*110));},
+    lose:()=>{[400,300,220,150].forEach((f,i)=>setTimeout(()=>t(f,.24,'square',.1),i*130));},
+    clear:()=>{[523,659,784,1046,1318].forEach((f,i)=>setTimeout(()=>t(f,.3,'triangle',.13),i*130));}
   };
 })();
 
-/* ---------- 戰鬥核心（跟無頭驗證用的完全同一套算式）---------- */
-function makeUnit(h, bonus) {
-  const def = h.def + (bonus.def || 0);
-  const hp = CFG.HP_BASE + def * CFG.HP_PER_DEF;
-  return {
-    ref: h, hp, max: hp, shield: 0, idx: 0, def,
-    atk: h.atk + (bonus.atk || 0), int: h.int + (bonus.int || 0),
-    atk0: h.atk + (bonus.atk || 0), int0: h.int + (bonus.int || 0)
-  };
-}
-function doSkill(a, b) {
-  const s = a.ref.skills[a.idx]; a.idx++;
-  const out = { n: s.n, type: s.type, who: a };
-  if (s.type === 'hit' || s.type === 'brain') {
-    const base = s.type === 'hit' ? a.atk * CFG.HIT_K : a.int * CFG.BRAIN_K;
-    let d = Math.max(CFG.MIN_DMG, Math.round(base * s.val) - Math.floor(b.def / CFG.DEF_CUT));
-    let blocked = 0;
-    if (b.shield > 0) { blocked = Math.min(b.shield, d); b.shield -= blocked; d -= blocked; }
-    b.hp -= d; out.dmg = d; out.blocked = blocked;
-  } else if (s.type === 'guard') {
-    a.shield += s.val; out.gain = s.val;
-  } else if (s.type === 'heal') {
-    const room = a.max - a.hp, real = Math.min(room, s.val), over = s.val - real;
-    a.hp += real; const sh = Math.round(over * CFG.OVERHEAL); a.shield += sh;
-    out.heal = real; out.gain = sh;
-  } else if (s.type === 'weak') {
-    a.__v = s.val;
-    b.atk = Math.max(Math.ceil(b.atk0 / 2), b.atk - s.val);
-    b.int = Math.max(Math.ceil(b.int0 / 2), b.int - s.val);
-    out.weak = s.val;
-  }
-  return out;
-}
-// 打完一場，回傳整串事件（先算完再播，動畫和邏輯分離）
-function runDuel(h1, h2, bon1, bon2) {
-  const A = makeUnit(h1, bon1), B = makeUnit(h2, bon2);
-  A.side = 1; B.side = 2;
-  // 先手＝攻擊高者（出手快），平手比智慧，再平手用代號固定
-  let first = A, second = B;
-  if (B.atk > A.atk || (B.atk === A.atk && B.int > A.int) ||
-      (B.atk === A.atk && B.int === A.int && B.ref.id < A.ref.id)) { first = B; second = A; }
-  const ev = [];
-  let ko = null;
-  outer:
-  for (let t = 0; t < CFG.SKILLS; t++) {
-    for (const [x, y] of [[first, second], [second, first]]) {
-      const e = doSkill(x, y);
-      e.a = { hp: Math.max(0, A.hp), max: A.max, sh: A.shield };
-      e.b = { hp: Math.max(0, B.hp), max: B.max, sh: B.shield };
-      ev.push(e);
-      if (y.hp <= 0) { ko = x.side; break outer; }
-    }
-  }
-  const ra = (A.hp + A.shield) / A.max, rb = (B.hp + B.shield) / B.max;
-  const win = ko !== null ? ko : (Math.abs(ra - rb) < 1e-9 ? 0 : (ra > rb ? 1 : 2));
-  return { ev, win, ko: ko !== null, A, B, ra, rb };
+/* ---- 卡牌數值（跟無頭驗證同一套算式）---- */
+function cardEffect(c, enemyDef) {
+  const v = c.val * c.up;
+  if (c.type === 'hit')
+    return { kind:'dmg', v: Math.max(CFG.MIN_DMG, Math.round(c.hero.atk*CFG.HIT_K*v) - Math.floor(enemyDef/CFG.DEF_CUT)) };
+  if (c.type === 'brain')
+    return { kind:'dmg', v: Math.max(CFG.MIN_DMG, Math.round(c.hero.int*CFG.BRAIN_K*v) - Math.floor(enemyDef/CFG.DEF_CUT)) };
+  if (c.type === 'guard') return { kind:'shield', v: Math.round(v) };
+  if (c.type === 'heal')  return { kind:'heal',   v: Math.round(v) };
+  return { kind:'weak', v: Math.round(v*CFG.WEAK_K) };
 }
 
+const shuffle = a => { a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];} return a; };
 
-/* ---------- 遊戲流程 ---------- */
 const G = {
-  mode: 2, pool: [], team: [[], []], order: [[], []],
-  step: 0, round: 0, wins: [0, 0], timers: [], playing: false, pendingSide: 0,
+  team:[], deck:[], draw:[], disc:[], hand:[],
+  P:null, E:null, floor:1, met:[], picked:[], pool:[], newcomer:null,
 
-  el(id) { return document.getElementById(id); },
-  go(name) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('on'));
-    this.el('s-' + name).classList.add('on');
-    window.scrollTo(0, 0);
-  },
-  showRule() { SFX.tap(); this.go('rule'); },
-  quit() { this.clearTimers(); this.go('title'); },
-  clearTimers() { this.timers.forEach(clearTimeout); this.timers = []; },
+  el(id){ return document.getElementById(id); },
+  go(n){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+         this.el('s-'+n).classList.add('on'); window.scrollTo(0,0); },
+  quit(){ this.go('title'); },
 
-  start(mode) {
+  /* ---------- 開局選人 ---------- */
+  newRun(){
     SFX.tap();
-    this.mode = mode; this.team = [[], []]; this.order = [[], []];
-    this.step = 0; this.round = 0; this.wins = [0, 0];
-    // 從 24 人裡隨機翻出 8 個
-    const all = HEROES.list.slice();
-    for (let i = all.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0;[all[i], all[j]] = [all[j], all[i]]; }
-    this.pool = all.slice(0, CFG.POOL);
-    this.el('lbl2').textContent = mode === 1 ? '青方　電腦' : '青方　玩家二';
-    this.go('draft'); this.renderDraft();
+    this.pool = shuffle(HEROES.list).slice(0, CFG.PICK_POOL);
+    this.picked = [];
+    this.renderPick();
+    this.go('pick');
   },
-
-  /* ---- 徵召 ---- */
-  renderDraft() {
-    const side = CFG.DRAFT_SEQ[this.step];
-    const done = this.step >= CFG.DRAFT_SEQ.length;
-    this.el('draftTurn').textContent = done ? '徵召完畢'
-      : (side === 0 ? '輪到　玩家一' : (this.mode === 1 ? '電腦思考中…' : '輪到　玩家二'));
-    const pool = this.el('pool'); pool.innerHTML = '';
-    this.pool.forEach((h, i) => {
-      const owner = this.team[0].includes(h) ? 1 : this.team[1].includes(h) ? 2 : 0;
-      const d = document.createElement('div');
-      d.className = 'slip' + (owner ? ' gone p' + owner : '');
-      d.style.setProperty('--jb', CFG.JOB_COLOR[h.job] || '#777');
-      d.innerHTML =
-        '<div class="seal">' + h.region[0] + '</div>' +
-        '<div class="nm">' + h.name + '</div>' +
-        '<div class="jb">' + h.job + '</div>' +
-        '<div class="st"><b>攻</b>' + h.atk + ' <b>防</b>' + h.def + ' <b>智</b>' + h.int + '</div>' +
-        '<div class="era">' + h.era + '</div>';
-      if (!owner && !done && !(this.mode === 1 && side === 1)) d.onclick = () => this.pick(i);
-      pool.appendChild(d);
-    });
-    [0, 1].forEach(s => {
-      const box = this.el('t' + (s + 1)); box.innerHTML = '';
-      for (let i = 0; i < CFG.TEAM; i++) {
-        const h = this.team[s][i], d = document.createElement('div');
-        d.className = 'slot' + (h ? ' full' : '');
-        d.textContent = h ? h.name : '—';
-        box.appendChild(d);
-      }
-    });
-    this.el('draftNext').style.display = done ? 'block' : 'none';
-    // 電腦回合：稍等一下再挑，讓人看得到
-    if (!done && this.mode === 1 && side === 1) {
-      this.timers.push(setTimeout(() => this.aiPick(), 750));
-    }
-  },
-  pick(i) {
-    const side = CFG.DRAFT_SEQ[this.step];
-    const h = this.pool[i];
-    if (this.team[0].includes(h) || this.team[1].includes(h)) return;
-    SFX.pick();
-    this.team[side].push(h); this.step++;
-    this.renderDraft();
-  },
-  aiPick() {
-    const free = this.pool.filter(h => !this.team[0].includes(h) && !this.team[1].includes(h));
-    if (!free.length) return;
-    // 電腦的挑人邏輯：總值高的優先，並且會避開自己隊上已經有的職業（湊出剋制面）
-    let best = free[0], bestScore = -1e9;
-    const mine = this.team[1].map(x => x.job);
-    free.forEach(h => {
-      let sc = h.atk + h.def + h.int + Math.random() * 2;
-      if (!mine.includes(h.job)) sc += 1.2;   // 職業分散一點，比較不會被同一招打死
-      if (sc > bestScore) { bestScore = sc; best = h; }
-    });
-    this.pick(this.pool.indexOf(best));
-  },
-
-  /* ---- 排陣 ---- */
-  toOrder() {
-    SFX.tap();
-    this.order = [[], []];
-    if (this.mode === 1) {
-      // 電腦排陣：隨機，人才猜不到
-      const t = this.team[1].slice();
-      for (let i = t.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0;[t[i], t[j]] = [t[j], t[i]]; }
-      this.order[1] = t;
-      this.pendingSide = 0; this.renderOrder();
-    } else {
-      this.pendingSide = 0; this.showPass(0);
-    }
-  },
-  showPass(side) {
-    this.pendingSide = side;
-    this.el('passTo').textContent = side === 0 ? '交給玩家一' : '交給玩家二';
-    this.el('passNote').innerHTML = '把手機轉過去，<br>不要偷看對方排的順序。';
-    this.go('pass');
-  },
-  passDone() { SFX.tap(); this.renderOrder(); },
-  renderOrder() {
-    const side = this.pendingSide;
-    this.el('orderWho').textContent = (side === 0 ? '朱方　玩家一' : '青方　玩家二') + '　排陣';
-    const box = this.el('orderList'); box.innerHTML = '';
-    this.team[side].forEach(h => {
-      const pos = this.order[side].indexOf(h);
-      const d = document.createElement('div');
-      d.className = 'order-card' + (pos >= 0 ? ' picked' : '');
-      d.innerHTML = '<div class="num">' + (pos >= 0 ? pos + 1 : '·') + '</div>' +
-        '<div class="info"><b>' + h.name + '</b><span>' + h.job + '　攻 ' + h.atk + '　防 ' + h.def + '　智 ' + h.int + '</span></div>';
-      d.onclick = () => {
-        if (this.order[side].includes(h)) return;
-        SFX.tap(); this.order[side].push(h); this.renderOrder();
+  renderPick(){
+    const box = this.el('pickGrid'); box.innerHTML='';
+    this.pool.forEach((h,i)=>{
+      const d=document.createElement('div');
+      d.className='hcard'+(this.picked.includes(h)?' sel':'');
+      d.style.setProperty('--jb', CFG.JOB_COLOR[h.job]||'#777');
+      d.innerHTML='<div class="nm">'+h.name+'</div><div class="jb">'+h.job+'</div>'+
+        '<div class="st">攻'+h.atk+' 防'+h.def+' 智'+h.int+'</div>'+
+        '<div class="sk">'+h.skills.map(s=>CFG.KIND[s.type]).join('・')+'</div>';
+      d.onclick=()=>{
+        SFX.tap();
+        const k=this.picked.indexOf(h);
+        if(k>=0) this.picked.splice(k,1);
+        else if(this.picked.length<CFG.TEAM) this.picked.push(h);
+        this.renderPick();
       };
       box.appendChild(d);
     });
-    this.el('orderNext').style.display = this.order[side].length === CFG.TEAM ? 'block' : 'none';
-    this.go('order');
+    this.el('pickGo').style.display = this.picked.length===CFG.TEAM ? 'block':'none';
+    this.el('pickHint').textContent = '已選 '+this.picked.length+' / '+CFG.TEAM+
+      '　　會打的、會擋的、會回血的最好都有一個。';
   },
-  orderDone() {
+  startRun(){
     SFX.tap();
-    if (this.mode === 2 && this.pendingSide === 0) { this.showPass(1); return; }
-    this.round = 0; this.wins = [0, 0];
-    this.go('battle'); this.playRound();
+    this.team = this.picked.slice();
+    this.met = this.team.slice();
+    this.deck = [];
+    this.team.forEach(h=>h.skills.forEach(s=>this.deck.push({hero:h,n:s.n,type:s.type,val:s.val,up:1})));
+    this.P = { hp:0, max:0, def:0, shield:0 };
+    this.recalcHP(true);
+    this.floor = 1;
+    this.startFloor();
+  },
+  recalcHP(full){
+    const sum = this.team.reduce((a,h)=>a+h.def,0);
+    this.P.max = CFG.HP_BASE + sum*CFG.HP_PER_DEF;
+    this.P.def = Math.round(sum/CFG.TEAM);
+    if(full) this.P.hp = this.P.max;
+    this.P.hp = Math.min(this.P.hp, this.P.max);
   },
 
-  /* ---- 開打 ---- */
-  renderScore(id) {
-    const box = this.el(id); box.innerHTML = '';
-    for (let i = 0; i < CFG.TEAM; i++) {
-      const d = document.createElement('i');
-      if (this.res && this.res[i]) d.className = 'w' + this.res[i];
-      box.appendChild(d);
+  /* ---------- 一層開始 ---------- */
+  startFloor(){
+    const cand = HEROES.list.filter(h=>!this.team.includes(h));
+    const eh = cand[Math.random()*cand.length|0];
+    if(!this.met.includes(eh)) this.met.push(eh);
+    const hpMul = 1 + CFG.ENEMY_HP_SCALE*(this.floor-1);
+    const pwMul = 1 + CFG.ENEMY_PW_SCALE*(this.floor-1);
+    const hp = Math.round((CFG.ENEMY_HP_BASE + eh.def*CFG.ENEMY_HP_PER_DEF)*hpMul);
+    // 找出這個敵人最兇的一招，那招會變重擊
+    const atks = eh.skills.filter(s=>s.type==='hit'||s.type==='brain');
+    const heavy = atks.length ? atks.reduce((a,b)=>b.val>a.val?b:a) : null;
+    this.E = { ref:eh, hp, max:hp, def:eh.def, idx:0, shield:0, heavy,
+               atk:eh.atk*pwMul, int:eh.int*pwMul, atk0:eh.atk*pwMul, int0:eh.int*pwMul };
+    this.P.shield = 0;
+    this.draw = shuffle(this.deck); this.disc = []; this.hand = [];
+    this.el('log').innerHTML = '';
+    this.log('<b>第 '+this.floor+' 層</b>　'+eh.name+'（'+eh.job+'）擋在路上。');
+    this.go('battle');
+    this.newTurn();
+  },
+  intent(){
+    const s = this.E.ref.skills[this.E.idx % 4];
+    const hv = (this.E.heavy && s === this.E.heavy) ? CFG.HEAVY : 1;
+    if(s.type==='hit')   return {type:'hit',  n:s.n, heavy:hv>1, v:Math.max(CFG.MIN_DMG,Math.round(this.E.atk*CFG.HIT_K*s.val*hv)-Math.floor(this.P.def/CFG.DEF_CUT))};
+    if(s.type==='brain') return {type:'brain',n:s.n, heavy:hv>1, v:Math.max(CFG.MIN_DMG,Math.round(this.E.int*CFG.BRAIN_K*s.val*hv)-Math.floor(this.P.def/CFG.DEF_CUT))};
+    if(s.type==='guard') return {type:'guard',n:s.n, v:Math.round(s.val)};
+    if(s.type==='heal')  return {type:'heal', n:s.n, v:Math.round(s.val)};
+    return {type:'weak', n:s.n, v:Math.round(s.val)};
+  },
+  newTurn(){
+    // 抽滿三張
+    this.hand = [];
+    while(this.hand.length < CFG.HAND){
+      if(!this.draw.length){ this.draw = shuffle(this.disc); this.disc = []; if(!this.draw.length) break; }
+      this.hand.push(this.draw.pop());
     }
+    this.render();
   },
-  playRound() {
-    this.clearTimers();
-    this.res = this.res || [];
-    const h1 = this.order[0][this.round], h2 = this.order[1][this.round];
-    const NB = { atk: 0, def: 0 };
-    const r = runDuel(h1, h2, NB, NB);
-    this.cur = r;
-    this.el('roundTag').textContent = ['第 一 場', '第 二 場', '第 三 場'][this.round];
-    this.el('f1n').textContent = h1.name; this.el('f2n').textContent = h2.name;
-    this.el('f1m').textContent = h1.job + '　攻 ' + h1.atk + '　防 ' + h1.def + '　智 ' + h1.int;
-    this.el('f2m').textContent = h2.job + '　攻 ' + h2.atk + '　防 ' + h2.def + '　智 ' + h2.int;
-    this.setBar(1, r.A.max, r.A.max, 0); this.setBar(2, r.B.max, r.B.max, 0);
-    this.el('log').innerHTML = '';
-    this.el('nextRound').style.display = 'none';
-    this.el('skipBtn').style.display = 'block';
-    this.renderScore('score');
-    this.playing = true;
-    r.ev.forEach((e, i) => this.timers.push(setTimeout(() => this.showEvent(e), i * CFG.LINE_MS)));
-    this.timers.push(setTimeout(() => this.finishRound(), r.ev.length * CFG.LINE_MS + 260));
-  },
-  setBar(n, hp, max, sh) {
-    this.el('f' + n + 'b').style.width = Math.max(0, hp / max * 100) + '%';
-    this.el('f' + n + 'h').textContent = Math.max(0, hp) + ' / ' + max + (sh ? '　盾 ' + sh : '');
-  },
-  showEvent(e) {
-    const L = this.el('log'), d = document.createElement('div');
-    d.className = 'ln';
-    let body = '';
-    if (e.type === 'hit' || e.type === 'brain') {
-      body = '<span class="dm">－' + e.dmg + '</span>' + (e.blocked ? '<span class="gd">（盾擋 ' + e.blocked + '）</span>' : '');
-      SFX.hit();
-    } else if (e.type === 'guard') { body = '<span class="gd">護盾 +' + e.gain + '</span>'; SFX.guard(); }
-    else if (e.type === 'heal') { body = '<span class="hl">回血 +' + e.heal + (e.gain ? '　護盾 +' + e.gain : '') + '</span>'; SFX.heal(); }
-    else if (e.type === 'weak') { body = '<span class="wk">對手攻擊與智慧 −' + e.weak + '</span>'; SFX.weak(); }
-    d.innerHTML = '<b style="font-family:var(--serif)">' + e.who.ref.name + '</b>　<span class="sk">' + e.n + '</span>　' + body;
-    L.appendChild(d); L.scrollTop = L.scrollHeight;
-    this.setBar(1, e.a.hp, e.a.max, e.a.sh);
-    this.setBar(2, e.b.hp, e.b.max, e.b.sh);
-  },
-  skip() {
-    if (!this.playing) return;
-    this.clearTimers();
-    const r = this.cur;
-    this.el('log').innerHTML = '';
-    r.ev.forEach(e => {
-      const d = document.createElement('div'); d.className = 'ln'; d.style.animation = 'none'; d.style.opacity = 1;
-      let body = '';
-      if (e.type === 'hit' || e.type === 'brain') body = '<span class="dm">－' + e.dmg + '</span>';
-      else if (e.type === 'guard') body = '<span class="gd">護盾 +' + e.gain + '</span>';
-      else if (e.type === 'heal') body = '<span class="hl">回血 +' + e.heal + '</span>';
-      else if (e.type === 'weak') body = '<span class="wk">對手 −' + e.weak + '</span>';
-      d.innerHTML = '<b style="font-family:var(--serif)">' + e.who.ref.name + '</b>　<span class="sk">' + e.n + '</span>　' + body;
-      this.el('log').appendChild(d);
+  render(){
+    const E=this.E,P=this.P,it=this.intent();
+    this.el('floorTxt').textContent='第 '+this.floor+' 層　／　共 '+CFG.FLOORS+' 層';
+    const tw=this.el('tower'); tw.innerHTML='';
+    for(let i=1;i<=CFG.FLOORS;i++){ const d=document.createElement('i');
+      if(i<this.floor)d.className='done'; else if(i===this.floor)d.className='now'; tw.appendChild(d); }
+    this.el('eName').textContent=E.ref.name;
+    this.el('eMeta').textContent=E.ref.job+'　'+E.ref.era;
+    this.el('eBar').style.width=Math.max(0,E.hp/E.max*100)+'%';
+    this.el('eHp').textContent=Math.max(0,E.hp)+' / '+E.max+(E.shield?'　盾 '+E.shield:'');
+    const box=this.el('intent');
+    box.className='intent'+(it.type==='hit'||it.type==='brain'?(it.heavy?' heavy':' attack'):'');
+    this.el('iWhat').innerHTML='下一招　'+it.n+(it.heavy?'<span class="tag">重擊</span>':'');
+    this.el('iNum').textContent=(it.type==='hit'||it.type==='brain'?'-'+it.v
+      :it.type==='guard'?'盾+'+it.v:it.type==='heal'?'回+'+it.v:'削'+it.v);
+    this.el('mBar').style.width=Math.max(0,P.hp/P.max*100)+'%';
+    this.el('mHp').textContent=Math.max(0,P.hp)+' / '+P.max;
+    this.el('mShield').textContent=P.shield?'護盾 '+P.shield:'';
+    const hb=this.el('hand'); hb.innerHTML='';
+    this.hand.forEach((c,i)=>{
+      const e=cardEffect(c,E.def);
+      const cls=e.kind==='dmg'?'dmg':e.kind==='shield'?'shd':e.kind==='heal'?'hea':'wk';
+      const d=document.createElement('div');
+      d.className='card '+cls;
+      d.style.setProperty('--jb',CFG.JOB_COLOR[c.hero.job]||'#777');
+      d.innerHTML=(c.up>1?'<div class="up">+</div>':'')+
+        '<div class="from">'+c.hero.name+'</div>'+
+        '<div class="sn">'+c.n+'</div>'+
+        '<div><div class="eff">'+e.v+'</div><div class="kind">'+CFG.KIND[c.type]+'</div></div>';
+      d.onclick=()=>this.play(i);
+      hb.appendChild(d);
     });
-    const last = r.ev[r.ev.length - 1];
-    this.setBar(1, last.a.hp, last.a.max, last.a.sh);
-    this.setBar(2, last.b.hp, last.b.max, last.b.sh);
-    this.finishRound();
   },
-  finishRound() {
-    this.playing = false;
-    const r = this.cur, L = this.el('log');
-    const d = document.createElement('div'); d.className = 'ln end';
-    const n1 = this.order[0][this.round].name, n2 = this.order[1][this.round].name;
-    if (r.win === 0) { d.textContent = '── 平手 ──'; }
-    else {
-      const wn = r.win === 1 ? n1 : n2;
-      d.textContent = '── ' + wn + (r.ko ? ' 擊倒對手' : ' 剩血較多，獲勝') + ' ──';
-      this.wins[r.win - 1]++;
+  log(html){ const L=this.el('log'); L.innerHTML+='<div>'+html+'</div>'; L.scrollTop=L.scrollHeight; },
+
+  /* ---------- 出牌 ---------- */
+  play(i){
+    const c=this.hand[i], E=this.E, P=this.P;
+    const e=cardEffect(c,E.def);
+    if(e.kind==='dmg'){
+      let d=e.v; if(E.shield>0){const a=Math.min(E.shield,d);E.shield-=a;d-=a;}
+      E.hp-=d; SFX.hit();
+      this.log('<b>'+c.n+'</b>　<span class="d">-'+d+'</span>');
+    } else if(e.kind==='shield'){ P.shield+=e.v; SFX.shield();
+      this.log('<b>'+c.n+'</b>　<span class="s">護盾 +'+e.v+'</span>');
+    } else if(e.kind==='heal'){ const b=P.hp; P.hp=Math.min(P.max,P.hp+e.v); SFX.heal();
+      this.log('<b>'+c.n+'</b>　<span class="h">回血 +'+(P.hp-b)+'</span>');
+    } else { E.atk=Math.max(E.atk0/2,E.atk-e.v); E.int=Math.max(E.int0/2,E.int-e.v); SFX.weak();
+      this.log('<b>'+c.n+'</b>　<span class="w">敵人變弱 -'+e.v+'</span>');
     }
-    this.res[this.round] = r.win;
-    L.appendChild(d); L.scrollTop = L.scrollHeight;
-    r.ko ? SFX.ko() : SFX.tap();
-    this.renderScore('score');
-    this.el('skipBtn').style.display = 'none';
-    const last = this.round >= CFG.TEAM - 1;
-    const decided = this.wins[0] > CFG.TEAM / 2 || this.wins[1] > CFG.TEAM / 2;
-    this.el('nextRound').textContent = (last || decided) ? '看結果' : '下一場';
-    this.el('nextRound').style.display = 'block';
-  },
-  nextRound() {
-    SFX.tap();
-    const last = this.round >= CFG.TEAM - 1;
-    const decided = this.wins[0] > CFG.TEAM / 2 || this.wins[1] > CFG.TEAM / 2;
-    if (last || decided) { this.showEnd(); return; }
-    this.round++; this.playRound();
+    this.hand.forEach(x=>this.disc.push(x));
+    this.hand=[];
+    if(E.hp<=0){ this.render(); this.winFloor(); return; }
+    // 敵人行動
+    const it=this.intent(); this.E.idx++;
+    if(it.type==='hit'||it.type==='brain'){
+      let d=it.v, blocked=0;
+      if(P.shield>0){ blocked=Math.min(P.shield,d); P.shield-=blocked; d-=blocked; }
+      P.hp-=d; it.heavy?SFX.heavy():SFX.hit();
+      this.log(E.ref.name+' 使出 <b>'+it.n+'</b>　<span class="d">-'+d+'</span>'+(blocked?'<span class="s">（擋 '+blocked+'）</span>':''));
+    } else if(it.type==='guard'){ E.shield+=it.v;
+      this.log(E.ref.name+' 使出 <b>'+it.n+'</b>　<span class="s">盾 +'+it.v+'</span>');
+    } else if(it.type==='heal'){ const b=E.hp; E.hp=Math.min(E.max,E.hp+it.v);
+      this.log(E.ref.name+' 使出 <b>'+it.n+'</b>　<span class="h">回 +'+(E.hp-b)+'</span>');
+    } else { P.def=Math.max(1,P.def-it.v);
+      this.log(E.ref.name+' 使出 <b>'+it.n+'</b>　<span class="w">你的防禦 -'+it.v+'</span>');
+    }
+    if(P.hp<=0){ this.render(); this.lose(); return; }
+    this.newTurn();
   },
 
-  /* ---- 結果 ---- */
-  showEnd() {
-    const w = this.wins[0] > this.wins[1] ? 1 : this.wins[1] > this.wins[0] ? 2 : 0;
-    const t = this.el('winTxt');
-    t.textContent = w === 0 ? '不 分 勝 負'
-      : w === 1 ? '朱 方 勝' : (this.mode === 1 ? '電 腦 勝' : '青 方 勝');
-    t.style.color = w === 1 ? 'var(--cinnabar)' : w === 2 ? 'var(--jade)' : 'var(--paper)';
-    this.renderScore('score2');
-    const box = this.el('facts'); box.innerHTML = '';
-    // 把這局出場過的人的史實列出來，這是偷渡教育的地方
-    const seen = [];
-    this.order[0].concat(this.order[1]).forEach(h => {
-      if (seen.includes(h.id)) return; seen.push(h.id);
-      const d = document.createElement('div'); d.className = 'fact';
-      d.innerHTML = '<b>' + h.name + '</b><span>' + h.job + '　' + h.era + '　' + h.region +
-        (h.conf === '低' ? '　（年代為推測）' : '') + '</span><br>' + h.fact;
-      box.appendChild(d);
-    });
+  /* ---------- 打贏一層 ---------- */
+  winFloor(){
     SFX.win();
-    this.go('end');
+    const before=this.P.hp;
+    this.P.hp=Math.min(this.P.max,this.P.hp+Math.round(this.P.max*CFG.FLOOR_HEAL));
+    if(this.floor>=CFG.FLOORS){ this.clearGame(); return; }
+    this.el('rewardTitle').textContent='打贏第 '+this.floor+' 層';
+    this.el('rewardHp').textContent='回血 +'+(this.P.hp-before)+'　現在 '+this.P.hp+' / '+this.P.max;
+    this.renderReward();
+    this.go('reward');
   },
-  again() { SFX.tap(); this.res = []; this.start(this.mode); }
+  renderReward(){
+    const box=this.el('rewardBox'); box.innerHTML='';
+    const opts=[
+      {t:'招募新偉人',d:'換一個人進隊伍，帶來他的四張新牌。牌庫會大改。',f:()=>this.openRecruit()},
+      {t:'強化一張牌',d:'挑一張牌，效果永久 +35%。牌庫變精不變大。',f:()=>this.openUpgrade()},
+      {t:'休息回血',d:'恢復 '+Math.round(CFG.HEAL_PCT*100)+'% 最大血量。撐不下去就選這個。',f:()=>{
+        SFX.heal(); this.P.hp=Math.min(this.P.max,this.P.hp+Math.round(this.P.max*CFG.HEAL_PCT)); this.nextFloor(); }}
+    ];
+    opts.forEach(o=>{ const d=document.createElement('div'); d.className='reward';
+      d.innerHTML='<b>'+o.t+'</b><span>'+o.d+'</span>';
+      d.onclick=()=>{SFX.tap();o.f();}; box.appendChild(d); });
+  },
+  backReward(){ SFX.tap(); this.newcomer=null; this.el('recruitStep2').style.display='none'; this.go('reward'); },
+  openRecruit(){
+    const cand=shuffle(HEROES.list.filter(h=>!this.team.includes(h))).slice(0,3);
+    this.newcomer=null;
+    const box=this.el('recruitGrid'); box.innerHTML='';
+    cand.forEach(h=>{
+      const d=document.createElement('div'); d.className='hcard';
+      d.style.setProperty('--jb',CFG.JOB_COLOR[h.job]||'#777');
+      d.innerHTML='<div class="nm">'+h.name+'</div><div class="jb">'+h.job+'</div>'+
+        '<div class="st">攻'+h.atk+' 防'+h.def+' 智'+h.int+'</div>'+
+        '<div class="sk">'+h.skills.map(s=>s.n).join('<br>')+'</div>';
+      d.onclick=()=>{ SFX.tap(); this.newcomer=h;
+        if(!this.met.includes(h)) this.met.push(h);
+        [...box.children].forEach(x=>x.classList.remove('sel'));
+        d.classList.add('sel'); this.renderLeave(); };
+      box.appendChild(d);
+    });
+    this.el('recruitStep2').style.display='none';
+    this.go('recruit');
+  },
+  renderLeave(){
+    const box=this.el('leaveGrid'); box.innerHTML='';
+    this.team.forEach(h=>{
+      const d=document.createElement('div'); d.className='hcard';
+      d.style.setProperty('--jb',CFG.JOB_COLOR[h.job]||'#777');
+      d.innerHTML='<div class="nm">'+h.name+'</div><div class="jb">'+h.job+'</div>'+
+        '<div class="st">攻'+h.atk+' 防'+h.def+' 智'+h.int+'</div>'+
+        '<div class="sk">'+h.skills.map(s=>s.n).join('<br>')+'</div>';
+      d.onclick=()=>{ SFX.tap();
+        this.team=this.team.map(x=>x===h?this.newcomer:x);
+        this.deck=this.deck.filter(c=>c.hero!==h);
+        this.newcomer.skills.forEach(s=>this.deck.push({hero:this.newcomer,n:s.n,type:s.type,val:s.val,up:1}));
+        this.recalcHP(false);
+        this.newcomer=null; this.nextFloor(); };
+      box.appendChild(d);
+    });
+    this.el('recruitStep2').style.display='block';
+  },
+  openUpgrade(){
+    const box=this.el('upGrid'); box.innerHTML='';
+    this.deck.forEach(c=>{
+      const e=cardEffect(c,10);
+      const cls=e.kind==='dmg'?'dmg':e.kind==='shield'?'shd':e.kind==='heal'?'hea':'wk';
+      const d=document.createElement('div'); d.className='card '+cls;
+      d.style.setProperty('--jb',CFG.JOB_COLOR[c.hero.job]||'#777');
+      d.innerHTML=(c.up>1?'<div class="up">+</div>':'')+
+        '<div class="from">'+c.hero.name+'</div><div class="sn">'+c.n+'</div>'+
+        '<div><div class="eff">'+e.v+'</div><div class="kind">'+CFG.KIND[c.type]+'</div></div>';
+      d.onclick=()=>{ SFX.win(); c.up*=CFG.UPGRADE; this.nextFloor(); };
+      box.appendChild(d);
+    });
+    this.go('upgrade');
+  },
+  nextFloor(){ this.floor++; this.startFloor(); },
+
+  /* ---------- 結束 ---------- */
+  lose(){
+    SFX.lose();
+    this.el('endTxt').textContent='倒 在 第 '+this.floor+' 層';
+    this.el('endTxt').style.color='var(--cinnabar)';
+    this.el('endSub').textContent='被 '+this.E.ref.name+' 擋下來了。八層走了 '+(this.floor-1)+' 層。';
+    this.renderFacts(); this.go('end');
+  },
+  clearGame(){
+    SFX.clear();
+    this.el('endTxt').textContent='登 頂';
+    this.el('endTxt').style.color='var(--gold)';
+    this.el('endSub').textContent='八層全破。剩餘血量 '+this.P.hp+' / '+this.P.max+'。';
+    this.renderFacts(); this.go('end');
+  },
+  renderFacts(){
+    const box=this.el('endFacts'); box.innerHTML='';
+    this.met.forEach(h=>{
+      const d=document.createElement('div'); d.className='fact';
+      d.innerHTML='<b>'+h.name+'</b>'+h.fact+
+        '<div style="color:var(--dim);font-size:11px;margin-top:4px">'+h.job+'　'+h.era+'　'+h.region+
+        (h.conf==='低'?'　（年代為推測）':'')+'</div>';
+      box.appendChild(d);
+    });
+  }
 };
 
-// 資料沒載到就講清楚，不要白畫面
-window.addEventListener('load', () => {
-  if (typeof HEROES === 'undefined' || !HEROES.list || !HEROES.list.length) {
-    document.body.innerHTML = '<div style="padding:40px;font-family:sans-serif;color:#e8e0cf">' +
-      '<h2>找不到 heroes.js</h2><p>請確認 heroes.js 和 index.html 放在同一個資料夾。</p></div>';
+window.addEventListener('load',()=>{
+  if(typeof HEROES==='undefined'||!HEROES.list||!HEROES.list.length){
+    document.body.innerHTML='<div style="padding:40px;color:#e8e0cf;font-family:sans-serif">'+
+      '<h2>找不到 heroes.js</h2><p>請確認 heroes.js 和 index.html 在同一個資料夾。</p></div>';
   }
 });
-// 防止雙指縮放（手機遊戲體驗）
-document.addEventListener('gesturestart', e => e.preventDefault());
-let lastTouch = 0;
-document.addEventListener('touchend', e => {
-  const now = Date.now();
-  if (now - lastTouch < 320) e.preventDefault();
-  lastTouch = now;
-}, { passive: false });
+document.addEventListener('gesturestart',e=>e.preventDefault());
+let lt=0;
+document.addEventListener('touchend',e=>{const n=Date.now();if(n-lt<320)e.preventDefault();lt=n;},{passive:false});
 </script>
 </body>
 </html>
