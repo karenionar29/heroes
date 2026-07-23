@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="千古亂鬥">
+<meta name="theme-color" content="#12151c">
+<meta name="description" content="張飛打岳飛。徵召歷史上真實存在的偉人，排出出場順序，三場定勝負。">
+<title>千古亂鬥</title>
+<style>
+/* ============================================================
+   設計方向：竹簡與朱印
+   底色是拓本的墨黑，卡片是泛黃的宣紙，
+   朱砂紅代表玩家一、青玉綠代表玩家二，金色只留給羈絆。
+   ============================================================ */
+:root{
+  --ink:#12151c;        /* 墨：整體底色 */
+  --slate:#1d222d;      /* 硯：面板 */
+  --line:#2c3342;       /* 界線 */
+  --paper:#e8e0cf;      /* 宣：卡片紙色 */
+  --paper-2:#d6cbb2;    /* 宣紙暗部 */
+  --cinnabar:#b5342b;   /* 朱砂：玩家一 */
+  --jade:#2f8f74;       /* 青玉：玩家二 */
+  --gold:#c9a227;       /* 金：羈絆與強調 */
+  --dim:#8b93a4;        /* 次要文字 */
+  --serif:"Noto Serif TC","Songti TC","Source Han Serif TC","STSong",serif;
+  --sans:-apple-system,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;height:100%}
+body{
+  background:var(--ink);color:var(--paper);font-family:var(--sans);
+  /* 拓本的紋理：兩層很淡的斜線，不用圖檔 */
+  background-image:
+    repeating-linear-gradient(115deg,rgba(255,255,255,.014) 0 2px,transparent 2px 7px),
+    radial-gradient(120% 80% at 50% 0%,rgba(201,162,39,.06),transparent 60%);
+  overscroll-behavior:none;-webkit-user-select:none;user-select:none;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+.wrap{max-width:520px;margin:0 auto;padding:14px 14px 28px;min-height:100%}
+.screen{display:none}
+.screen.on{display:block;animation:fade .28s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ---------- 標題 ---------- */
+h1.logo{
+  font-family:var(--serif);font-size:clamp(38px,13vw,62px);letter-spacing:.22em;
+  text-align:center;margin:34px 0 6px;font-weight:600;
+  color:var(--paper);text-indent:.22em;
+}
+.sub{text-align:center;color:var(--dim);font-size:13px;letter-spacing:.18em;margin-bottom:6px}
+.tagline{text-align:center;font-family:var(--serif);color:var(--gold);font-size:15px;letter-spacing:.1em;margin:18px 0 26px}
+.rule{height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent);margin:16px 0}
+
+/* ---------- 按鈕 ---------- */
+.btn{
+  display:block;width:100%;padding:16px;margin:10px 0;border:1px solid var(--line);
+  background:var(--slate);color:var(--paper);font-family:var(--serif);font-size:18px;
+  letter-spacing:.14em;border-radius:3px;cursor:pointer;transition:.15s;
+}
+.btn:active{transform:scale(.985)}
+.btn.main{background:var(--cinnabar);border-color:#8f2820;color:#fff4ec}
+.btn.go{background:var(--gold);border-color:#9c7d1c;color:#20180a;font-weight:700}
+.btn:disabled{opacity:.35}
+.btn small{display:block;font-family:var(--sans);font-size:12px;letter-spacing:.02em;color:var(--dim);margin-top:4px}
+.btn.main small,.btn.go small{color:rgba(255,255,255,.7)}
+.btn.go small{color:rgba(32,24,10,.65)}
+
+/* ---------- 進度條 ---------- */
+.steps{display:flex;gap:6px;justify-content:center;margin:10px 0 16px}
+.steps i{width:26px;height:2px;background:var(--line);display:block}
+.steps i.on{background:var(--gold)}
+
+/* ---------- 竹簡卡 ---------- */
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.slip{
+  position:relative;background:var(--paper);color:#211d15;border-radius:2px;
+  padding:6px 4px 5px;text-align:center;cursor:pointer;overflow:hidden;
+  border:1px solid var(--paper-2);transition:.15s;
+}
+.slip:before{content:"";position:absolute;left:0;right:0;top:0;height:4px;background:var(--jb,#777)}
+.slip.gone{opacity:.16;pointer-events:none;filter:grayscale(1)}
+.slip.p1{outline:2px solid var(--cinnabar);outline-offset:1px}
+.slip.p2{outline:2px solid var(--jade);outline-offset:1px}
+.slip .nm{font-family:var(--serif);font-size:14px;font-weight:600;line-height:1.15;margin:5px 0 3px;letter-spacing:.02em}
+.slip .jb{font-size:10px;color:#6a6252;letter-spacing:.08em}
+.slip .rg{font-size:9px;color:#8a8271;margin-top:2px}
+.slip .st{display:flex;justify-content:center;gap:5px;font-size:10px;margin-top:4px;color:#3d372c;font-variant-numeric:tabular-nums}
+.slip .st b{font-weight:700}
+.slip .era{font-size:8.5px;color:#948b78;margin-top:3px;letter-spacing:.02em}
+.seal{position:absolute;top:7px;right:4px;width:15px;height:15px;border:1px solid var(--cinnabar);
+  color:var(--cinnabar);font-size:8px;line-height:13px;border-radius:2px;opacity:.75}
+
+/* ---------- 隊伍列 ---------- */
+.team{display:flex;gap:6px;margin:8px 0}
+.team .slot{flex:1;border:1px dashed var(--line);border-radius:2px;min-height:46px;
+  display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--dim);
+  font-family:var(--serif);letter-spacing:.06em;padding:4px;text-align:center}
+.team .slot.full{border-style:solid;background:var(--slate)}
+.lbl{font-size:12px;letter-spacing:.14em;margin:14px 0 4px;font-family:var(--serif)}
+.lbl.c1{color:var(--cinnabar)}.lbl.c2{color:var(--jade)}
+.bond{font-size:12px;color:var(--gold);min-height:17px;letter-spacing:.04em;margin-top:3px}
+
+/* ---------- 排陣 ---------- */
+.order-card{display:flex;align-items:center;gap:11px;background:var(--slate);
+  border:1px solid var(--line);border-radius:3px;padding:11px;margin:9px 0;cursor:pointer}
+.order-card .num{width:29px;height:29px;flex:none;border-radius:50%;border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:14px;color:var(--dim)}
+.order-card.picked .num{background:var(--gold);color:#20180a;border-color:var(--gold);font-weight:700}
+.order-card .info{flex:1;min-width:0}
+.order-card .info b{font-family:var(--serif);font-size:16px;letter-spacing:.04em}
+.order-card .info span{display:block;font-size:11px;color:var(--dim);margin-top:2px}
+
+/* ---------- 交接畫面 ---------- */
+.pass{text-align:center;padding:64px 10px}
+.pass .big{font-family:var(--serif);font-size:30px;letter-spacing:.16em;margin-bottom:10px}
+.pass .note{color:var(--dim);font-size:13px;line-height:1.9}
+
+/* ---------- 戰報 ---------- */
+.bar{height:9px;background:#0c0f15;border:1px solid var(--line);border-radius:2px;overflow:hidden;margin-top:5px}
+.bar i{display:block;height:100%;transition:width .4s ease}
+.fighter{display:flex;justify-content:space-between;gap:12px;margin-bottom:12px}
+.fighter>div{flex:1;min-width:0}
+.fighter .nm{font-family:var(--serif);font-size:17px;letter-spacing:.04em}
+.fighter .meta{font-size:11px;color:var(--dim);margin-top:2px}
+.fighter .hpn{font-size:11px;color:var(--dim);margin-top:3px;font-variant-numeric:tabular-nums}
+.log{background:#0d1016;border:1px solid var(--line);border-radius:3px;padding:11px;
+  min-height:196px;max-height:44vh;overflow-y:auto;font-size:13.5px;line-height:1.65}
+.log .ln{opacity:0;animation:slip .3s forwards;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+@keyframes slip{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:none}}
+.log .sk{font-family:var(--serif);color:var(--gold);letter-spacing:.04em}
+.log .dm{color:#e07a6d;font-variant-numeric:tabular-nums}
+.log .hl{color:#7fd0a8}
+.log .gd{color:#8fb4e8}
+.log .wk{color:#c9a0d8}
+.log .end{font-family:var(--serif);color:var(--paper);letter-spacing:.1em;padding-top:6px}
+.round-tag{text-align:center;font-family:var(--serif);letter-spacing:.3em;color:var(--dim);font-size:12px;margin:2px 0 12px}
+.score{display:flex;justify-content:center;gap:9px;margin:12px 0 4px}
+.score i{width:11px;height:11px;border:1px solid var(--line);border-radius:50%;display:block}
+.score i.w1{background:var(--cinnabar);border-color:var(--cinnabar)}
+.score i.w2{background:var(--jade);border-color:var(--jade)}
+
+/* ---------- 結果 ---------- */
+.winner{text-align:center;font-family:var(--serif);font-size:34px;letter-spacing:.2em;margin:26px 0 4px}
+.fact{background:var(--slate);border-left:3px solid var(--gold);padding:11px 13px;margin:9px 0;
+  font-size:13px;line-height:1.75;border-radius:0 3px 3px 0}
+.fact b{font-family:var(--serif);font-size:15px;letter-spacing:.06em;display:block;margin-bottom:3px}
+.fact span{color:var(--dim);font-size:11px}
+.hint{color:var(--dim);font-size:12.5px;line-height:1.85;margin:12px 0}
+.topbar{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--dim);letter-spacing:.1em}
+.topbar button{background:none;border:none;color:var(--dim);font-size:12px;padding:6px 0;cursor:pointer;letter-spacing:.1em}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ══════════ 標題 ══════════ -->
+<section id="s-title" class="screen on">
+  <h1 class="logo">千古亂鬥</h1>
+  <div class="sub">張 飛 打 岳 飛</div>
+  <div class="rule"></div>
+  <p class="tagline">二十四位史上真有其人的偉人，<br>跨越四千年，在這裡打一架。</p>
+  <button class="btn main" onclick="G.start(2)">兩人對戰<small>同一台手機輪流操作</small></button>
+  <button class="btn" onclick="G.start(1)">一個人打電腦<small>電腦會跟你搶人</small></button>
+  <button class="btn" onclick="G.showRule()">怎麼玩<small>三十秒看懂</small></button>
+  <p class="hint" style="text-align:center;margin-top:22px">
+    收錄標準：史書有記載、留下的東西讓後人受益。<br>侵略者、屠殺者、神話人物一律不收。
+  </p>
+</section>
+
+<!-- ══════════ 規則 ══════════ -->
+<section id="s-rule" class="screen">
+  <div class="topbar"><span>怎麼玩</span><button onclick="G.go('title')">返回</button></div>
+  <div class="rule"></div>
+  <p class="hint">
+    <b style="color:var(--gold);font-family:var(--serif);font-size:15px">一　徵召</b><br>
+    翻出八個人，兩邊輪流挑，各挑三個。你想要的對方也想要，先搶還是先卡他，自己決定。
+  </p>
+  <p class="hint">
+    <b style="color:var(--gold);font-family:var(--serif);font-size:15px">二　排陣</b><br>
+    偷偷決定三個人的出場順序，同時揭曉。最強的擺第一碾壓？還是擺第三收尾？這是猜心。
+  </p>
+  <p class="hint">
+    <b style="color:var(--gold);font-family:var(--serif);font-size:15px">三　開打</b><br>
+    一對一打三場，各出四招，剩血多的贏。兩勝就是贏家。你不用操作，看戰報就好。
+  </p>
+  <div class="rule"></div>
+  <p class="hint">
+    <b style="color:var(--gold);font-family:var(--serif);font-size:15px">兩件事要想</b><br>
+    挑人的時候：這個我要，還是先卡住對方想要的？<br>
+    排陣的時候：對方會把最強的擺哪一場？
+  </p>
+  <button class="btn main" onclick="G.go('title')">知道了</button>
+</section>
+
+<!-- ══════════ 徵召 ══════════ -->
+<section id="s-draft" class="screen">
+  <div class="topbar"><span id="draftTurn">徵召</span><button onclick="G.quit()">重來</button></div>
+  <div class="steps"><i class="on"></i><i></i><i></i></div>
+  <div class="grid" id="pool"></div>
+  <div class="lbl c1">朱方　玩家一</div>
+  <div class="team" id="t1"></div>
+  <div class="lbl c2" id="lbl2">青方　玩家二</div>
+  <div class="team" id="t2"></div>
+  <button class="btn go" id="draftNext" style="display:none" onclick="G.toOrder()">徵召完畢，去排陣</button>
+</section>
+
+<!-- ══════════ 交接 ══════════ -->
+<section id="s-pass" class="screen">
+  <div class="pass">
+    <div class="big" id="passTo">交給玩家二</div>
+    <p class="note" id="passNote">把手機轉過去，<br>不要偷看對方排的順序。</p>
+    <div class="rule"></div>
+    <button class="btn main" id="passBtn" onclick="G.passDone()">我準備好了</button>
+  </div>
+</section>
+
+<!-- ══════════ 排陣 ══════════ -->
+<section id="s-order" class="screen">
+  <div class="topbar"><span id="orderWho">排陣</span><button onclick="G.quit()">重來</button></div>
+  <div class="steps"><i class="on"></i><i class="on"></i><i></i></div>
+  <p class="hint" style="margin:12px 0 4px">照你要的<b style="color:var(--gold)">出場順序</b>點下去。第一個點的先上場。</p>
+  <div id="orderList"></div>
+  <button class="btn go" id="orderNext" style="display:none" onclick="G.orderDone()">排好了</button>
+</section>
+
+<!-- ══════════ 開打 ══════════ -->
+<section id="s-battle" class="screen">
+  <div class="topbar"><span id="battleTitle">開打</span><button onclick="G.quit()">重來</button></div>
+  <div class="steps"><i class="on"></i><i class="on"></i><i class="on"></i></div>
+  <div class="score" id="score"></div>
+  <div class="round-tag" id="roundTag">第 一 場</div>
+  <div class="fighter">
+    <div>
+      <div class="nm" id="f1n">—</div><div class="meta" id="f1m"></div>
+      <div class="bar"><i id="f1b" style="width:100%;background:var(--cinnabar)"></i></div>
+      <div class="hpn" id="f1h"></div>
+    </div>
+    <div style="text-align:right">
+      <div class="nm" id="f2n">—</div><div class="meta" id="f2m"></div>
+      <div class="bar"><i id="f2b" style="width:100%;background:var(--jade);margin-left:auto"></i></div>
+      <div class="hpn" id="f2h"></div>
+    </div>
+  </div>
+  <div class="log" id="log"></div>
+  <button class="btn" id="skipBtn" onclick="G.skip()">跳過動畫</button>
+  <button class="btn go" id="nextRound" style="display:none" onclick="G.nextRound()">下一場</button>
+</section>
+
+<!-- ══════════ 結果 ══════════ -->
+<section id="s-end" class="screen">
+  <div class="winner" id="winTxt">—</div>
+  <div class="score" id="score2" style="margin-bottom:18px"></div>
+  <div class="rule"></div>
+  <p class="hint" style="text-align:center;letter-spacing:.1em;color:var(--gold);font-family:var(--serif)">今天你認識了誰</p>
+  <div id="facts"></div>
+  <button class="btn main" onclick="G.again()">再來一局</button>
+  <button class="btn" onclick="G.go('title')">回到首頁</button>
+</section>
+
+</div>
+
+<script src="heroes.js?v=1"></script>
+<script>
+/* ============================================================
+   千古亂鬥　遊戲邏輯
+   所有可調的常數都集中在 CFG，改數值不用翻程式碼
+   ============================================================ */
+const CFG = {
+  POOL: 8,          // 徵召時翻出幾張
+  TEAM: 3,          // 每邊幾個人
+  SKILLS: 4,        // 每人出幾招
+  HP_BASE: 18,      // 基礎血量
+  HP_PER_DEF: 3,    // 每點防禦加多少血
+  HIT_K: 1.5,       // 普通攻擊係數
+  BRAIN_K: 1.25,    // 智慧攻擊係數
+  DEF_CUT: 2,       // 傷害減免 = 防禦 / 這個數
+  OVERHEAL: 0.5,    // 治療溢出轉護盾的比例
+  MIN_DMG: 3,       // 傷害最低值
+  LINE_MS: 620,     // 戰報一行間隔（毫秒）
+  // 徵召順序：0=玩家一 1=玩家二（蛇形，先挑的不會通吃）
+  DRAFT_SEQ: [0, 1, 1, 0, 0, 1],
+  JOB_COLOR: {
+    '武將': '#b5342b', '軍師': '#5b7fb5', '君王': '#8a6d3b', '科學家': '#2f8f74',
+    '醫者': '#3f9aa8', '航海家': '#4a6fa5', '文人': '#8e5ba6', '工匠': '#8a7b4a'
+  }
+};
+
+/* ---------- 音效：Web Audio 現場合成，零音檔 ---------- */
+const SFX = (() => {
+  let ac = null;
+  const ok = () => { try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); if (ac.state === 'suspended') ac.resume(); return true; } catch (e) { return false; } };
+  function tone(f, d, type, vol) {
+    if (!ok()) return;
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.type = type || 'sine'; o.frequency.value = f;
+    g.gain.setValueAtTime(0, ac.currentTime);
+    g.gain.linearRampToValueAtTime(vol || .16, ac.currentTime + .01);
+    g.gain.exponentialRampToValueAtTime(.0001, ac.currentTime + d);
+    o.connect(g); g.connect(ac.destination); o.start(); o.stop(ac.currentTime + d);
+  }
+  return {
+    tap:  () => tone(520, .07, 'triangle', .1),
+    pick: () => { tone(660, .1, 'triangle', .13); setTimeout(() => tone(880, .12, 'triangle', .1), 70); },
+    hit:  () => { tone(150, .13, 'square', .1); setTimeout(() => tone(90, .16, 'sawtooth', .08), 40); },
+    heal: () => { tone(520, .12, 'sine', .1); setTimeout(() => tone(780, .16, 'sine', .09), 80); },
+    guard:() => tone(300, .2, 'sine', .1),
+    weak: () => tone(210, .22, 'sawtooth', .07),
+    ko:   () => { [420, 330, 260, 180].forEach((f, i) => setTimeout(() => tone(f, .2, 'square', .11), i * 90)); },
+    win:  () => { [523, 659, 784, 1046].forEach((f, i) => setTimeout(() => tone(f, .28, 'triangle', .13), i * 120)); }
+  };
+})();
+
+/* ---------- 戰鬥核心（跟無頭驗證用的完全同一套算式）---------- */
+function makeUnit(h, bonus) {
+  const def = h.def + (bonus.def || 0);
+  const hp = CFG.HP_BASE + def * CFG.HP_PER_DEF;
+  return {
+    ref: h, hp, max: hp, shield: 0, idx: 0, def,
+    atk: h.atk + (bonus.atk || 0), int: h.int + (bonus.int || 0),
+    atk0: h.atk + (bonus.atk || 0), int0: h.int + (bonus.int || 0)
+  };
+}
+function doSkill(a, b) {
+  const s = a.ref.skills[a.idx]; a.idx++;
+  const out = { n: s.n, type: s.type, who: a };
+  if (s.type === 'hit' || s.type === 'brain') {
+    const base = s.type === 'hit' ? a.atk * CFG.HIT_K : a.int * CFG.BRAIN_K;
+    let d = Math.max(CFG.MIN_DMG, Math.round(base * s.val) - Math.floor(b.def / CFG.DEF_CUT));
+    let blocked = 0;
+    if (b.shield > 0) { blocked = Math.min(b.shield, d); b.shield -= blocked; d -= blocked; }
+    b.hp -= d; out.dmg = d; out.blocked = blocked;
+  } else if (s.type === 'guard') {
+    a.shield += s.val; out.gain = s.val;
+  } else if (s.type === 'heal') {
+    const room = a.max - a.hp, real = Math.min(room, s.val), over = s.val - real;
+    a.hp += real; const sh = Math.round(over * CFG.OVERHEAL); a.shield += sh;
+    out.heal = real; out.gain = sh;
+  } else if (s.type === 'weak') {
+    a.__v = s.val;
+    b.atk = Math.max(Math.ceil(b.atk0 / 2), b.atk - s.val);
+    b.int = Math.max(Math.ceil(b.int0 / 2), b.int - s.val);
+    out.weak = s.val;
+  }
+  return out;
+}
+// 打完一場，回傳整串事件（先算完再播，動畫和邏輯分離）
+function runDuel(h1, h2, bon1, bon2) {
+  const A = makeUnit(h1, bon1), B = makeUnit(h2, bon2);
+  A.side = 1; B.side = 2;
+  // 先手＝攻擊高者（出手快），平手比智慧，再平手用代號固定
+  let first = A, second = B;
+  if (B.atk > A.atk || (B.atk === A.atk && B.int > A.int) ||
+      (B.atk === A.atk && B.int === A.int && B.ref.id < A.ref.id)) { first = B; second = A; }
+  const ev = [];
+  let ko = null;
+  outer:
+  for (let t = 0; t < CFG.SKILLS; t++) {
+    for (const [x, y] of [[first, second], [second, first]]) {
+      const e = doSkill(x, y);
+      e.a = { hp: Math.max(0, A.hp), max: A.max, sh: A.shield };
+      e.b = { hp: Math.max(0, B.hp), max: B.max, sh: B.shield };
+      ev.push(e);
+      if (y.hp <= 0) { ko = x.side; break outer; }
+    }
+  }
+  const ra = (A.hp + A.shield) / A.max, rb = (B.hp + B.shield) / B.max;
+  const win = ko !== null ? ko : (Math.abs(ra - rb) < 1e-9 ? 0 : (ra > rb ? 1 : 2));
+  return { ev, win, ko: ko !== null, A, B, ra, rb };
+}
+
+
+/* ---------- 遊戲流程 ---------- */
+const G = {
+  mode: 2, pool: [], team: [[], []], order: [[], []],
+  step: 0, round: 0, wins: [0, 0], timers: [], playing: false, pendingSide: 0,
+
+  el(id) { return document.getElementById(id); },
+  go(name) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('on'));
+    this.el('s-' + name).classList.add('on');
+    window.scrollTo(0, 0);
+  },
+  showRule() { SFX.tap(); this.go('rule'); },
+  quit() { this.clearTimers(); this.go('title'); },
+  clearTimers() { this.timers.forEach(clearTimeout); this.timers = []; },
+
+  start(mode) {
+    SFX.tap();
+    this.mode = mode; this.team = [[], []]; this.order = [[], []];
+    this.step = 0; this.round = 0; this.wins = [0, 0];
+    // 從 24 人裡隨機翻出 8 個
+    const all = HEROES.list.slice();
+    for (let i = all.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0;[all[i], all[j]] = [all[j], all[i]]; }
+    this.pool = all.slice(0, CFG.POOL);
+    this.el('lbl2').textContent = mode === 1 ? '青方　電腦' : '青方　玩家二';
+    this.go('draft'); this.renderDraft();
+  },
+
+  /* ---- 徵召 ---- */
+  renderDraft() {
+    const side = CFG.DRAFT_SEQ[this.step];
+    const done = this.step >= CFG.DRAFT_SEQ.length;
+    this.el('draftTurn').textContent = done ? '徵召完畢'
+      : (side === 0 ? '輪到　玩家一' : (this.mode === 1 ? '電腦思考中…' : '輪到　玩家二'));
+    const pool = this.el('pool'); pool.innerHTML = '';
+    this.pool.forEach((h, i) => {
+      const owner = this.team[0].includes(h) ? 1 : this.team[1].includes(h) ? 2 : 0;
+      const d = document.createElement('div');
+      d.className = 'slip' + (owner ? ' gone p' + owner : '');
+      d.style.setProperty('--jb', CFG.JOB_COLOR[h.job] || '#777');
+      d.innerHTML =
+        '<div class="seal">' + h.region[0] + '</div>' +
+        '<div class="nm">' + h.name + '</div>' +
+        '<div class="jb">' + h.job + '</div>' +
+        '<div class="st"><b>攻</b>' + h.atk + ' <b>防</b>' + h.def + ' <b>智</b>' + h.int + '</div>' +
+        '<div class="era">' + h.era + '</div>';
+      if (!owner && !done && !(this.mode === 1 && side === 1)) d.onclick = () => this.pick(i);
+      pool.appendChild(d);
+    });
+    [0, 1].forEach(s => {
+      const box = this.el('t' + (s + 1)); box.innerHTML = '';
+      for (let i = 0; i < CFG.TEAM; i++) {
+        const h = this.team[s][i], d = document.createElement('div');
+        d.className = 'slot' + (h ? ' full' : '');
+        d.textContent = h ? h.name : '—';
+        box.appendChild(d);
+      }
+    });
+    this.el('draftNext').style.display = done ? 'block' : 'none';
+    // 電腦回合：稍等一下再挑，讓人看得到
+    if (!done && this.mode === 1 && side === 1) {
+      this.timers.push(setTimeout(() => this.aiPick(), 750));
+    }
+  },
+  pick(i) {
+    const side = CFG.DRAFT_SEQ[this.step];
+    const h = this.pool[i];
+    if (this.team[0].includes(h) || this.team[1].includes(h)) return;
+    SFX.pick();
+    this.team[side].push(h); this.step++;
+    this.renderDraft();
+  },
+  aiPick() {
+    const free = this.pool.filter(h => !this.team[0].includes(h) && !this.team[1].includes(h));
+    if (!free.length) return;
+    // 電腦的挑人邏輯：總值高的優先，並且會避開自己隊上已經有的職業（湊出剋制面）
+    let best = free[0], bestScore = -1e9;
+    const mine = this.team[1].map(x => x.job);
+    free.forEach(h => {
+      let sc = h.atk + h.def + h.int + Math.random() * 2;
+      if (!mine.includes(h.job)) sc += 1.2;   // 職業分散一點，比較不會被同一招打死
+      if (sc > bestScore) { bestScore = sc; best = h; }
+    });
+    this.pick(this.pool.indexOf(best));
+  },
+
+  /* ---- 排陣 ---- */
+  toOrder() {
+    SFX.tap();
+    this.order = [[], []];
+    if (this.mode === 1) {
+      // 電腦排陣：隨機，人才猜不到
+      const t = this.team[1].slice();
+      for (let i = t.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0;[t[i], t[j]] = [t[j], t[i]]; }
+      this.order[1] = t;
+      this.pendingSide = 0; this.renderOrder();
+    } else {
+      this.pendingSide = 0; this.showPass(0);
+    }
+  },
+  showPass(side) {
+    this.pendingSide = side;
+    this.el('passTo').textContent = side === 0 ? '交給玩家一' : '交給玩家二';
+    this.el('passNote').innerHTML = '把手機轉過去，<br>不要偷看對方排的順序。';
+    this.go('pass');
+  },
+  passDone() { SFX.tap(); this.renderOrder(); },
+  renderOrder() {
+    const side = this.pendingSide;
+    this.el('orderWho').textContent = (side === 0 ? '朱方　玩家一' : '青方　玩家二') + '　排陣';
+    const box = this.el('orderList'); box.innerHTML = '';
+    this.team[side].forEach(h => {
+      const pos = this.order[side].indexOf(h);
+      const d = document.createElement('div');
+      d.className = 'order-card' + (pos >= 0 ? ' picked' : '');
+      d.innerHTML = '<div class="num">' + (pos >= 0 ? pos + 1 : '·') + '</div>' +
+        '<div class="info"><b>' + h.name + '</b><span>' + h.job + '　攻 ' + h.atk + '　防 ' + h.def + '　智 ' + h.int + '</span></div>';
+      d.onclick = () => {
+        if (this.order[side].includes(h)) return;
+        SFX.tap(); this.order[side].push(h); this.renderOrder();
+      };
+      box.appendChild(d);
+    });
+    this.el('orderNext').style.display = this.order[side].length === CFG.TEAM ? 'block' : 'none';
+    this.go('order');
+  },
+  orderDone() {
+    SFX.tap();
+    if (this.mode === 2 && this.pendingSide === 0) { this.showPass(1); return; }
+    this.round = 0; this.wins = [0, 0];
+    this.go('battle'); this.playRound();
+  },
+
+  /* ---- 開打 ---- */
+  renderScore(id) {
+    const box = this.el(id); box.innerHTML = '';
+    for (let i = 0; i < CFG.TEAM; i++) {
+      const d = document.createElement('i');
+      if (this.res && this.res[i]) d.className = 'w' + this.res[i];
+      box.appendChild(d);
+    }
+  },
+  playRound() {
+    this.clearTimers();
+    this.res = this.res || [];
+    const h1 = this.order[0][this.round], h2 = this.order[1][this.round];
+    const NB = { atk: 0, def: 0 };
+    const r = runDuel(h1, h2, NB, NB);
+    this.cur = r;
+    this.el('roundTag').textContent = ['第 一 場', '第 二 場', '第 三 場'][this.round];
+    this.el('f1n').textContent = h1.name; this.el('f2n').textContent = h2.name;
+    this.el('f1m').textContent = h1.job + '　攻 ' + h1.atk + '　防 ' + h1.def + '　智 ' + h1.int;
+    this.el('f2m').textContent = h2.job + '　攻 ' + h2.atk + '　防 ' + h2.def + '　智 ' + h2.int;
+    this.setBar(1, r.A.max, r.A.max, 0); this.setBar(2, r.B.max, r.B.max, 0);
+    this.el('log').innerHTML = '';
+    this.el('nextRound').style.display = 'none';
+    this.el('skipBtn').style.display = 'block';
+    this.renderScore('score');
+    this.playing = true;
+    r.ev.forEach((e, i) => this.timers.push(setTimeout(() => this.showEvent(e), i * CFG.LINE_MS)));
+    this.timers.push(setTimeout(() => this.finishRound(), r.ev.length * CFG.LINE_MS + 260));
+  },
+  setBar(n, hp, max, sh) {
+    this.el('f' + n + 'b').style.width = Math.max(0, hp / max * 100) + '%';
+    this.el('f' + n + 'h').textContent = Math.max(0, hp) + ' / ' + max + (sh ? '　盾 ' + sh : '');
+  },
+  showEvent(e) {
+    const L = this.el('log'), d = document.createElement('div');
+    d.className = 'ln';
+    let body = '';
+    if (e.type === 'hit' || e.type === 'brain') {
+      body = '<span class="dm">－' + e.dmg + '</span>' + (e.blocked ? '<span class="gd">（盾擋 ' + e.blocked + '）</span>' : '');
+      SFX.hit();
+    } else if (e.type === 'guard') { body = '<span class="gd">護盾 +' + e.gain + '</span>'; SFX.guard(); }
+    else if (e.type === 'heal') { body = '<span class="hl">回血 +' + e.heal + (e.gain ? '　護盾 +' + e.gain : '') + '</span>'; SFX.heal(); }
+    else if (e.type === 'weak') { body = '<span class="wk">對手攻擊與智慧 −' + e.weak + '</span>'; SFX.weak(); }
+    d.innerHTML = '<b style="font-family:var(--serif)">' + e.who.ref.name + '</b>　<span class="sk">' + e.n + '</span>　' + body;
+    L.appendChild(d); L.scrollTop = L.scrollHeight;
+    this.setBar(1, e.a.hp, e.a.max, e.a.sh);
+    this.setBar(2, e.b.hp, e.b.max, e.b.sh);
+  },
+  skip() {
+    if (!this.playing) return;
+    this.clearTimers();
+    const r = this.cur;
+    this.el('log').innerHTML = '';
+    r.ev.forEach(e => {
+      const d = document.createElement('div'); d.className = 'ln'; d.style.animation = 'none'; d.style.opacity = 1;
+      let body = '';
+      if (e.type === 'hit' || e.type === 'brain') body = '<span class="dm">－' + e.dmg + '</span>';
+      else if (e.type === 'guard') body = '<span class="gd">護盾 +' + e.gain + '</span>';
+      else if (e.type === 'heal') body = '<span class="hl">回血 +' + e.heal + '</span>';
+      else if (e.type === 'weak') body = '<span class="wk">對手 −' + e.weak + '</span>';
+      d.innerHTML = '<b style="font-family:var(--serif)">' + e.who.ref.name + '</b>　<span class="sk">' + e.n + '</span>　' + body;
+      this.el('log').appendChild(d);
+    });
+    const last = r.ev[r.ev.length - 1];
+    this.setBar(1, last.a.hp, last.a.max, last.a.sh);
+    this.setBar(2, last.b.hp, last.b.max, last.b.sh);
+    this.finishRound();
+  },
+  finishRound() {
+    this.playing = false;
+    const r = this.cur, L = this.el('log');
+    const d = document.createElement('div'); d.className = 'ln end';
+    const n1 = this.order[0][this.round].name, n2 = this.order[1][this.round].name;
+    if (r.win === 0) { d.textContent = '── 平手 ──'; }
+    else {
+      const wn = r.win === 1 ? n1 : n2;
+      d.textContent = '── ' + wn + (r.ko ? ' 擊倒對手' : ' 剩血較多，獲勝') + ' ──';
+      this.wins[r.win - 1]++;
+    }
+    this.res[this.round] = r.win;
+    L.appendChild(d); L.scrollTop = L.scrollHeight;
+    r.ko ? SFX.ko() : SFX.tap();
+    this.renderScore('score');
+    this.el('skipBtn').style.display = 'none';
+    const last = this.round >= CFG.TEAM - 1;
+    const decided = this.wins[0] > CFG.TEAM / 2 || this.wins[1] > CFG.TEAM / 2;
+    this.el('nextRound').textContent = (last || decided) ? '看結果' : '下一場';
+    this.el('nextRound').style.display = 'block';
+  },
+  nextRound() {
+    SFX.tap();
+    const last = this.round >= CFG.TEAM - 1;
+    const decided = this.wins[0] > CFG.TEAM / 2 || this.wins[1] > CFG.TEAM / 2;
+    if (last || decided) { this.showEnd(); return; }
+    this.round++; this.playRound();
+  },
+
+  /* ---- 結果 ---- */
+  showEnd() {
+    const w = this.wins[0] > this.wins[1] ? 1 : this.wins[1] > this.wins[0] ? 2 : 0;
+    const t = this.el('winTxt');
+    t.textContent = w === 0 ? '不 分 勝 負'
+      : w === 1 ? '朱 方 勝' : (this.mode === 1 ? '電 腦 勝' : '青 方 勝');
+    t.style.color = w === 1 ? 'var(--cinnabar)' : w === 2 ? 'var(--jade)' : 'var(--paper)';
+    this.renderScore('score2');
+    const box = this.el('facts'); box.innerHTML = '';
+    // 把這局出場過的人的史實列出來，這是偷渡教育的地方
+    const seen = [];
+    this.order[0].concat(this.order[1]).forEach(h => {
+      if (seen.includes(h.id)) return; seen.push(h.id);
+      const d = document.createElement('div'); d.className = 'fact';
+      d.innerHTML = '<b>' + h.name + '</b><span>' + h.job + '　' + h.era + '　' + h.region +
+        (h.conf === '低' ? '　（年代為推測）' : '') + '</span><br>' + h.fact;
+      box.appendChild(d);
+    });
+    SFX.win();
+    this.go('end');
+  },
+  again() { SFX.tap(); this.res = []; this.start(this.mode); }
+};
+
+// 資料沒載到就講清楚，不要白畫面
+window.addEventListener('load', () => {
+  if (typeof HEROES === 'undefined' || !HEROES.list || !HEROES.list.length) {
+    document.body.innerHTML = '<div style="padding:40px;font-family:sans-serif;color:#e8e0cf">' +
+      '<h2>找不到 heroes.js</h2><p>請確認 heroes.js 和 index.html 放在同一個資料夾。</p></div>';
+  }
+});
+// 防止雙指縮放（手機遊戲體驗）
+document.addEventListener('gesturestart', e => e.preventDefault());
+let lastTouch = 0;
+document.addEventListener('touchend', e => {
+  const now = Date.now();
+  if (now - lastTouch < 320) e.preventDefault();
+  lastTouch = now;
+}, { passive: false });
+</script>
+</body>
+</html>
