@@ -10,116 +10,99 @@
 <meta name="theme-color" content="#12151c">
 <title>千古亂鬥・登樓</title>
 <style>
-:root{
-  --ink:#12151c; --slate:#1d222d; --line:#2c3342;
-  --paper:#e8e0cf; --paper-2:#d6cbb2;
-  --cinnabar:#b5342b; --jade:#2f8f74; --gold:#c9a227;
-  --dim:#8b93a4; --danger:#e05a4a;
+:root{--ink:#12151c;--slate:#1d222d;--line:#2c3342;--paper:#e8e0cf;--paper2:#d6cbb2;
+  --cinnabar:#b5342b;--jade:#2f8f74;--gold:#c9a227;--dim:#8b93a4;--danger:#e05a4a;
   --serif:"Noto Serif TC","Songti TC","Source Han Serif TC",serif;
-  --sans:-apple-system,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;
-}
+  --sans:-apple-system,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;height:100%}
 body{background:var(--ink);color:var(--paper);font-family:var(--sans);
   background-image:repeating-linear-gradient(115deg,rgba(255,255,255,.014) 0 2px,transparent 2px 7px);
   overscroll-behavior:none;-webkit-user-select:none;user-select:none;
   padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
-.wrap{max-width:560px;margin:0 auto;padding:12px 12px 24px;min-height:100%}
-.screen{display:none}.screen.on{display:block;animation:fade .25s ease}
-@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-h1.logo{font-family:var(--serif);font-size:clamp(34px,11vw,54px);letter-spacing:.2em;
-  text-align:center;margin:30px 0 4px;font-weight:600;text-indent:.2em}
+.wrap{max-width:540px;margin:0 auto;padding:10px 10px 20px;min-height:100%}
+.screen{display:none}.screen.on{display:block;animation:fade .25s}
+@keyframes fade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+h1.logo{font-family:var(--serif);font-size:clamp(32px,10.5vw,50px);letter-spacing:.2em;
+  text-align:center;margin:26px 0 2px;font-weight:600;text-indent:.2em}
 .sub{text-align:center;color:var(--dim);font-size:12px;letter-spacing:.2em}
 .tagline{text-align:center;font-family:var(--serif);color:var(--gold);font-size:15px;
-  letter-spacing:.08em;margin:20px 0 24px;line-height:1.9}
-.rule{height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent);margin:14px 0}
-.btn{display:block;width:100%;padding:15px;margin:9px 0;border:1px solid var(--line);
+  letter-spacing:.06em;margin:18px 0 22px;line-height:1.9}
+.rule{height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent);margin:13px 0}
+.btn{display:block;width:100%;padding:14px;margin:8px 0;border:1px solid var(--line);
   background:var(--slate);color:var(--paper);font-family:var(--serif);font-size:17px;
-  letter-spacing:.12em;border-radius:3px;cursor:pointer}
+  letter-spacing:.1em;border-radius:3px;cursor:pointer;text-align:center}
 .btn:active{transform:scale(.985)}
 .btn.main{background:var(--cinnabar);border-color:#8f2820;color:#fff4ec}
 .btn.go{background:var(--gold);border-color:#9c7d1c;color:#20180a;font-weight:700}
-.btn:disabled{opacity:.3}
-.btn small{display:block;font-family:var(--sans);font-size:12px;letter-spacing:0;color:var(--dim);margin-top:3px}
+.btn small{display:block;font-family:var(--sans);font-size:12px;letter-spacing:0;
+  color:var(--dim);margin-top:3px}
 .btn.main small{color:rgba(255,255,255,.72)}.btn.go small{color:rgba(32,24,10,.68)}
 .topbar{display:flex;justify-content:space-between;align-items:center;font-size:12px;
-  color:var(--dim);letter-spacing:.1em;padding:2px 0}
+  color:var(--dim);letter-spacing:.08em;padding:1px 0 5px}
 .topbar button{background:none;border:none;color:var(--dim);font-size:12px;cursor:pointer}
-.hint{color:var(--dim);font-size:12.5px;line-height:1.85;margin:10px 0}
+.hint{color:var(--dim);font-size:12.5px;line-height:1.8;margin:9px 0}
+.tower{display:flex;gap:3px;margin:5px 0 7px}
+.tower i{flex:1;height:3px;background:var(--line);border-radius:2px}
+.tower i.done{background:var(--jade)}.tower i.now{background:var(--gold)}
 
-/* 樓層條 */
-.tower{display:flex;gap:4px;margin:8px 0 12px}
-.tower i{flex:1;height:4px;background:var(--line);border-radius:2px}
-.tower i.done{background:var(--jade)}
-.tower i.now{background:var(--gold)}
-
-/* 偉人簡 */
-.heroes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.hcard{background:var(--paper);color:#211d15;border-radius:2px;padding:8px 5px 7px;
-  text-align:center;cursor:pointer;position:relative;overflow:hidden;border:1px solid var(--paper-2)}
-.hcard:before{content:"";position:absolute;left:0;right:0;top:0;height:4px;background:var(--jb,#777)}
-.hcard.sel{outline:2px solid var(--gold);outline-offset:1px}
-.hcard .nm{font-family:var(--serif);font-size:15px;font-weight:600;margin:5px 0 3px}
-.hcard .jb{font-size:10px;color:#6a6252;letter-spacing:.08em}
-.hcard .st{font-size:10px;margin-top:4px;color:#3d372c;font-variant-numeric:tabular-nums}
-.hcard .sk{font-size:9.5px;color:#7b7364;margin-top:4px;line-height:1.5}
-
-/* 敵人 */
-.enemy{background:var(--slate);border:1px solid var(--line);border-radius:4px;padding:12px;margin-bottom:10px}
-.enemy .row{display:flex;justify-content:space-between;align-items:baseline}
-.enemy .nm{font-family:var(--serif);font-size:20px;letter-spacing:.06em}
-.enemy .meta{font-size:11px;color:var(--dim)}
-.bar{height:10px;background:#0b0e13;border:1px solid var(--line);border-radius:2px;overflow:hidden;margin-top:6px}
-.bar i{display:block;height:100%;transition:width .35s ease}
-.hpn{font-size:11px;color:var(--dim);margin-top:4px;font-variant-numeric:tabular-nums}
-.intent{margin-top:9px;padding:8px 10px;border-radius:3px;background:#0d1016;border:1px solid var(--line);
-  font-size:14px;display:flex;justify-content:space-between;align-items:center}
-.intent.attack{border-color:#5a2f2a}
+/* 舞台 */
+#stage{display:block;width:100%;border-radius:4px;background:#0d1016;
+  border:1px solid var(--line);touch-action:none}
+.bars{display:flex;gap:10px;margin-top:7px}
+.bars>div{flex:1;min-width:0}
+.nm{font-family:var(--serif);font-size:15px;letter-spacing:.05em}
+.bar{height:9px;background:#0b0e13;border:1px solid var(--line);border-radius:2px;
+  overflow:hidden;margin-top:4px}
+.bar i{display:block;height:100%;transition:width .3s ease}
+.hpn{font-size:11px;color:var(--dim);margin-top:3px;font-variant-numeric:tabular-nums}
+.intent{margin-top:8px;padding:7px 10px;border-radius:3px;background:#0d1016;
+  border:1px solid var(--line);font-size:13.5px;display:flex;
+  justify-content:space-between;align-items:center}
+.intent.atk{border-color:#5a2f2a}
 .intent.heavy{border-color:var(--danger);background:#1c1010}
-.intent .what{font-family:var(--serif);letter-spacing:.05em}
-.intent .num{font-size:19px;font-weight:700;font-variant-numeric:tabular-nums}
-.intent.attack .num{color:var(--danger)}
-.intent.heavy .num{color:#ff7a66}
-.intent.heavy .tag{font-size:10px;background:var(--danger);color:#fff;padding:1px 5px;border-radius:2px;margin-left:6px}
-
-/* 我方 */
-.me{background:var(--slate);border:1px solid var(--line);border-radius:4px;padding:11px;margin-bottom:10px}
-.me .row{display:flex;justify-content:space-between;align-items:baseline}
-.me .who{font-size:12px;color:var(--dim);letter-spacing:.1em}
-.shield{color:#8fb4e8;font-size:13px;font-variant-numeric:tabular-nums}
+.intent .what{font-family:var(--serif);letter-spacing:.04em}
+.intent .num{font-size:18px;font-weight:700;font-variant-numeric:tabular-nums}
+.intent.atk .num{color:var(--danger)}.intent.heavy .num{color:#ff7a66}
+.intent .tag{font-size:10px;background:var(--danger);color:#fff;padding:1px 5px;
+  border-radius:2px;margin-left:5px}
 
 /* 手牌 */
-.hand{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:4px}
-.card{background:var(--paper);color:#211d15;border-radius:3px;padding:9px 6px;text-align:center;
-  cursor:pointer;position:relative;overflow:hidden;border:1px solid var(--paper-2);min-height:104px;
-  display:flex;flex-direction:column;justify-content:space-between}
+.hand{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:8px}
+.card{background:var(--paper);color:#211d15;border-radius:3px;padding:8px 5px;
+  text-align:center;position:relative;overflow:hidden;border:1px solid var(--paper2);
+  min-height:98px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer}
 .card:before{content:"";position:absolute;left:0;right:0;top:0;height:4px;background:var(--jb,#777)}
 .card:active{transform:translateY(2px)}
-.card .from{font-size:9.5px;color:#8a8271;margin-top:3px}
-.card .sn{font-family:var(--serif);font-size:14px;font-weight:600;line-height:1.2;margin:5px 0}
+.card .from{font-size:9.5px;color:#8a8271;margin-top:2px}
+.card .sn{font-family:var(--serif);font-size:13.5px;font-weight:600;line-height:1.2;margin:4px 0}
 .card .eff{font-size:17px;font-weight:700;font-variant-numeric:tabular-nums}
 .card .kind{font-size:10px;color:#6a6252;letter-spacing:.06em}
 .card.dmg .eff{color:#a33228}.card.shd .eff{color:#3a6ba8}
 .card.hea .eff{color:#2f7d5e}.card.wk .eff{color:#7a4b8c}
-.card .up{position:absolute;top:6px;right:5px;font-size:9px;color:var(--gold);
+.card .up{position:absolute;top:5px;right:4px;font-size:9px;color:var(--gold);
   background:#3a2f10;padding:1px 4px;border-radius:2px}
+.card.locked{opacity:.45;pointer-events:none}
 
-/* 戰報 */
-.log{background:#0d1016;border:1px solid var(--line);border-radius:3px;padding:9px;
-  height:88px;overflow-y:auto;font-size:12.5px;line-height:1.6;margin-top:10px;color:var(--dim)}
-.log b{color:var(--paper);font-family:var(--serif)}
-.log .d{color:#e07a6d}.log .s{color:#8fb4e8}.log .h{color:#7fd0a8}.log .w{color:#c9a0d8}
-
-/* 獎勵 */
-.reward{background:var(--slate);border:1px solid var(--line);border-radius:4px;padding:13px;
-  margin:9px 0;cursor:pointer}
-.reward b{font-family:var(--serif);font-size:17px;letter-spacing:.06em;display:block;margin-bottom:4px}
+/* 選人 */
+.heroes{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.hcard{background:var(--slate);border:1px solid var(--line);border-radius:3px;
+  padding:6px 4px 8px;text-align:center;cursor:pointer;position:relative}
+.hcard.sel{border-color:var(--gold);background:#241f11}
+.hcard canvas{display:block;width:100%;height:auto}
+.hcard .n2{font-family:var(--serif);font-size:14px;margin-top:2px;letter-spacing:.04em}
+.hcard .j2{font-size:10px;color:var(--dim);letter-spacing:.06em}
+.hcard .s2{font-size:10px;color:var(--dim);margin-top:3px;font-variant-numeric:tabular-nums}
+.hcard .k2{font-size:9.5px;color:#6f7787;margin-top:3px;line-height:1.5}
+.reward{background:var(--slate);border:1px solid var(--line);border-radius:4px;
+  padding:12px;margin:8px 0;cursor:pointer}
+.reward b{font-family:var(--serif);font-size:16px;letter-spacing:.06em;display:block;margin-bottom:3px}
 .reward span{font-size:12px;color:var(--dim);line-height:1.7}
-.fact{background:var(--slate);border-left:3px solid var(--gold);padding:10px 12px;margin:8px 0;
-  font-size:12.5px;line-height:1.75;border-radius:0 3px 3px 0}
-.fact b{font-family:var(--serif);font-size:14px;display:block;margin-bottom:2px;letter-spacing:.06em}
-.big{text-align:center;font-family:var(--serif);font-size:32px;letter-spacing:.18em;margin:24px 0 6px}
-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.fact{background:var(--slate);border-left:3px solid var(--gold);padding:9px 11px;margin:7px 0;
+  font-size:12.5px;line-height:1.7;border-radius:0 3px 3px 0}
+.fact b{font-family:var(--serif);font-size:14px;display:block;margin-bottom:2px;letter-spacing:.05em}
+.big{text-align:center;font-family:var(--serif);font-size:30px;letter-spacing:.18em;margin:22px 0 5px}
+@media (prefers-reduced-motion:reduce){.screen{animation:none}}
 </style>
 </head>
 <body>
@@ -130,31 +113,29 @@ h1.logo{font-family:var(--serif);font-size:clamp(34px,11vw,54px);letter-spacing:
   <div class="sub">登 樓</div>
   <div class="rule"></div>
   <p class="tagline">帶三位偉人，用他們的十二招，<br>一層一層打上去。</p>
-  <button class="btn main" onclick="G.newRun()">開始登樓<small>八層，死了就從頭來</small></button>
+  <button class="btn main" onclick="G.newRun()">開始登樓<small>八層，死了從頭來</small></button>
   <button class="btn" onclick="G.go('rule')">怎麼玩<small>三十秒看懂</small></button>
-  <p class="hint" style="text-align:center;margin-top:20px">
-    二十四位史書有載的偉人，九十六招真實事蹟。<br>侵略者、屠殺者、神話人物不收。
-  </p>
+  <p class="hint" style="text-align:center;margin-top:18px">
+    二十四位史書有載的偉人，九十六招真實事蹟。<br>人物與特效全部由程式繪製，零圖檔。</p>
 </section>
 
 <section id="s-rule" class="screen">
   <div class="topbar"><span>怎麼玩</span><button onclick="G.go('title')">返回</button></div>
   <div class="rule"></div>
   <p class="hint"><b style="color:var(--gold);font-family:var(--serif);font-size:15px">一　組隊</b><br>
-  六個人選三個。他們的四招合起來十二張牌，就是你的牌庫。</p>
+  六個人選三個，他們的四招合起來十二張牌就是你的牌庫。</p>
   <p class="hint"><b style="color:var(--gold);font-family:var(--serif);font-size:15px">二　打牌</b><br>
-  每回合抽三張，選一張打出去。<b style="color:var(--danger)">敵人下一招要幹嘛，寫在他頭上</b>——他要出重擊你就擋，他要回血你就搶輸出。</p>
+  每回合抽三張選一張。<b style="color:var(--danger)">敵人下一招寫在他頭上</b>——標紅的重擊不擋會很痛。</p>
   <p class="hint"><b style="color:var(--gold);font-family:var(--serif);font-size:15px">三　變強</b><br>
-  打贏一層，三選一：換一個新偉人、強化一張牌、或者回血。</p>
+  打贏一層三選一：換新偉人、強化一張牌、或回血。第八層打贏通關。</p>
   <div class="rule"></div>
-  <p class="hint">護盾會留著不會消失。削弱會讓敵人整場都變弱。<br>
-  第八層打贏就是通關。<b style="color:var(--gold)">通關率大約三成</b>，死了很正常。</p>
+  <p class="hint">護盾留著不會消失。削弱整場有效。<b style="color:var(--gold)">通關率約三成</b>，死了很正常。</p>
   <button class="btn main" onclick="G.go('title')">知道了</button>
 </section>
 
 <section id="s-pick" class="screen">
-  <div class="topbar"><span>選三位偉人</span><button onclick="G.go('title')">放棄</button></div>
-  <p class="hint" id="pickHint">六個人裡選三個。看他們的招式決定——會打的、會擋的、會回血的，最好都有一個。</p>
+  <div class="topbar"><span id="pickHead">選三位偉人</span><button onclick="G.go('title')">放棄</button></div>
+  <p class="hint" id="pickHint">六個人選三個。會打的、會擋的、會回血的最好都有一個。</p>
   <div class="heroes" id="pickGrid"></div>
   <button class="btn go" id="pickGo" style="display:none" onclick="G.startRun()">就這三個，出發</button>
 </section>
@@ -162,19 +143,21 @@ h1.logo{font-family:var(--serif);font-size:clamp(34px,11vw,54px);letter-spacing:
 <section id="s-battle" class="screen">
   <div class="topbar"><span id="floorTxt">第一層</span><button onclick="G.quit()">放棄這局</button></div>
   <div class="tower" id="tower"></div>
-  <div class="enemy">
-    <div class="row"><span class="nm" id="eName">—</span><span class="meta" id="eMeta"></span></div>
-    <div class="bar"><i id="eBar" style="width:100%;background:var(--cinnabar)"></i></div>
-    <div class="hpn" id="eHp"></div>
-    <div class="intent" id="intent"><span class="what" id="iWhat">—</span><span class="num" id="iNum"></span></div>
+  <canvas id="stage" width="540" height="360"></canvas>
+  <div class="bars">
+    <div>
+      <div class="nm" id="mName">我方</div>
+      <div class="bar"><i id="mBar" style="width:100%;background:var(--jade)"></i></div>
+      <div class="hpn" id="mHp"></div>
+    </div>
+    <div style="text-align:right">
+      <div class="nm" id="eName">—</div>
+      <div class="bar"><i id="eBar" style="width:100%;background:var(--cinnabar);margin-left:auto"></i></div>
+      <div class="hpn" id="eHp"></div>
+    </div>
   </div>
-  <div class="me">
-    <div class="row"><span class="who">我方</span><span class="shield" id="mShield"></span></div>
-    <div class="bar"><i id="mBar" style="width:100%;background:var(--jade)"></i></div>
-    <div class="hpn" id="mHp"></div>
-  </div>
+  <div class="intent" id="intent"><span class="what" id="iWhat">—</span><span class="num" id="iNum"></span></div>
   <div class="hand" id="hand"></div>
-  <div class="log" id="log"></div>
 </section>
 
 <section id="s-reward" class="screen">
@@ -185,11 +168,10 @@ h1.logo{font-family:var(--serif);font-size:clamp(34px,11vw,54px);letter-spacing:
 
 <section id="s-recruit" class="screen">
   <div class="topbar"><span>招募新偉人</span><button onclick="G.backReward()">算了</button></div>
-  <p class="hint" id="recruitHint">選一個加入，然後選一個離隊（他的四張牌會被抽掉）。</p>
+  <p class="hint">選一個加入。</p>
   <div class="heroes" id="recruitGrid"></div>
   <div id="recruitStep2" style="display:none">
-    <div class="rule"></div>
-    <p class="hint">誰離隊？</p>
+    <div class="rule"></div><p class="hint">誰離隊？他的四張牌會被抽掉。</p>
     <div class="heroes" id="leaveGrid"></div>
   </div>
 </section>
@@ -197,7 +179,7 @@ h1.logo{font-family:var(--serif);font-size:clamp(34px,11vw,54px);letter-spacing:
 <section id="s-upgrade" class="screen">
   <div class="topbar"><span>強化一張牌</span><button onclick="G.backReward()">算了</button></div>
   <p class="hint">選一張，效果永久 +35%（這一局有效）。</p>
-  <div class="hand" id="upGrid" style="grid-template-columns:repeat(3,1fr)"></div>
+  <div class="hand" id="upGrid"></div>
 </section>
 
 <section id="s-end" class="screen">
@@ -215,336 +197,536 @@ h1.logo{font-family:var(--serif);font-size:clamp(34px,11vw,54px);letter-spacing:
 <script src="heroes.js?v=1"></script>
 <script>
 /* ============================================================
-   千古亂鬥・登樓
-   所有數值都在 CFG，全部經過兩萬局無頭驗證：
-   通關率 29.9%、無必勝組合、九十六張牌只有十張沒人選
+   千古亂鬥・登樓（水墨版）
+   規則與數值跟上一版一字不改（已通過兩萬局無頭驗證：
+   通關率 29.9%、無必勝組合），這一版只換掉「畫面」那一層。
+   所有人物與特效都是 Canvas 算出來的，零圖檔。
    ============================================================ */
 const CFG = {
-  FLOORS: 8,            // 幾層
-  HAND: 3,              // 每回合抽幾張
-  TEAM: 3,              // 隊上幾個人
-  PICK_POOL: 6,         // 開局從幾個人裡挑
-  HP_BASE: 95,          // 玩家基礎血量
-  HP_PER_DEF: 3,        // 隊上每點防禦加多少血
-  HIT_K: 1.5,           // 普通攻擊係數
-  BRAIN_K: 1.25,        // 智慧攻擊係數
-  DEF_CUT: 2,           // 減傷 = 防禦 / 這個數
-  MIN_DMG: 3,
-  WEAK_K: 2,            // 削弱倍率
-  HEAVY: 1.8,           // 敵人重擊倍率
-  ENEMY_HP_BASE: 22, ENEMY_HP_PER_DEF: 3,
-  ENEMY_HP_SCALE: 0.08, // 每層敵人血量成長
-  ENEMY_PW_SCALE: 0.02, // 每層敵人攻擊成長
-  FLOOR_HEAL: 0.25,     // 每層打完自動回多少最大血
-  HEAL_PCT: 0.28,       // 選「回血」的獎勵回多少
-  UPGRADE: 1.35,        // 強化倍率
-  JOB_COLOR: {'武將':'#b5342b','軍師':'#5b7fb5','君王':'#8a6d3b','科學家':'#2f8f74',
+  FLOORS:8, HAND:3, TEAM:3, PICK_POOL:6,
+  HP_BASE:95, HP_PER_DEF:3,
+  HIT_K:1.5, BRAIN_K:1.25, DEF_CUT:2, MIN_DMG:3,
+  WEAK_K:2, HEAVY:1.8,
+  ENEMY_HP_BASE:22, ENEMY_HP_PER_DEF:3,
+  ENEMY_HP_SCALE:0.08, ENEMY_PW_SCALE:0.02,
+  FLOOR_HEAL:0.25, HEAL_PCT:0.28, UPGRADE:1.35,
+  JOB_COLOR:{'武將':'#b5342b','軍師':'#5b7fb5','君王':'#8a6d3b','科學家':'#2f8f74',
     '醫者':'#3f9aa8','航海家':'#4a6fa5','文人':'#8e5ba6','工匠':'#8a7b4a'},
-  KIND: {hit:'攻擊',brain:'智取',guard:'護盾',heal:'治療',weak:'削弱'}
+  KIND:{hit:'攻擊',brain:'智取',guard:'護盾',heal:'治療',weak:'削弱'}
 };
 
-/* ---- 音效：Web Audio 合成，零音檔 ---- */
-const SFX = (() => {
-  let ac = null;
-  const ok = () => { try { ac = ac || new (window.AudioContext||window.webkitAudioContext)();
-    if (ac.state === 'suspended') ac.resume(); return true; } catch(e){ return false; } };
-  function t(f,d,ty,v){ if(!ok())return; const o=ac.createOscillator(),g=ac.createGain();
-    o.type=ty||'sine'; o.frequency.value=f;
-    g.gain.setValueAtTime(0,ac.currentTime);
-    g.gain.linearRampToValueAtTime(v||.14,ac.currentTime+.01);
+/* ══════════ 水墨繪製工具 ══════════ */
+const IK = {
+  // 有粗細變化的墨線：起筆重、收筆輕
+  stroke(g,pts,w,alpha,col){
+    g.save(); g.strokeStyle=col; g.lineCap='round'; g.lineJoin='round';
+    for(let i=1;i<pts.length;i++){
+      const t=i/pts.length;
+      g.globalAlpha=(alpha===undefined?1:alpha)*(0.5+0.5*(1-t));
+      g.lineWidth=w*(1-t*0.7)+1;
+      g.beginPath(); g.moveTo(pts[i-1][0],pts[i-1][1]); g.lineTo(pts[i][0],pts[i][1]); g.stroke();
+    }
+    g.restore();
+  },
+  // 飛白：乾筆掉下來的小墨點
+  splat(g,x,y,n,r,col,a){
+    g.save(); g.fillStyle=col;
+    for(let i=0;i<n;i++){
+      const ang=Math.random()*6.283, d=Math.random()*r;
+      g.globalAlpha=(a===undefined?1:a)*(0.12+Math.random()*0.45);
+      g.beginPath(); g.arc(x+Math.cos(ang)*d,y+Math.sin(ang)*d,Math.random()*2.6+0.5,0,6.283); g.fill();
+    }
+    g.restore();
+  },
+  // 固定亂數：同一個 id 永遠長同一個樣子
+  rng(seed){ let r=seed; return ()=>((r=(r*9301+49297)%233280)/233280); },
+  seedOf(str){ let h=0; for(let i=0;i<str.length;i++) h=(h*31+str.charCodeAt(i))%99991; return h+7; },
+
+  /* 一個偉人的水墨人形
+     face: 1 面向右, -1 面向左
+     lunge: 0~1 前傾（出招時） */
+  figure(g,cx,cy,s,hero,opt){
+    const o=opt||{}, face=o.face||1, lunge=o.lunge||0, col=o.col||'#e8e0cf', a=o.alpha===undefined?1:o.alpha;
+    const rn=IK.rng(IK.seedOf(hero.id));
+    const jc=CFG.JOB_COLOR[hero.job]||'#888';
+    const L=lunge*14*face;
+    g.save(); g.translate(L,-lunge*4);
+    // 袍身
+    IK.stroke(g,[[cx,cy-38*s],[cx+face*4*s,cy],[cx-face*3*s,cy+36*s]],13*s,a,col);
+    IK.stroke(g,[[cx-9*s,cy-14*s],[cx-13*s,cy+34*s]],7*s,a*.7,col);
+    IK.stroke(g,[[cx+9*s,cy-14*s],[cx+13*s,cy+34*s]],7*s,a*.7,col);
+    // 頭
+    g.save(); g.strokeStyle=col; g.globalAlpha=a*.92; g.lineWidth=4.2*s;
+    g.beginPath(); g.ellipse(cx+face*3*s,cy-52*s,14*s,16*s,0,0,6.283); g.stroke(); g.restore();
+    // 手臂：出招那隻往前伸
+    const reach=(22+rn()*10+lunge*20)*s;
+    IK.stroke(g,[[cx,cy-25*s],[cx+face*reach,cy-(4+rn()*16)*s-lunge*10*s]],7.5*s,a*.95,col);
+    IK.stroke(g,[[cx,cy-21*s],[cx-face*(20+rn()*10)*s,cy+(3+rn()*14)*s]],7.5*s,a*.95,col);
+    // 腿
+    IK.stroke(g,[[cx,cy+28*s],[cx+face*(14+rn()*9)*s,cy+72*s]],8.5*s,a*.95,col);
+    IK.stroke(g,[[cx,cy+28*s],[cx-face*(12+rn()*9)*s,cy+72*s]],8.5*s,a*.95,col);
+    // 職業信物（用職業色，讓八種職業一眼分得出來）
+    IK.prop(g,cx,cy,s,hero.job,face,jc,a,lunge);
+    // 下襬飛白
+    IK.splat(g,cx,cy+38*s,10,24*s,col,a);
+    g.restore();
+  },
+
+  /* 八種職業各有一個信物，這是「一眼認出他是誰」的關鍵 */
+  prop(g,cx,cy,s,job,face,col,a,lunge){
+    g.save(); g.strokeStyle=col; g.fillStyle=col; g.globalAlpha=a*.9;
+    g.lineCap='round'; g.lineWidth=4*s;
+    const hx=cx+face*(24+lunge*20)*s, hy=cy-12*s-lunge*10*s;   // 手的位置
+    if(job==='武將'){            // 長矛
+      g.lineWidth=5*s; g.beginPath();
+      g.moveTo(hx-face*10*s,hy+40*s); g.lineTo(hx+face*16*s,hy-52*s); g.stroke();
+      g.beginPath(); g.moveTo(hx+face*16*s,hy-52*s); g.lineTo(hx+face*10*s,hy-40*s);
+      g.lineTo(hx+face*22*s,hy-40*s); g.closePath(); g.fill();
+    } else if(job==='軍師'){     // 羽扇
+      g.beginPath(); g.moveTo(hx,hy);
+      g.arc(hx,hy-14*s,15*s,0.5,Math.PI-0.5); g.closePath(); g.globalAlpha=a*.55; g.fill();
+      g.globalAlpha=a*.9; g.lineWidth=3*s; g.beginPath();
+      g.moveTo(hx,hy); g.lineTo(hx,hy+16*s); g.stroke();
+    } else if(job==='君王'){     // 冠冕
+      g.lineWidth=3.4*s;
+      g.beginPath(); g.moveTo(cx-16*s,cy-64*s); g.lineTo(cx-16*s,cy-76*s);
+      g.lineTo(cx-6*s,cy-68*s); g.lineTo(cx+3*s,cy-79*s); g.lineTo(cx+12*s,cy-68*s);
+      g.lineTo(cx+20*s,cy-76*s); g.lineTo(cx+20*s,cy-64*s); g.stroke();
+    } else if(job==='科學家'){   // 渾儀（同心圓環）
+      g.lineWidth=2.6*s; g.globalAlpha=a*.85;
+      g.beginPath(); g.arc(hx,hy,15*s,0,6.283); g.stroke();
+      g.beginPath(); g.ellipse(hx,hy,15*s,6*s,0.5,0,6.283); g.stroke();
+      g.beginPath(); g.ellipse(hx,hy,6*s,15*s,0.5,0,6.283); g.stroke();
+    } else if(job==='醫者'){     // 藥葫蘆
+      g.globalAlpha=a*.8;
+      g.beginPath(); g.arc(hx,hy+8*s,11*s,0,6.283); g.fill();
+      g.beginPath(); g.arc(hx,hy-7*s,7*s,0,6.283); g.fill();
+      g.globalAlpha=a; g.lineWidth=3*s;
+      g.beginPath(); g.moveTo(hx-5*s,hy-14*s); g.lineTo(hx+5*s,hy-14*s); g.stroke();
+    } else if(job==='航海家'){   // 帆
+      g.globalAlpha=a*.55;
+      g.beginPath(); g.moveTo(hx,hy-30*s); g.lineTo(hx+face*22*s,hy+4*s);
+      g.lineTo(hx,hy+14*s); g.closePath(); g.fill();
+      g.globalAlpha=a; g.lineWidth=3.4*s;
+      g.beginPath(); g.moveTo(hx,hy-34*s); g.lineTo(hx,hy+22*s); g.stroke();
+    } else if(job==='文人'){     // 展開的卷軸
+      g.globalAlpha=a*.5;
+      g.fillRect(hx-face*4*s,hy-12*s,face*30*s,22*s);
+      g.globalAlpha=a; g.lineWidth=3.6*s;
+      g.beginPath(); g.moveTo(hx-face*4*s,hy-15*s); g.lineTo(hx-face*4*s,hy+13*s); g.stroke();
+      g.beginPath(); g.moveTo(hx+face*26*s,hy-15*s); g.lineTo(hx+face*26*s,hy+13*s); g.stroke();
+    } else {                     // 工匠：曲尺與槌
+      g.lineWidth=4.4*s;
+      g.beginPath(); g.moveTo(hx-face*12*s,hy-14*s); g.lineTo(hx+face*12*s,hy-14*s);
+      g.lineTo(hx+face*12*s,hy+12*s); g.stroke();
+      g.globalAlpha=a*.85; g.fillRect(hx+face*4*s,hy+12*s,face*16*s,9*s);
+    }
+    g.restore();
+  }
+};
+
+/* ══════════ 音效（Web Audio 合成，零音檔）══════════ */
+const SFX=(()=>{
+  let ac=null;
+  const ok=()=>{try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();
+    if(ac.state==='suspended')ac.resume();return 1}catch(e){return 0}};
+  const t=(f,d,ty,v)=>{if(!ok())return;const o=ac.createOscillator(),g=ac.createGain();
+    o.type=ty||'sine';o.frequency.value=f;g.gain.setValueAtTime(0,ac.currentTime);
+    g.gain.linearRampToValueAtTime(v||.13,ac.currentTime+.008);
     g.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+d);
-    o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+d); }
-  return {
-    tap:()=>t(520,.06,'triangle',.09),
-    hit:()=>{t(160,.12,'square',.11);setTimeout(()=>t(95,.15,'sawtooth',.08),40);},
-    heavy:()=>{t(110,.2,'sawtooth',.14);setTimeout(()=>t(70,.26,'square',.11),70);},
-    shield:()=>t(310,.18,'sine',.1),
-    heal:()=>{t(520,.11,'sine',.1);setTimeout(()=>t(790,.15,'sine',.09),80);},
-    weak:()=>t(210,.2,'sawtooth',.07),
-    win:()=>{[523,659,784].forEach((f,i)=>setTimeout(()=>t(f,.24,'triangle',.12),i*110));},
-    lose:()=>{[400,300,220,150].forEach((f,i)=>setTimeout(()=>t(f,.24,'square',.1),i*130));},
-    clear:()=>{[523,659,784,1046,1318].forEach((f,i)=>setTimeout(()=>t(f,.3,'triangle',.13),i*130));}
+    o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+d);};
+  const noise=(d,v,freq)=>{if(!ok())return;const n=ac.sampleRate*d,b=ac.createBuffer(1,n,ac.sampleRate),c=b.getChannelData(0);
+    for(let i=0;i<n;i++)c[i]=(Math.random()*2-1)*(1-i/n);
+    const src=ac.createBufferSource();src.buffer=b;
+    const f=ac.createBiquadFilter();f.type='bandpass';f.frequency.value=freq||1700;
+    const g=ac.createGain();g.gain.value=v||.14;
+    src.connect(f);f.connect(g);g.connect(ac.destination);src.start();};
+  return{
+    tap:()=>t(520,.06,'triangle',.08),
+    slash:()=>{noise(.15,.19,2000);t(190,.1,'square',.09)},
+    brain:()=>{t(720,.14,'triangle',.1);setTimeout(()=>t(1080,.18,'sine',.09),70)},
+    guard:()=>{noise(.12,.1,600);t(300,.2,'sine',.1)},
+    heal:()=>{t(520,.11,'sine',.09);setTimeout(()=>t(790,.16,'sine',.08),80)},
+    weak:()=>t(200,.22,'sawtooth',.07),
+    heavy:()=>{noise(.3,.24,900);t(85,.3,'sawtooth',.16)},
+    hurt:()=>{noise(.14,.14,1100);t(150,.13,'square',.1)},
+    win:()=>{[523,659,784].forEach((f,i)=>setTimeout(()=>t(f,.22,'triangle',.11),i*105))},
+    lose:()=>{[400,300,220,150].forEach((f,i)=>setTimeout(()=>t(f,.24,'square',.1),i*130))},
+    clear:()=>{[523,659,784,1046,1318].forEach((f,i)=>setTimeout(()=>t(f,.3,'triangle',.12),i*125))}
   };
 })();
 
-/* ---- 卡牌數值（跟無頭驗證同一套算式）---- */
-function cardEffect(c, enemyDef) {
-  const v = c.val * c.up;
-  if (c.type === 'hit')
-    return { kind:'dmg', v: Math.max(CFG.MIN_DMG, Math.round(c.hero.atk*CFG.HIT_K*v) - Math.floor(enemyDef/CFG.DEF_CUT)) };
-  if (c.type === 'brain')
-    return { kind:'dmg', v: Math.max(CFG.MIN_DMG, Math.round(c.hero.int*CFG.BRAIN_K*v) - Math.floor(enemyDef/CFG.DEF_CUT)) };
-  if (c.type === 'guard') return { kind:'shield', v: Math.round(v) };
-  if (c.type === 'heal')  return { kind:'heal',   v: Math.round(v) };
-  return { kind:'weak', v: Math.round(v*CFG.WEAK_K) };
+/* ══════════ 卡牌數值（與無頭驗證同一套算式）══════════ */
+function cardEffect(c,enemyDef){
+  const v=c.val*c.up;
+  if(c.type==='hit')   return {kind:'dmg',  v:Math.max(CFG.MIN_DMG,Math.round(c.hero.atk*CFG.HIT_K*v)-Math.floor(enemyDef/CFG.DEF_CUT))};
+  if(c.type==='brain') return {kind:'dmg',  v:Math.max(CFG.MIN_DMG,Math.round(c.hero.int*CFG.BRAIN_K*v)-Math.floor(enemyDef/CFG.DEF_CUT))};
+  if(c.type==='guard') return {kind:'shield',v:Math.round(v)};
+  if(c.type==='heal')  return {kind:'heal', v:Math.round(v)};
+  return {kind:'weak', v:Math.round(v*CFG.WEAK_K)};
 }
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;};
 
-const shuffle = a => { a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];} return a; };
+/* ══════════ 舞台：所有角色與特效都畫在這裡 ══════════ */
+const ST=(()=>{
+  const cv=document.getElementById('stage'), g=cv.getContext('2d');
+  const W=540,H=360;
+  let fx=[], shake=0, running=false;
+  const anim={ me:{lunge:0,hurt:0,idx:0}, en:{lunge:0,hurt:0,dead:0} };
 
-const G = {
-  team:[], deck:[], draw:[], disc:[], hand:[],
-  P:null, E:null, floor:1, met:[], picked:[], pool:[], newcomer:null,
+  function start(){ if(running)return; running=true; loop(); }
+  function stop(){ running=false; }
+  function reset(){ fx=[]; shake=0; anim.en.dead=0; anim.en.hurt=0; anim.me.hurt=0; }
 
-  el(id){ return document.getElementById(id); },
+  // 五種招式各有各的墨色特效
+  function cast(kind,from,to,heavy){
+    const x0=from==='me'?150:400, x1=to==='me'?150:400, y=190;
+    if(kind==='dmg'){
+      fx.push({t:0,dur:.14,draw(p,g){        // 筆鋒橫掃
+        g.save(); g.globalAlpha=(1-p)*.95; g.strokeStyle='#e8e0cf'; g.lineCap='round';
+        g.lineWidth=17*(1-p)+3;
+        const d=x1>x0?1:-1;
+        g.beginPath(); g.moveTo(x1-d*150+d*p*90,y-95);
+        g.quadraticCurveTo(x1,y+10,x1-d*150+d*p*90,y+95); g.stroke(); g.restore();
+      }});
+      for(let i=0;i<(heavy?46:30);i++) fx.push({t:0,dur:.03,px:x1,py:y,
+        vx:(Math.random()-.5)*(heavy?24:17),vy:(Math.random()-.5)*20-3,
+        r:Math.random()*4.5+1.4,grav:.55});
+      shake=heavy?18:11;
+    } else if(kind==='shield'){
+      fx.push({t:0,dur:.045,draw(p,g){       // 墨圈護體
+        g.save(); g.globalAlpha=(1-p)*.85; g.strokeStyle='#8fb4e8';
+        g.lineWidth=5*(1-p)+1.5;
+        g.beginPath(); g.arc(x0,y,40+p*46,0,6.283); g.stroke();
+        g.globalAlpha=(1-p)*.3; g.lineWidth=14*(1-p);
+        g.beginPath(); g.arc(x0,y,40+p*30,0,6.283); g.stroke(); g.restore();
+      }});
+    } else if(kind==='heal'){
+      for(let i=0;i<26;i++) fx.push({t:0,dur:.022,px:x0+(Math.random()-.5)*70,py:y+60,
+        vx:(Math.random()-.5)*1.6,vy:-2.2-Math.random()*2.6,r:Math.random()*3.4+1.4,
+        grav:-.02,col:'#7fd0a8'});
+    } else if(kind==='weak'){
+      for(let i=0;i<30;i++) fx.push({t:0,dur:.02,px:x1+(Math.random()-.5)*50,py:y-40,
+        vx:(Math.random()-.5)*3.2,vy:1.6+Math.random()*2.6,r:Math.random()*4+1.2,
+        grav:.05,col:'#c9a0d8'});
+    } else if(kind==='ripple'){
+      for(let k=0;k<3;k++) fx.push({t:-k*0.35,dur:.03,draw(p,g){ // 金色波紋＝智取
+        if(p<0)return; g.save(); g.globalAlpha=(1-p)*.8; g.strokeStyle='#c9a227';
+        g.lineWidth=5*(1-p)+1;
+        g.beginPath(); g.arc(x1,y,20+p*130,0,6.283); g.stroke(); g.restore();
+      }});
+      shake=8;
+    }
+  }
+  function lunge(who){ anim[who].lunge=1; }
+  function hurt(who,heavy){ anim[who].hurt=1; shake=Math.max(shake,heavy?18:10); }
+  function die(){ anim.en.dead=0.001; }
+
+  function loop(){
+    if(!running)return;
+    const sx=(Math.random()-.5)*shake, sy=(Math.random()-.5)*shake;
+    shake*=.85; if(shake<.4)shake=0;
+    g.clearRect(0,0,W,H);
+    g.save(); g.translate(sx,sy);
+    // 遠山
+    g.save(); g.globalAlpha=.1; g.fillStyle='#e8e0cf';
+    g.beginPath(); g.moveTo(0,275); g.quadraticCurveTo(150,165,290,265);
+    g.quadraticCurveTo(410,195,540,275); g.lineTo(540,360); g.lineTo(0,360); g.fill(); g.restore();
+    // 地平線
+    g.save(); g.globalAlpha=.18; g.strokeStyle='#e8e0cf'; g.lineWidth=1.5;
+    g.beginPath(); g.moveTo(20,300); g.lineTo(520,300); g.stroke(); g.restore();
+
+    const me=G.activeHero(), en=G.E&&G.E.ref;
+    // 我方：出戰的那位站前面，另外兩位淡淡站在後面
+    if(G.team&&G.team.length){
+      G.team.forEach((h,i)=>{
+        if(h===me)return;
+        IK.figure(g,58+i*30,236,0.52,h,{face:1,alpha:.24});
+      });
+      if(me) IK.figure(g,150,205,1.0,me,{face:1,lunge:anim.me.lunge,
+        alpha:1,col:anim.me.hurt>.1?'#e8a49a':'#e8e0cf'});
+    }
+    // 敵方
+    if(en&&anim.en.dead<1){
+      const a=anim.en.dead?1-anim.en.dead:1;
+      IK.figure(g,400,205,1.18,en,{face:-1,lunge:anim.en.lunge,alpha:a,
+        col:anim.en.hurt>.1?'#e8a49a':'#e8e0cf'});
+      if(anim.en.dead){ IK.splat(g,400,215,26,70*anim.en.dead,'#e8e0cf',1-anim.en.dead); }
+    }
+    // 特效
+    fx=fx.filter(p=>{
+      p.t+=p.dur;
+      if(p.draw){ if(p.t>1)return false; p.draw(Math.max(0,p.t),g); return true; }
+      if(p.t>1)return false;
+      p.px+=p.vx; p.py+=p.vy; p.vy+=p.grav; p.r*=.985;
+      g.save(); g.globalAlpha=Math.max(0,1-p.t); g.fillStyle=p.col||'#e8e0cf';
+      g.beginPath(); g.arc(p.px,p.py,p.r,0,6.283); g.fill(); g.restore();
+      return true;
+    });
+    g.restore();
+    anim.me.lunge*=.82; anim.en.lunge*=.82;
+    anim.me.hurt*=.86; anim.en.hurt*=.86;
+    if(anim.en.dead) anim.en.dead=Math.min(1,anim.en.dead+0.035);
+    requestAnimationFrame(loop);
+  }
+  // 小頭像：選人畫面用
+  function portrait(canvas,hero){
+    const c=canvas.getContext('2d');
+    c.clearRect(0,0,canvas.width,canvas.height);
+    IK.figure(c,canvas.width/2,canvas.height*0.52,canvas.width/150,hero,{face:1,alpha:.95});
+  }
+  return { start,stop,reset,cast,lunge,hurt,die,portrait };
+})();
+
+/* ══════════ 遊戲流程 ══════════ */
+const G={
+  team:[],deck:[],draw:[],disc:[],hand:[],
+  P:null,E:null,floor:1,met:[],picked:[],pool:[],newcomer:null,active:null,busy:false,
+
+  el(id){return document.getElementById(id)},
+  activeHero(){ return this.active || (this.team&&this.team[0]) || null; },
   go(n){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
-         this.el('s-'+n).classList.add('on'); window.scrollTo(0,0); },
-  quit(){ this.go('title'); },
+    this.el('s-'+n).classList.add('on');
+    n==='battle'?ST.start():ST.stop(); window.scrollTo(0,0); },
+  quit(){ ST.stop(); this.go('title'); },
 
-  /* ---------- 開局選人 ---------- */
+  /* --- 選人 --- */
   newRun(){
     SFX.tap();
-    this.pool = shuffle(HEROES.list).slice(0, CFG.PICK_POOL);
-    this.picked = [];
-    this.renderPick();
-    this.go('pick');
+    this.pool=shuffle(HEROES.list).slice(0,CFG.PICK_POOL);
+    this.picked=[]; this.renderPick(); this.go('pick');
+  },
+  heroCard(h,sel,onclick,showSkills){
+    const d=document.createElement('div');
+    d.className='hcard'+(sel?' sel':'');
+    const cvs=document.createElement('canvas'); cvs.width=150; cvs.height=150;
+    d.appendChild(cvs);
+    const info=document.createElement('div');
+    info.innerHTML='<div class="n2">'+h.name+'</div><div class="j2">'+h.job+'</div>'+
+      '<div class="s2">攻'+h.atk+' 防'+h.def+' 智'+h.int+'</div>'+
+      '<div class="k2">'+(showSkills?h.skills.map(s=>s.n).join('<br>'):h.skills.map(s=>CFG.KIND[s.type]).join('・'))+'</div>';
+    d.appendChild(info);
+    d.onclick=onclick;
+    setTimeout(()=>ST.portrait(cvs,h),0);
+    return d;
   },
   renderPick(){
-    const box = this.el('pickGrid'); box.innerHTML='';
-    this.pool.forEach((h,i)=>{
-      const d=document.createElement('div');
-      d.className='hcard'+(this.picked.includes(h)?' sel':'');
-      d.style.setProperty('--jb', CFG.JOB_COLOR[h.job]||'#777');
-      d.innerHTML='<div class="nm">'+h.name+'</div><div class="jb">'+h.job+'</div>'+
-        '<div class="st">攻'+h.atk+' 防'+h.def+' 智'+h.int+'</div>'+
-        '<div class="sk">'+h.skills.map(s=>CFG.KIND[s.type]).join('・')+'</div>';
-      d.onclick=()=>{
+    const box=this.el('pickGrid'); box.innerHTML='';
+    this.pool.forEach(h=>{
+      box.appendChild(this.heroCard(h,this.picked.includes(h),()=>{
         SFX.tap();
         const k=this.picked.indexOf(h);
-        if(k>=0) this.picked.splice(k,1);
-        else if(this.picked.length<CFG.TEAM) this.picked.push(h);
+        if(k>=0)this.picked.splice(k,1);
+        else if(this.picked.length<CFG.TEAM)this.picked.push(h);
         this.renderPick();
-      };
-      box.appendChild(d);
+      },false));
     });
-    this.el('pickGo').style.display = this.picked.length===CFG.TEAM ? 'block':'none';
-    this.el('pickHint').textContent = '已選 '+this.picked.length+' / '+CFG.TEAM+
-      '　　會打的、會擋的、會回血的最好都有一個。';
+    this.el('pickGo').style.display=this.picked.length===CFG.TEAM?'block':'none';
+    this.el('pickHead').textContent='已選 '+this.picked.length+' / '+CFG.TEAM;
   },
   startRun(){
     SFX.tap();
-    this.team = this.picked.slice();
-    this.met = this.team.slice();
-    this.deck = [];
+    this.team=this.picked.slice(); this.met=this.team.slice(); this.active=this.team[0];
+    this.deck=[];
     this.team.forEach(h=>h.skills.forEach(s=>this.deck.push({hero:h,n:s.n,type:s.type,val:s.val,up:1})));
-    this.P = { hp:0, max:0, def:0, shield:0 };
-    this.recalcHP(true);
-    this.floor = 1;
-    this.startFloor();
+    this.P={hp:0,max:0,def:0,shield:0};
+    this.recalcHP(true); this.floor=1; this.startFloor();
   },
   recalcHP(full){
-    const sum = this.team.reduce((a,h)=>a+h.def,0);
-    this.P.max = CFG.HP_BASE + sum*CFG.HP_PER_DEF;
-    this.P.def = Math.round(sum/CFG.TEAM);
-    if(full) this.P.hp = this.P.max;
-    this.P.hp = Math.min(this.P.hp, this.P.max);
+    const sum=this.team.reduce((a,h)=>a+h.def,0);
+    this.P.max=CFG.HP_BASE+sum*CFG.HP_PER_DEF;
+    this.P.def=Math.round(sum/CFG.TEAM);
+    if(full)this.P.hp=this.P.max;
+    this.P.hp=Math.min(this.P.hp,this.P.max);
   },
 
-  /* ---------- 一層開始 ---------- */
+  /* --- 一層 --- */
   startFloor(){
-    const cand = HEROES.list.filter(h=>!this.team.includes(h));
-    const eh = cand[Math.random()*cand.length|0];
-    if(!this.met.includes(eh)) this.met.push(eh);
-    const hpMul = 1 + CFG.ENEMY_HP_SCALE*(this.floor-1);
-    const pwMul = 1 + CFG.ENEMY_PW_SCALE*(this.floor-1);
-    const hp = Math.round((CFG.ENEMY_HP_BASE + eh.def*CFG.ENEMY_HP_PER_DEF)*hpMul);
-    // 找出這個敵人最兇的一招，那招會變重擊
-    const atks = eh.skills.filter(s=>s.type==='hit'||s.type==='brain');
-    const heavy = atks.length ? atks.reduce((a,b)=>b.val>a.val?b:a) : null;
-    this.E = { ref:eh, hp, max:hp, def:eh.def, idx:0, shield:0, heavy,
-               atk:eh.atk*pwMul, int:eh.int*pwMul, atk0:eh.atk*pwMul, int0:eh.int*pwMul };
-    this.P.shield = 0;
-    this.draw = shuffle(this.deck); this.disc = []; this.hand = [];
-    this.el('log').innerHTML = '';
-    this.log('<b>第 '+this.floor+' 層</b>　'+eh.name+'（'+eh.job+'）擋在路上。');
-    this.go('battle');
-    this.newTurn();
+    const cand=HEROES.list.filter(h=>!this.team.includes(h));
+    const eh=cand[Math.random()*cand.length|0];
+    if(!this.met.includes(eh))this.met.push(eh);
+    const hpMul=1+CFG.ENEMY_HP_SCALE*(this.floor-1);
+    const pwMul=1+CFG.ENEMY_PW_SCALE*(this.floor-1);
+    const hp=Math.round((CFG.ENEMY_HP_BASE+eh.def*CFG.ENEMY_HP_PER_DEF)*hpMul);
+    const atks=eh.skills.filter(s=>s.type==='hit'||s.type==='brain');
+    const heavy=atks.length?atks.reduce((a,b)=>b.val>a.val?b:a):null;
+    this.E={ref:eh,hp,max:hp,def:eh.def,idx:0,shield:0,heavy,
+      atk:eh.atk*pwMul,int:eh.int*pwMul,atk0:eh.atk*pwMul,int0:eh.int*pwMul};
+    this.P.shield=0; this.busy=false;
+    this.draw=shuffle(this.deck); this.disc=[]; this.hand=[];
+    ST.reset(); this.go('battle'); this.newTurn();
   },
   intent(){
-    const s = this.E.ref.skills[this.E.idx % 4];
-    const hv = (this.E.heavy && s === this.E.heavy) ? CFG.HEAVY : 1;
-    if(s.type==='hit')   return {type:'hit',  n:s.n, heavy:hv>1, v:Math.max(CFG.MIN_DMG,Math.round(this.E.atk*CFG.HIT_K*s.val*hv)-Math.floor(this.P.def/CFG.DEF_CUT))};
-    if(s.type==='brain') return {type:'brain',n:s.n, heavy:hv>1, v:Math.max(CFG.MIN_DMG,Math.round(this.E.int*CFG.BRAIN_K*s.val*hv)-Math.floor(this.P.def/CFG.DEF_CUT))};
-    if(s.type==='guard') return {type:'guard',n:s.n, v:Math.round(s.val)};
-    if(s.type==='heal')  return {type:'heal', n:s.n, v:Math.round(s.val)};
-    return {type:'weak', n:s.n, v:Math.round(s.val)};
+    const s=this.E.ref.skills[this.E.idx%4];
+    const hv=(this.E.heavy&&s===this.E.heavy)?CFG.HEAVY:1;
+    if(s.type==='hit')   return {type:'hit',n:s.n,heavy:hv>1,v:Math.max(CFG.MIN_DMG,Math.round(this.E.atk*CFG.HIT_K*s.val*hv)-Math.floor(this.P.def/CFG.DEF_CUT))};
+    if(s.type==='brain') return {type:'brain',n:s.n,heavy:hv>1,v:Math.max(CFG.MIN_DMG,Math.round(this.E.int*CFG.BRAIN_K*s.val*hv)-Math.floor(this.P.def/CFG.DEF_CUT))};
+    if(s.type==='guard') return {type:'guard',n:s.n,v:Math.round(s.val)};
+    if(s.type==='heal')  return {type:'heal',n:s.n,v:Math.round(s.val)};
+    return {type:'weak',n:s.n,v:Math.round(s.val)};
   },
   newTurn(){
-    // 抽滿三張
-    this.hand = [];
-    while(this.hand.length < CFG.HAND){
-      if(!this.draw.length){ this.draw = shuffle(this.disc); this.disc = []; if(!this.draw.length) break; }
+    this.hand=[];
+    while(this.hand.length<CFG.HAND){
+      if(!this.draw.length){this.draw=shuffle(this.disc);this.disc=[];if(!this.draw.length)break;}
       this.hand.push(this.draw.pop());
     }
-    this.render();
+    this.busy=false; this.render();
   },
   render(){
     const E=this.E,P=this.P,it=this.intent();
     this.el('floorTxt').textContent='第 '+this.floor+' 層　／　共 '+CFG.FLOORS+' 層';
     const tw=this.el('tower'); tw.innerHTML='';
-    for(let i=1;i<=CFG.FLOORS;i++){ const d=document.createElement('i');
-      if(i<this.floor)d.className='done'; else if(i===this.floor)d.className='now'; tw.appendChild(d); }
-    this.el('eName').textContent=E.ref.name;
-    this.el('eMeta').textContent=E.ref.job+'　'+E.ref.era;
+    for(let i=1;i<=CFG.FLOORS;i++){const d=document.createElement('i');
+      if(i<this.floor)d.className='done';else if(i===this.floor)d.className='now';tw.appendChild(d);}
+    this.el('eName').textContent=E.ref.name+'　'+E.ref.job;
     this.el('eBar').style.width=Math.max(0,E.hp/E.max*100)+'%';
     this.el('eHp').textContent=Math.max(0,E.hp)+' / '+E.max+(E.shield?'　盾 '+E.shield:'');
-    const box=this.el('intent');
-    box.className='intent'+(it.type==='hit'||it.type==='brain'?(it.heavy?' heavy':' attack'):'');
-    this.el('iWhat').innerHTML='下一招　'+it.n+(it.heavy?'<span class="tag">重擊</span>':'');
-    this.el('iNum').textContent=(it.type==='hit'||it.type==='brain'?'-'+it.v
-      :it.type==='guard'?'盾+'+it.v:it.type==='heal'?'回+'+it.v:'削'+it.v);
+    this.el('mName').textContent=this.team.map(h=>h.name).join('・');
     this.el('mBar').style.width=Math.max(0,P.hp/P.max*100)+'%';
-    this.el('mHp').textContent=Math.max(0,P.hp)+' / '+P.max;
-    this.el('mShield').textContent=P.shield?'護盾 '+P.shield:'';
+    this.el('mHp').textContent=Math.max(0,P.hp)+' / '+P.max+(P.shield?'　盾 '+P.shield:'');
+    const box=this.el('intent');
+    box.className='intent'+((it.type==='hit'||it.type==='brain')?(it.heavy?' heavy':' atk'):'');
+    this.el('iWhat').innerHTML='下一招　'+it.n+(it.heavy?'<span class="tag">重擊</span>':'');
+    this.el('iNum').textContent=(it.type==='hit'||it.type==='brain')?'-'+it.v
+      :it.type==='guard'?'盾+'+it.v:it.type==='heal'?'回+'+it.v:'削'+it.v;
     const hb=this.el('hand'); hb.innerHTML='';
     this.hand.forEach((c,i)=>{
       const e=cardEffect(c,E.def);
       const cls=e.kind==='dmg'?'dmg':e.kind==='shield'?'shd':e.kind==='heal'?'hea':'wk';
       const d=document.createElement('div');
-      d.className='card '+cls;
+      d.className='card '+cls+(this.busy?' locked':'');
       d.style.setProperty('--jb',CFG.JOB_COLOR[c.hero.job]||'#777');
       d.innerHTML=(c.up>1?'<div class="up">+</div>':'')+
-        '<div class="from">'+c.hero.name+'</div>'+
-        '<div class="sn">'+c.n+'</div>'+
+        '<div class="from">'+c.hero.name+'</div><div class="sn">'+c.n+'</div>'+
         '<div><div class="eff">'+e.v+'</div><div class="kind">'+CFG.KIND[c.type]+'</div></div>';
       d.onclick=()=>this.play(i);
       hb.appendChild(d);
     });
   },
-  log(html){ const L=this.el('log'); L.innerHTML+='<div>'+html+'</div>'; L.scrollTop=L.scrollHeight; },
 
-  /* ---------- 出牌 ---------- */
+  /* --- 出牌：先演，再結算 --- */
   play(i){
-    const c=this.hand[i], E=this.E, P=this.P;
-    const e=cardEffect(c,E.def);
+    if(this.busy)return; this.busy=true;
+    const c=this.hand[i],E=this.E,P=this.P,e=cardEffect(c,E.def);
+    this.active=c.hero;            // 誰的牌，誰上場
+    ST.lunge('me');
     if(e.kind==='dmg'){
+      c.type==='brain'?(ST.cast('ripple','me','en'),SFX.brain()):(ST.cast('dmg','me','en'),SFX.slash());
       let d=e.v; if(E.shield>0){const a=Math.min(E.shield,d);E.shield-=a;d-=a;}
-      E.hp-=d; SFX.hit();
-      this.log('<b>'+c.n+'</b>　<span class="d">-'+d+'</span>');
-    } else if(e.kind==='shield'){ P.shield+=e.v; SFX.shield();
-      this.log('<b>'+c.n+'</b>　<span class="s">護盾 +'+e.v+'</span>');
-    } else if(e.kind==='heal'){ const b=P.hp; P.hp=Math.min(P.max,P.hp+e.v); SFX.heal();
-      this.log('<b>'+c.n+'</b>　<span class="h">回血 +'+(P.hp-b)+'</span>');
-    } else { E.atk=Math.max(E.atk0/2,E.atk-e.v); E.int=Math.max(E.int0/2,E.int-e.v); SFX.weak();
-      this.log('<b>'+c.n+'</b>　<span class="w">敵人變弱 -'+e.v+'</span>');
-    }
-    this.hand.forEach(x=>this.disc.push(x));
-    this.hand=[];
-    if(E.hp<=0){ this.render(); this.winFloor(); return; }
-    // 敵人行動
-    const it=this.intent(); this.E.idx++;
+      E.hp-=d; ST.hurt('en',false);
+    } else if(e.kind==='shield'){ P.shield+=e.v; ST.cast('shield','me','me'); SFX.guard(); }
+    else if(e.kind==='heal'){ P.hp=Math.min(P.max,P.hp+e.v); ST.cast('heal','me','me'); SFX.heal(); }
+    else { E.atk=Math.max(E.atk0/2,E.atk-e.v); E.int=Math.max(E.int0/2,E.int-e.v);
+           ST.cast('weak','me','en'); SFX.weak(); }
+    this.hand.forEach(x=>this.disc.push(x)); this.hand=[];
+    this.render();
+    if(E.hp<=0){ ST.die(); setTimeout(()=>this.winFloor(),820); return; }
+    setTimeout(()=>this.enemyTurn(),620);
+  },
+  enemyTurn(){
+    const E=this.E,P=this.P,it=this.intent(); this.E.idx++;
+    ST.lunge('en');
     if(it.type==='hit'||it.type==='brain'){
-      let d=it.v, blocked=0;
-      if(P.shield>0){ blocked=Math.min(P.shield,d); P.shield-=blocked; d-=blocked; }
-      P.hp-=d; it.heavy?SFX.heavy():SFX.hit();
-      this.log(E.ref.name+' 使出 <b>'+it.n+'</b>　<span class="d">-'+d+'</span>'+(blocked?'<span class="s">（擋 '+blocked+'）</span>':''));
-    } else if(it.type==='guard'){ E.shield+=it.v;
-      this.log(E.ref.name+' 使出 <b>'+it.n+'</b>　<span class="s">盾 +'+it.v+'</span>');
-    } else if(it.type==='heal'){ const b=E.hp; E.hp=Math.min(E.max,E.hp+it.v);
-      this.log(E.ref.name+' 使出 <b>'+it.n+'</b>　<span class="h">回 +'+(E.hp-b)+'</span>');
-    } else { P.def=Math.max(1,P.def-it.v);
-      this.log(E.ref.name+' 使出 <b>'+it.n+'</b>　<span class="w">你的防禦 -'+it.v+'</span>');
-    }
-    if(P.hp<=0){ this.render(); this.lose(); return; }
-    this.newTurn();
+      let d=it.v,blocked=0;
+      if(P.shield>0){blocked=Math.min(P.shield,d);P.shield-=blocked;d-=blocked;}
+      P.hp-=d;
+      it.type==='brain'?ST.cast('ripple','en','me'):ST.cast('dmg','en','me',it.heavy);
+      ST.hurt('me',it.heavy); it.heavy?SFX.heavy():SFX.hurt();
+    } else if(it.type==='guard'){ E.shield+=it.v; ST.cast('shield','en','en'); SFX.guard(); }
+    else if(it.type==='heal'){ E.hp=Math.min(E.max,E.hp+it.v); ST.cast('heal','en','en'); SFX.heal(); }
+    else { P.def=Math.max(1,P.def-it.v); ST.cast('weak','en','me'); SFX.weak(); }
+    this.render();
+    if(P.hp<=0){ setTimeout(()=>this.lose(),700); return; }
+    setTimeout(()=>this.newTurn(),480);
   },
 
-  /* ---------- 打贏一層 ---------- */
+  /* --- 獎勵 --- */
   winFloor(){
-    SFX.win();
+    SFX.win(); ST.stop();
     const before=this.P.hp;
     this.P.hp=Math.min(this.P.max,this.P.hp+Math.round(this.P.max*CFG.FLOOR_HEAL));
-    if(this.floor>=CFG.FLOORS){ this.clearGame(); return; }
+    if(this.floor>=CFG.FLOORS){this.clearGame();return;}
     this.el('rewardTitle').textContent='打贏第 '+this.floor+' 層';
-    this.el('rewardHp').textContent='回血 +'+(this.P.hp-before)+'　現在 '+this.P.hp+' / '+this.P.max;
-    this.renderReward();
-    this.go('reward');
+    this.el('rewardHp').textContent='回血 +'+(this.P.hp-before)+'　'+this.P.hp+' / '+this.P.max;
+    this.renderReward(); this.go('reward');
   },
   renderReward(){
     const box=this.el('rewardBox'); box.innerHTML='';
-    const opts=[
-      {t:'招募新偉人',d:'換一個人進隊伍，帶來他的四張新牌。牌庫會大改。',f:()=>this.openRecruit()},
-      {t:'強化一張牌',d:'挑一張牌，效果永久 +35%。牌庫變精不變大。',f:()=>this.openUpgrade()},
-      {t:'休息回血',d:'恢復 '+Math.round(CFG.HEAL_PCT*100)+'% 最大血量。撐不下去就選這個。',f:()=>{
-        SFX.heal(); this.P.hp=Math.min(this.P.max,this.P.hp+Math.round(this.P.max*CFG.HEAL_PCT)); this.nextFloor(); }}
-    ];
-    opts.forEach(o=>{ const d=document.createElement('div'); d.className='reward';
+    [{t:'招募新偉人',d:'換一個人進隊伍，帶來四張新牌，牌庫會大改。',f:()=>this.openRecruit()},
+     {t:'強化一張牌',d:'挑一張牌效果永久 +35%，牌庫變精不變大。',f:()=>this.openUpgrade()},
+     {t:'休息回血',d:'恢復 '+Math.round(CFG.HEAL_PCT*100)+'% 最大血量。撐不下去就選這個。',
+      f:()=>{SFX.heal();this.P.hp=Math.min(this.P.max,this.P.hp+Math.round(this.P.max*CFG.HEAL_PCT));this.nextFloor();}}
+    ].forEach(o=>{const d=document.createElement('div');d.className='reward';
       d.innerHTML='<b>'+o.t+'</b><span>'+o.d+'</span>';
-      d.onclick=()=>{SFX.tap();o.f();}; box.appendChild(d); });
+      d.onclick=()=>{SFX.tap();o.f();};box.appendChild(d);});
   },
-  backReward(){ SFX.tap(); this.newcomer=null; this.el('recruitStep2').style.display='none'; this.go('reward'); },
+  backReward(){SFX.tap();this.newcomer=null;this.el('recruitStep2').style.display='none';this.go('reward');},
   openRecruit(){
     const cand=shuffle(HEROES.list.filter(h=>!this.team.includes(h))).slice(0,3);
     this.newcomer=null;
-    const box=this.el('recruitGrid'); box.innerHTML='';
+    const box=this.el('recruitGrid');box.innerHTML='';
     cand.forEach(h=>{
-      const d=document.createElement('div'); d.className='hcard';
-      d.style.setProperty('--jb',CFG.JOB_COLOR[h.job]||'#777');
-      d.innerHTML='<div class="nm">'+h.name+'</div><div class="jb">'+h.job+'</div>'+
-        '<div class="st">攻'+h.atk+' 防'+h.def+' 智'+h.int+'</div>'+
-        '<div class="sk">'+h.skills.map(s=>s.n).join('<br>')+'</div>';
-      d.onclick=()=>{ SFX.tap(); this.newcomer=h;
-        if(!this.met.includes(h)) this.met.push(h);
+      const d=this.heroCard(h,false,()=>{
+        SFX.tap(); this.newcomer=h;
+        if(!this.met.includes(h))this.met.push(h);
         [...box.children].forEach(x=>x.classList.remove('sel'));
-        d.classList.add('sel'); this.renderLeave(); };
+        d.classList.add('sel'); this.renderLeave();
+      },true);
       box.appendChild(d);
     });
-    this.el('recruitStep2').style.display='none';
-    this.go('recruit');
+    this.el('recruitStep2').style.display='none'; this.go('recruit');
   },
   renderLeave(){
-    const box=this.el('leaveGrid'); box.innerHTML='';
+    const box=this.el('leaveGrid');box.innerHTML='';
     this.team.forEach(h=>{
-      const d=document.createElement('div'); d.className='hcard';
-      d.style.setProperty('--jb',CFG.JOB_COLOR[h.job]||'#777');
-      d.innerHTML='<div class="nm">'+h.name+'</div><div class="jb">'+h.job+'</div>'+
-        '<div class="st">攻'+h.atk+' 防'+h.def+' 智'+h.int+'</div>'+
-        '<div class="sk">'+h.skills.map(s=>s.n).join('<br>')+'</div>';
-      d.onclick=()=>{ SFX.tap();
+      box.appendChild(this.heroCard(h,false,()=>{
+        SFX.tap();
         this.team=this.team.map(x=>x===h?this.newcomer:x);
         this.deck=this.deck.filter(c=>c.hero!==h);
         this.newcomer.skills.forEach(s=>this.deck.push({hero:this.newcomer,n:s.n,type:s.type,val:s.val,up:1}));
-        this.recalcHP(false);
-        this.newcomer=null; this.nextFloor(); };
-      box.appendChild(d);
+        if(this.active===h)this.active=this.team[0];
+        this.recalcHP(false); this.newcomer=null; this.nextFloor();
+      },true));
     });
     this.el('recruitStep2').style.display='block';
   },
   openUpgrade(){
-    const box=this.el('upGrid'); box.innerHTML='';
+    const box=this.el('upGrid');box.innerHTML='';
     this.deck.forEach(c=>{
       const e=cardEffect(c,10);
       const cls=e.kind==='dmg'?'dmg':e.kind==='shield'?'shd':e.kind==='heal'?'hea':'wk';
-      const d=document.createElement('div'); d.className='card '+cls;
+      const d=document.createElement('div');d.className='card '+cls;
       d.style.setProperty('--jb',CFG.JOB_COLOR[c.hero.job]||'#777');
       d.innerHTML=(c.up>1?'<div class="up">+</div>':'')+
         '<div class="from">'+c.hero.name+'</div><div class="sn">'+c.n+'</div>'+
         '<div><div class="eff">'+e.v+'</div><div class="kind">'+CFG.KIND[c.type]+'</div></div>';
-      d.onclick=()=>{ SFX.win(); c.up*=CFG.UPGRADE; this.nextFloor(); };
+      d.onclick=()=>{SFX.win();c.up*=CFG.UPGRADE;this.nextFloor();};
       box.appendChild(d);
     });
     this.go('upgrade');
   },
-  nextFloor(){ this.floor++; this.startFloor(); },
+  nextFloor(){this.floor++;this.startFloor();},
 
-  /* ---------- 結束 ---------- */
+  /* --- 結束 --- */
   lose(){
-    SFX.lose();
+    SFX.lose(); ST.stop();
     this.el('endTxt').textContent='倒 在 第 '+this.floor+' 層';
     this.el('endTxt').style.color='var(--cinnabar)';
     this.el('endSub').textContent='被 '+this.E.ref.name+' 擋下來了。八層走了 '+(this.floor-1)+' 層。';
     this.renderFacts(); this.go('end');
   },
   clearGame(){
-    SFX.clear();
+    SFX.clear(); ST.stop();
     this.el('endTxt').textContent='登 頂';
     this.el('endTxt').style.color='var(--gold)';
-    this.el('endSub').textContent='八層全破。剩餘血量 '+this.P.hp+' / '+this.P.max+'。';
+    this.el('endSub').textContent='八層全破，剩餘血量 '+this.P.hp+' / '+this.P.max+'。';
     this.renderFacts(); this.go('end');
   },
   renderFacts(){
-    const box=this.el('endFacts'); box.innerHTML='';
+    const box=this.el('endFacts');box.innerHTML='';
     this.met.forEach(h=>{
-      const d=document.createElement('div'); d.className='fact';
+      const d=document.createElement('div');d.className='fact';
       d.innerHTML='<b>'+h.name+'</b>'+h.fact+
         '<div style="color:var(--dim);font-size:11px;margin-top:4px">'+h.job+'　'+h.era+'　'+h.region+
         (h.conf==='低'?'　（年代為推測）':'')+'</div>';
