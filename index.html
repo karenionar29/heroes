@@ -261,14 +261,24 @@ const ART = (() => {
     return cv;
   }
 
+  // iPhone 存檔常常給出 .PNG 大寫、或被轉成 jpg，
+  // 所以這裡把常見的副檔名依序試一輪，找到能載的就用，
+  // 讓 Kris 不必為了副檔名大小寫傷腦筋。
+  const EXTS = ['.png','.PNG','.jpg','.JPG','.jpeg','.JPEG','.webp','.WEBP'];
   function load(id){
     if(cache[id]) return cache[id];
     const rec = { state:'load', cv:null };
     cache[id] = rec;
-    const img = new Image();
-    img.onload  = ()=>{ try{ rec.cv = process(img); rec.state='ok'; }catch(e){ rec.state='fail'; } };
-    img.onerror = ()=>{ rec.state='fail'; };
-    img.src = 'img/' + id + '.png';   // 檔名就是角色代號
+    let k = 0;
+    const tryNext = () => {
+      if(k >= EXTS.length){ rec.state = 'fail'; return; }   // 全部試完都沒有，退回水墨
+      const img = new Image();
+      const ext = EXTS[k++];
+      img.onload  = ()=>{ try{ rec.cv = process(img); rec.state='ok'; }catch(e){ tryNext(); } };
+      img.onerror = tryNext;
+      img.src = 'img/' + id + ext;    // 檔名就是角色代號
+    };
+    tryNext();
     return rec;
   }
   // 用到誰才載誰
