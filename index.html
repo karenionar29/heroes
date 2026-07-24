@@ -285,7 +285,7 @@ const ART = (() => {
       if(k >= EXTS.length){ rec.state = 'fail'; return; }   // 全部試完都沒有，退回水墨
       const img = new Image();
       const ext = EXTS[k++];
-      img.onload  = ()=>{ try{ rec.cv = process(img); rec.state='ok'; }catch(e){ tryNext(); } };
+      img.onload  = ()=>{ try{ rec.cv = process(img); rec.state='ok'; fire(); }catch(e){ tryNext(); } };
       img.onerror = tryNext;
       img.src = 'img/' + id + ext;    // 檔名就是角色代號
     };
@@ -294,8 +294,11 @@ const ART = (() => {
   }
   // 用到誰才載誰
   function want(list){ (Array.isArray(list)?list:[list]).forEach(h=>h&&load(h.id)); }
+  const subs = [];
+  function onReady(fn){ subs.push(fn); }
+  function fire(){ subs.forEach(f=>{ try{ f(); }catch(e){} }); }
   function get(id){ const r = cache[id]; return (r && r.state==='ok') ? r.cv : null; }
-  return { want, get, load };
+  return { want, get, load, onReady };
 })();
 
 /* ══════════ 水墨繪製工具 ══════════ */
@@ -372,7 +375,10 @@ const IK = {
   /* 畫立繪：來源圖一律假設「面向右」，面向左時左右翻轉 */
   picture(g,cx,cy,s,img,face,lunge,a){
     const H = 178*s;                                  // 人物在畫面上的高度
-    const W = H * (img.naturalWidth/img.naturalHeight);
+    const iw = img.naturalWidth  || img.width;    // Image 用 natural*，canvas 用 width/height
+    const ih = img.naturalHeight || img.height;
+    if(!iw || !ih) return;                         // 尺寸拿不到就什麼都不畫，交給呼叫端
+    const W = H * (iw/ih);
     g.save();
     g.globalAlpha = a;
     g.translate(cx + lunge*14*face, cy - lunge*4 + 6*s);
@@ -619,7 +625,8 @@ const G={
       '<div class="k2">'+(showSkills?h.skills.map(s=>s.n).join('<br>'):h.skills.map(s=>CFG.KIND[s.type]).join('・'))+'</div>';
     d.appendChild(info);
     d.onclick=onclick;
-    [0,500,1200,2500].forEach(ms=>setTimeout(()=>ST.portrait(cvs,h),ms));  // 圖片可能晚到，補畫幾次
+    ST.portrait(cvs,h);
+    ART.onReady(()=>ST.portrait(cvs,h));   // 立繪載好會自動重畫這一格
     return d;
   },
   renderPick(){
