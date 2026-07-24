@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#12151c">
+<title>六格見方・戰術原型</title>
+<style>
+:root{--ink:#12151c;--slate:#1d222d;--line:#2c3342;--paper:#e6ddcb;
+  --cinnabar:#b5342b;--gold:#c9a227;--jade:#2f8f74;--dim:#8b93a4;
+  --serif:"Noto Serif TC","Songti TC",serif;
+  --sans:-apple-system,"PingFang TC","Noto Sans TC",sans-serif}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--ink);color:#e8e0cf;font-family:var(--sans);
+  background-image:repeating-linear-gradient(115deg,rgba(255,255,255,.014) 0 2px,transparent 2px 7px);
+  -webkit-user-select:none;user-select:none;overscroll-behavior:none;
+  padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+.wrap{max-width:480px;margin:0 auto;padding:10px 12px 20px}
+.screen{display:none}.screen.on{display:block}
+h1{font-family:var(--serif);font-size:30px;letter-spacing:.16em;text-align:center;margin:24px 0 4px}
+.sub{text-align:center;color:var(--dim);font-size:12px;letter-spacing:.18em;margin-bottom:16px}
+.rule{height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent);margin:13px 0}
+.btn{display:block;width:100%;padding:14px;margin:8px 0;border:1px solid var(--line);
+  background:var(--slate);color:#e8e0cf;font-family:var(--serif);font-size:17px;
+  letter-spacing:.1em;border-radius:3px;cursor:pointer;text-align:center}
+.btn.main{background:var(--cinnabar);border-color:#8f2820;color:#fff4ec}
+.btn small{display:block;font-family:var(--sans);font-size:12px;letter-spacing:0;color:var(--dim);margin-top:3px}
+.btn.main small{color:rgba(255,255,255,.72)}
+.hint{color:var(--dim);font-size:13px;line-height:1.9;margin:8px 0}
+.topbar{display:flex;justify-content:space-between;align-items:center;
+  font-size:12px;color:var(--dim);letter-spacing:.08em;margin-bottom:7px}
+.topbar button{background:none;border:none;color:var(--dim);font-size:12px;cursor:pointer}
+.turnbar{display:flex;gap:4px;margin-bottom:9px}
+.turnbar i{flex:1;height:4px;background:var(--line);border-radius:2px}
+.turnbar i.done{background:var(--jade)}.turnbar i.now{background:var(--gold)}
+#board{display:block;width:100%;border-radius:4px;background:var(--paper);
+  border:1px solid #3a3f4d;touch-action:manipulation}
+.say{text-align:center;font-size:13.5px;color:var(--gold);font-family:var(--serif);
+  letter-spacing:.04em;margin:10px 0 6px;min-height:22px;line-height:1.5}
+.heroes{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:4px}
+.h{background:var(--slate);border:1px solid var(--line);border-radius:3px;padding:9px 5px;
+  text-align:center;cursor:pointer;transition:.12s}
+.h.on{border-color:var(--gold);background:#2a2413}
+.h.used{opacity:.3;pointer-events:none}
+.h b{font-family:var(--serif);font-size:14px;display:block;letter-spacing:.02em}
+.h i{font-style:normal;font-size:11px;color:var(--gold);display:block;margin-top:3px}
+.h u{text-decoration:none;font-size:10.5px;color:var(--dim);display:block;margin-top:4px;line-height:1.45}
+.big{text-align:center;font-family:var(--serif);font-size:32px;letter-spacing:.16em;margin:22px 0 6px}
+.fact{background:var(--slate);border-left:3px solid var(--gold);padding:10px 12px;margin:7px 0;
+  font-size:12.5px;line-height:1.8;border-radius:0 3px 3px 0}
+.fact b{font-family:var(--serif);font-size:14px;display:block;margin-bottom:3px;letter-spacing:.05em}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<section id="s-title" class="screen on">
+  <h1>六格見方</h1>
+  <div class="sub">戰 術 原 型 ・ 一 關</div>
+  <div class="rule"></div>
+  <p class="hint">
+    兩個敵人要衝進「城」。<b style="color:#e8e0cf">你要撐過五回合。</b><br><br>
+    你有三位偉人，每人一個獨門絕活，<b style="color:var(--gold)">一局只能用一次</b>。<br>
+    敵人下一步要走哪，箭頭直接畫在地圖上——<b style="color:#e8e0cf">沒有運氣，全是算的。</b>
+  </p>
+  <div class="rule"></div>
+  <p class="hint">
+    <b style="color:var(--gold);font-family:var(--serif)">印和闐・階梯金字塔</b>　指定一格永久變成牆<br>
+    <b style="color:var(--gold);font-family:var(--serif)">華佗・麻沸散</b>　指定一個敵人，睡兩回合<br>
+    <b style="color:var(--gold);font-family:var(--serif)">諸葛亮・空城計</b>　指定一格，兩回合內敵人不敢靠近
+  </p>
+  <button class="btn main" onclick="G.start()">開始<small>三十秒內解得開</small></button>
+</section>
+
+<section id="s-play" class="screen">
+  <div class="topbar"><span id="turnTxt">第 1 回合</span><button onclick="G.start()">重來</button></div>
+  <div class="turnbar" id="turnbar"></div>
+  <canvas id="board" width="600" height="600"></canvas>
+  <div class="say" id="say">選一位偉人</div>
+  <div class="heroes" id="heroes"></div>
+  <button class="btn" onclick="G.pass()">這回合什麼都不做</button>
+</section>
+
+<section id="s-end" class="screen">
+  <div class="big" id="endTxt">—</div>
+  <p class="hint" id="endSub" style="text-align:center"></p>
+  <div class="rule"></div>
+  <div id="facts"></div>
+  <button class="btn main" onclick="G.start()">再解一次</button>
+  <button class="btn" onclick="G.go('title')">回首頁</button>
+</section>
+
+</div>
+<script>
+/* ══════════════════════════════════════════════
+   六格見方　戰術解謎原型
+   這一關已用窮舉驗證過：
+     什麼都不做一定輸；十萬種下法裡只有 7.4% 能贏；最少要用兩個技能
+   ══════════════════════════════════════════════ */
+const W=6, H=6, TURNS=5;
+const MAP0 = ['......','.####.','C.....','.####.','......','......'];
+const CITY = {x:0,y:2};
+const START = [{x:4,y:2},{x:1,y:5}];
+
+const HEROES = [
+  {id:'imhotep', n:'印和闐', s:'階梯金字塔', d:'指定一格，永久變成牆', target:'cell',
+   f:'他蓋了世界第一座金字塔，後來埃及人乾脆把他當成神來拜。'},
+  {id:'huatuo',  n:'華佗',   s:'麻沸散',     d:'指定一個敵人，睡兩回合', target:'enemy',
+   f:'他用麻沸散讓病人睡著再開刀，是最早的麻醉紀錄之一。'},
+  {id:'zhugeliang', n:'諸葛亮', s:'空城計',  d:'指定一格，兩回合內敵人不敢靠近', target:'cell',
+   f:'他大開城門獨自撫琴，司馬懿疑心有埋伏，帶兵撤了。'}
+];
+
+/* ---- 音效 ---- */
+const S=(()=>{let ac=null;
+  const ok=()=>{try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();
+    if(ac.state==='suspended')ac.resume();return 1}catch(e){return 0}};
+  const t=(f,d,ty,v)=>{if(!ok())return;const o=ac.createOscillator(),g=ac.createGain();
+    o.type=ty||'sine';o.frequency.value=f;g.gain.setValueAtTime(0,ac.currentTime);
+    g.gain.linearRampToValueAtTime(v||.12,ac.currentTime+.008);
+    g.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+d);
+    o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+d);};
+  return{tap:()=>t(520,.06,'triangle',.08),
+    build:()=>{t(160,.16,'square',.12);setTimeout(()=>t(120,.2,'sawtooth',.1),70)},
+    sleep:()=>{t(440,.14,'sine',.1);setTimeout(()=>t(280,.24,'sine',.09),90)},
+    ghost:()=>{t(620,.2,'triangle',.09);setTimeout(()=>t(830,.24,'sine',.08),100)},
+    step:()=>t(240,.07,'square',.06),
+    win:()=>{[523,659,784,1046].forEach((f,i)=>setTimeout(()=>t(f,.26,'triangle',.12),i*115))},
+    lose:()=>{[400,300,220,150].forEach((f,i)=>setTimeout(()=>t(f,.24,'square',.1),i*135))}};
+})();
+
+/* ---- 尋路 ---- */
+const key=(x,y)=>y*W+x;
+function isWall(g,x,y){ return x<0||y<0||x>=W||y>=H||g[y][x]==='#'; }
+function distMap(g, avoid){
+  const q=[[CITY.x,CITY.y]], d={}; d[key(CITY.x,CITY.y)]=0;
+  while(q.length){
+    const [x,y]=q.shift();
+    [[1,0],[-1,0],[0,1],[0,-1]].forEach(([dx,dy])=>{
+      const nx=x+dx, ny=y+dy;
+      if(isWall(g,nx,ny)) return;
+      if(avoid.has(key(nx,ny))) return;
+      if(d[key(nx,ny)]!==undefined) return;
+      d[key(nx,ny)]=d[key(x,y)]+1; q.push([nx,ny]);
+    });
+  }
+  return d;
+}
+function nextStep(g, e, avoid){
+  const d=distMap(g,avoid);
+  let best=null, bd=1e9;
+  [[1,0],[-1,0],[0,1],[0,-1]].forEach(([dx,dy])=>{
+    const nx=e.x+dx, ny=e.y+dy;
+    if(isWall(g,nx,ny)) return;
+    if(avoid.has(key(nx,ny))) return;
+    const v=d[key(nx,ny)];
+    if(v!==undefined && v<bd){ bd=v; best={x:nx,y:ny}; }
+  });
+  return best;
+}
+
+/* ---- 遊戲 ---- */
+const cv=document.getElementById('board'), g2=cv.getContext('2d');
+const G={
+  grid:[], es:[], turn:0, sel:null, used:{}, ghost:null, ghostLeft:0, anim:0,
+  el(id){return document.getElementById(id)},
+  go(n){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+    this.el('s-'+n).classList.add('on');window.scrollTo(0,0);},
+
+  start(){
+    S.tap();
+    this.grid=MAP0.map(r=>r.split(''));
+    this.es=START.map((e,i)=>({x:e.x,y:e.y,sleep:0,id:i}));
+    this.turn=0; this.sel=null; this.used={}; this.ghost=null; this.ghostLeft=0;
+    this.say('選一位偉人，或直接跳過這回合');
+    this.renderHeroes(); this.draw(); this.go('play');
+  },
+  say(t){ this.el('say').textContent=t; },
+  avoidSet(){
+    const a=new Set();
+    if(this.ghostLeft>0 && this.ghost){
+      [[1,0],[-1,0],[0,1],[0,-1],[0,0]].forEach(([dx,dy])=>{
+        const nx=this.ghost.x+dx, ny=this.ghost.y+dy;
+        if(nx<0||ny<0||nx>=W||ny>=H) return;
+        if(nx===CITY.x&&ny===CITY.y) return;   // 城本身不受影響
+        a.add(key(nx,ny));
+      });
+    }
+    return a;
+  },
+  renderHeroes(){
+    const box=this.el('heroes'); box.innerHTML='';
+    HEROES.forEach(h=>{
+      const d=document.createElement('div');
+      d.className='h'+(this.sel===h.id?' on':'')+(this.used[h.id]?' used':'');
+      d.innerHTML='<b>'+h.n+'</b><i>'+h.s+'</i><u>'+h.d+'</u>';
+      d.onclick=()=>{ S.tap();
+        this.sel = this.sel===h.id?null:h.id;
+        this.say(this.sel? (h.target==='enemy'?'點一個敵人':'點地圖上的一格') : '選一位偉人');
+        this.renderHeroes(); this.draw(); };
+      box.appendChild(d);
+    });
+    const tb=this.el('turnbar'); tb.innerHTML='';
+    for(let i=0;i<TURNS;i++){ const e=document.createElement('i');
+      if(i<this.turn)e.className='done'; else if(i===this.turn)e.className='now'; tb.appendChild(e); }
+    this.el('turnTxt').textContent='第 '+(this.turn+1)+' 回合　／　共 '+TURNS+' 回合';
+  },
+
+  /* ---- 出手 ---- */
+  tapCell(x,y){
+    if(this.anim) return;
+    const h=HEROES.find(k=>k.id===this.sel);
+    if(!h) return;
+    if(h.target==='enemy'){
+      const e=this.es.find(e=>e.x===x&&e.y===y);
+      if(!e){ this.say('要點在敵人身上'); return; }
+      e.sleep=2; S.sleep();
+      this.commit(h, e.id===0?'左邊那個':'下面那個');
+      return;
+    }
+    if(x===CITY.x&&y===CITY.y){ this.say('不能蓋在城上面'); return; }
+    if(this.grid[y][x]==='#'){ this.say('那裡已經是牆了'); return; }
+    if(this.es.some(e=>e.x===x&&e.y===y)){ this.say('那格站著人'); return; }
+    if(h.id==='imhotep'){ this.grid[y][x]='#'; S.build(); }
+    else { this.ghost={x,y}; this.ghostLeft=2; S.ghost(); }
+    this.commit(h);
+  },
+  commit(h, extra){
+    this.used[h.id]=1; this.sel=null;
+    this.say(h.n+' 使出 '+h.s+(extra?'（'+extra+'）':''));
+    this.renderHeroes(); this.draw();
+    setTimeout(()=>this.enemyTurn(), 520);
+  },
+  pass(){ if(this.anim) return; S.tap(); this.sel=null;
+    this.say('按兵不動'); this.renderHeroes(); this.draw();
+    setTimeout(()=>this.enemyTurn(), 300); },
+
+  enemyTurn(){
+    this.anim=1;
+    const avoid=this.avoidSet();
+    if(this.ghostLeft>0) this.ghostLeft--;
+    let lost=false;
+    this.es.forEach(e=>{
+      if(e.sleep>0){ e.sleep--; return; }
+      const n=nextStep(this.grid,e,avoid);
+      if(n){ e.x=n.x; e.y=n.y; S.step(); }
+      if(e.x===CITY.x&&e.y===CITY.y) lost=true;
+    });
+    this.draw();
+    if(lost){ setTimeout(()=>this.end(false),450); this.anim=0; return; }
+    this.turn++;
+    if(this.turn>=TURNS){ setTimeout(()=>this.end(true),450); this.anim=0; return; }
+    this.anim=0;
+    this.say('選一位偉人，或直接跳過這回合');
+    this.renderHeroes(); this.draw();
+  },
+
+  end(win){
+    S[win?'win':'lose']();
+    this.el('endTxt').textContent = win?'守 住 了':'城 破 了';
+    this.el('endTxt').style.color = win?'var(--gold)':'var(--cinnabar)';
+    this.el('endSub').textContent = win
+      ? '五回合撐過去了。這一關十萬種下法裡只有 7.4% 能贏。'
+      : '敵人衝進城了。提示：先看清楚箭頭要往哪走，再決定擋哪一格。';
+    const box=this.el('facts'); box.innerHTML='';
+    if(win) HEROES.forEach(h=>{
+      const d=document.createElement('div'); d.className='fact';
+      d.innerHTML='<b>'+h.n+'・'+h.s+'</b>'+h.f;
+      box.appendChild(d);
+    });
+    this.go('end');
+  },
+
+  /* ---- 畫面 ---- */
+  draw(){
+    const N=600, C=N/W;
+    g2.clearRect(0,0,N,N);
+    g2.fillStyle='#e6ddcb'; g2.fillRect(0,0,N,N);
+    const avoid=this.avoidSet();
+    // 格線
+    g2.strokeStyle='rgba(90,83,72,.28)'; g2.lineWidth=1.5;
+    for(let i=0;i<=W;i++){ g2.beginPath(); g2.moveTo(i*C,0); g2.lineTo(i*C,N); g2.stroke();
+      g2.beginPath(); g2.moveTo(0,i*C); g2.lineTo(N,i*C); g2.stroke(); }
+    // 空城計影響範圍
+    if(this.ghostLeft>0&&this.ghost){
+      g2.save(); g2.fillStyle='#8e5ba6'; g2.globalAlpha=.16;
+      avoid.forEach(k=>{ const x=k%W, y=(k/W)|0; g2.fillRect(x*C,y*C,C,C); });
+      g2.globalAlpha=.85; g2.strokeStyle='#8e5ba6'; g2.lineWidth=3;
+      g2.strokeRect(this.ghost.x*C+4,this.ghost.y*C+4,C-8,C-8);
+      g2.fillStyle='#8e5ba6'; g2.font='600 20px "Noto Serif TC",serif'; g2.textAlign='center';
+      g2.fillText('空', this.ghost.x*C+C/2, this.ghost.y*C+C/2+7);
+      g2.restore();
+    }
+    // 牆
+    for(let y=0;y<H;y++)for(let x=0;x<W;x++){
+      if(this.grid[y][x]!=='#') continue;
+      const built = MAP0[y][x]!=='#';
+      g2.save(); g2.fillStyle=built?'#8a7b4a':'#1e1a16'; g2.globalAlpha=built?.92:.86;
+      g2.fillRect(x*C+5,y*C+5,C-10,C-10);
+      if(built){ g2.fillStyle='#e6ddcb'; g2.font='600 26px "Noto Serif TC",serif';
+        g2.textAlign='center'; g2.fillText('塔',x*C+C/2,y*C+C/2+9); }
+      g2.restore();
+    }
+    // 城
+    g2.save(); g2.strokeStyle='#c9a227'; g2.lineWidth=4;
+    g2.strokeRect(CITY.x*C+6,CITY.y*C+6,C-12,C-12);
+    g2.fillStyle='#c9a227'; g2.globalAlpha=.16; g2.fillRect(CITY.x*C+6,CITY.y*C+6,C-12,C-12);
+    g2.globalAlpha=1; g2.font='700 34px "Noto Serif TC",serif'; g2.textAlign='center';
+    g2.fillText('城',CITY.x*C+C/2,CITY.y*C+C/2+12); g2.restore();
+    // 敵人與他的下一步
+    this.es.forEach(e=>{
+      const cx=e.x*C+C/2, cy=e.y*C+C/2;
+      if(e.sleep>0){
+        g2.save(); g2.globalAlpha=.45; g2.fillStyle='#1e1a16';
+        g2.beginPath(); g2.arc(cx,cy,C*0.3,0,6.283); g2.fill();
+        g2.globalAlpha=1; g2.fillStyle='#3f9aa8'; g2.font='700 22px "Noto Serif TC",serif';
+        g2.textAlign='center'; g2.fillText('睡',cx,cy+8);
+        g2.fillStyle='#3f9aa8'; g2.font='600 13px sans-serif';
+        g2.fillText('剩 '+e.sleep+' 回合',cx,cy+C*0.36); g2.restore();
+        return;
+      }
+      g2.save(); g2.fillStyle='#b5342b';
+      g2.beginPath(); g2.arc(cx,cy,C*0.3,0,6.283); g2.fill();
+      g2.fillStyle='#fff'; g2.font='700 24px "Noto Serif TC",serif'; g2.textAlign='center';
+      g2.fillText('敵',cx,cy+9); g2.restore();
+      // 箭頭：下一步往哪走（資訊全公開）
+      const n=nextStep(this.grid,e,avoid);
+      if(n){
+        const dx=n.x-e.x, dy=n.y-e.y;
+        g2.save(); g2.strokeStyle='#b5342b'; g2.fillStyle='#b5342b';
+        g2.lineWidth=5; g2.lineCap='round';
+        const sx=cx+dx*C*0.34, sy=cy+dy*C*0.34;
+        const ex=cx+dx*C*0.74, ey=cy+dy*C*0.74;
+        g2.beginPath(); g2.moveTo(sx,sy); g2.lineTo(ex,ey); g2.stroke();
+        g2.beginPath();
+        g2.moveTo(ex+dx*10, ey+dy*10);
+        g2.lineTo(ex-dy*9-dx*4, ey-dx*9-dy*4);
+        g2.lineTo(ex+dy*9-dx*4, ey+dx*9-dy*4);
+        g2.closePath(); g2.fill(); g2.restore();
+      } else {
+        g2.save(); g2.fillStyle='#b5342b'; g2.font='600 14px sans-serif'; g2.textAlign='center';
+        g2.fillText('走不了', cx, cy+C*0.42); g2.restore();
+      }
+    });
+    // 選了偉人之後，可以點的格子亮起來
+    if(this.sel){
+      const h=HEROES.find(k=>k.id===this.sel);
+      g2.save(); g2.globalAlpha=.2; g2.fillStyle='#c9a227';
+      for(let y=0;y<H;y++)for(let x=0;x<W;x++){
+        const okCell = h.target==='cell' && this.grid[y][x]==='.' &&
+          !(x===CITY.x&&y===CITY.y) && !this.es.some(e=>e.x===x&&e.y===y);
+        const okEnemy = h.target==='enemy' && this.es.some(e=>e.x===x&&e.y===y&&e.sleep===0);
+        if(okCell||okEnemy) g2.fillRect(x*C+3,y*C+3,C-6,C-6);
+      }
+      g2.restore();
+    }
+  }
+};
+cv.addEventListener('click', e=>{
+  const r=cv.getBoundingClientRect();
+  const x=Math.floor((e.clientX-r.left)/r.width*W);
+  const y=Math.floor((e.clientY-r.top)/r.height*H);
+  if(x>=0&&y>=0&&x<W&&y<H) G.tapCell(x,y);
+});
+document.addEventListener('gesturestart',e=>e.preventDefault());
+</script>
+</body>
+</html>
