@@ -6,865 +6,976 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="千古亂鬥">
+<meta name="apple-mobile-web-app-title" content="六格見方">
 <meta name="theme-color" content="#12151c">
-<title>千古亂鬥・登樓</title>
+<meta name="description" content="八位史書有載的偉人，八個只能用地圖表示的獨門絕活。五關戰術解謎。">
+<title>六格見方</title>
 <style>
-:root{--ink:#12151c;--slate:#1d222d;--line:#2c3342;--paper:#e8e0cf;--paper2:#d6cbb2;
-  --cinnabar:#b5342b;--jade:#2f8f74;--gold:#c9a227;--dim:#8b93a4;--danger:#e05a4a;
+:root{--ink:#12151c;--slate:#1d222d;--line:#2c3342;--paper:#e6ddcb;
+  --cinnabar:#b5342b;--gold:#c9a227;--jade:#2f8f74;--dim:#8b93a4;
   --serif:"Noto Serif TC","Songti TC","Source Han Serif TC",serif;
   --sans:-apple-system,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;height:100%}
-body{background:var(--ink);color:var(--paper);font-family:var(--sans);
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--ink);color:#e8e0cf;font-family:var(--sans);
   background-image:repeating-linear-gradient(115deg,rgba(255,255,255,.014) 0 2px,transparent 2px 7px);
-  overscroll-behavior:none;-webkit-user-select:none;user-select:none;
+  -webkit-user-select:none;user-select:none;overscroll-behavior:none;
   padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
-.wrap{max-width:540px;margin:0 auto;padding:10px 10px 20px;min-height:100%}
-.screen{display:none}.screen.on{display:block;animation:fade .25s}
-@keyframes fade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
-h1.logo{font-family:var(--serif);font-size:clamp(32px,10.5vw,50px);letter-spacing:.2em;
-  text-align:center;margin:26px 0 2px;font-weight:600;text-indent:.2em}
-.sub{text-align:center;color:var(--dim);font-size:12px;letter-spacing:.2em}
-.tagline{text-align:center;font-family:var(--serif);color:var(--gold);font-size:15px;
-  letter-spacing:.06em;margin:18px 0 22px;line-height:1.9}
-.rule{height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent);margin:13px 0}
+.wrap{max-width:480px;margin:0 auto;padding:10px 12px 22px}
+.screen{display:none}.screen.on{display:block;animation:f .25s}
+@keyframes f{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+h1{font-family:var(--serif);font-size:clamp(30px,10vw,44px);letter-spacing:.2em;
+  text-align:center;margin:24px 0 4px;text-indent:.2em}
+.sub{text-align:center;color:var(--dim);font-size:12px;letter-spacing:.2em;margin-bottom:14px}
+.rule{height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent);margin:12px 0}
 .btn{display:block;width:100%;padding:14px;margin:8px 0;border:1px solid var(--line);
-  background:var(--slate);color:var(--paper);font-family:var(--serif);font-size:17px;
+  background:var(--slate);color:#e8e0cf;font-family:var(--serif);font-size:17px;
   letter-spacing:.1em;border-radius:3px;cursor:pointer;text-align:center}
-.btn:active{transform:scale(.985)}
 .btn.main{background:var(--cinnabar);border-color:#8f2820;color:#fff4ec}
 .btn.go{background:var(--gold);border-color:#9c7d1c;color:#20180a;font-weight:700}
-.btn small{display:block;font-family:var(--sans);font-size:12px;letter-spacing:0;
-  color:var(--dim);margin-top:3px}
-.btn.main small{color:rgba(255,255,255,.72)}.btn.go small{color:rgba(32,24,10,.68)}
-.topbar{display:flex;justify-content:space-between;align-items:center;font-size:12px;
-  color:var(--dim);letter-spacing:.08em;padding:1px 0 5px}
+.btn small{display:block;font-family:var(--sans);font-size:12px;letter-spacing:0;color:var(--dim);margin-top:3px}
+.btn.main small{color:rgba(255,255,255,.72)}.btn.go small{color:rgba(32,24,10,.7)}
+.hint{color:var(--dim);font-size:13px;line-height:1.9;margin:8px 0}
+.topbar{display:flex;justify-content:space-between;align-items:center;
+  font-size:12px;color:var(--dim);letter-spacing:.08em;margin-bottom:7px}
 .topbar button{background:none;border:none;color:var(--dim);font-size:12px;cursor:pointer}
-.hint{color:var(--dim);font-size:12.5px;line-height:1.8;margin:9px 0}
-.tower{display:flex;gap:3px;margin:5px 0 7px}
-.tower i{flex:1;height:3px;background:var(--line);border-radius:2px}
-.tower i.done{background:var(--jade)}.tower i.now{background:var(--gold)}
-
-/* 舞台 */
-#stage{display:block;width:100%;border-radius:4px;background:#e6ddcb;
-  border:1px solid #3a3f4d;touch-action:none;box-shadow:inset 0 0 40px rgba(120,100,70,.18)}
-.bars{display:flex;gap:10px;margin-top:7px}
-.bars>div{flex:1;min-width:0}
-.nm{font-family:var(--serif);font-size:15px;letter-spacing:.05em}
-.bar{height:9px;background:#0b0e13;border:1px solid var(--line);border-radius:2px;
-  overflow:hidden;margin-top:4px}
-.bar i{display:block;height:100%;transition:width .3s ease}
-.hpn{font-size:11px;color:var(--dim);margin-top:3px;font-variant-numeric:tabular-nums}
-.intent{margin-top:8px;padding:7px 10px;border-radius:3px;background:#0d1016;
-  border:1px solid var(--line);font-size:13.5px;display:flex;
-  justify-content:space-between;align-items:center}
-.intent.atk{border-color:#5a2f2a}
-.intent.heavy{border-color:var(--danger);background:#1c1010}
-.intent .what{font-family:var(--serif);letter-spacing:.04em}
-.intent .num{font-size:18px;font-weight:700;font-variant-numeric:tabular-nums}
-.intent.atk .num{color:var(--danger)}.intent.heavy .num{color:#ff7a66}
-.intent .tag{font-size:10px;background:var(--danger);color:#fff;padding:1px 5px;
-  border-radius:2px;margin-left:5px}
-
-/* 手牌 */
-.hand{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:8px}
-.card{background:var(--paper);color:#211d15;border-radius:3px;padding:8px 5px;
-  text-align:center;position:relative;overflow:hidden;border:1px solid var(--paper2);
-  min-height:98px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer}
-.card:before{content:"";position:absolute;left:0;right:0;top:0;height:4px;background:var(--jb,#777)}
-.card:active{transform:translateY(2px)}
-.card .from{font-size:9.5px;color:#8a8271;margin-top:2px}
-.card .sn{font-family:var(--serif);font-size:13.5px;font-weight:600;line-height:1.2;margin:4px 0}
-.card .eff{font-size:17px;font-weight:700;font-variant-numeric:tabular-nums}
-.card .kind{font-size:10px;color:#6a6252;letter-spacing:.06em}
-.card.dmg .eff{color:#a33228}.card.shd .eff{color:#3a6ba8}
-.card.hea .eff{color:#2f7d5e}.card.wk .eff{color:#7a4b8c}
-.card .up{position:absolute;top:5px;right:4px;font-size:9px;color:var(--gold);
-  background:#3a2f10;padding:1px 4px;border-radius:2px}
-.card.locked{opacity:.45;pointer-events:none}
-
-/* 選人 */
+.turnbar{display:flex;gap:4px;margin-bottom:8px}
+.turnbar i{flex:1;height:4px;background:var(--line);border-radius:2px}
+.turnbar i.done{background:var(--jade)}.turnbar i.now{background:var(--gold)}
+#view{width:100%;aspect-ratio:1/0.95;border-radius:4px;overflow:hidden;
+  background:#161a22;border:1px solid #3a3f4d;position:relative;touch-action:none}
+#view canvas{display:block;width:100%;height:100%}
+#loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  color:var(--dim);font-size:13px;padding:20px;text-align:center}
+.say{text-align:center;font-size:13.5px;color:var(--gold);font-family:var(--serif);
+  letter-spacing:.04em;margin:9px 0 4px;min-height:22px;line-height:1.5}
+.tipline{text-align:center;font-size:11.5px;color:var(--dim);margin-bottom:7px}
 .heroes{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
-.hcard{background:var(--slate);border:1px solid var(--line);border-radius:3px;
-  padding:6px 4px 8px;text-align:center;cursor:pointer;position:relative}
-.hcard.sel{border-color:var(--gold);background:#241f11}
-.hcard canvas{display:block;width:100%;height:auto;background:#e6ddcb;border-radius:2px}
-.hcard .n2{font-family:var(--serif);font-size:14px;margin-top:2px;letter-spacing:.04em}
-.hcard .j2{font-size:10px;color:var(--dim);letter-spacing:.06em}
-.hcard .s2{font-size:10px;color:var(--dim);margin-top:3px;font-variant-numeric:tabular-nums}
-.hcard .k2{font-size:9.5px;color:#6f7787;margin-top:3px;line-height:1.5}
-.reward{background:var(--slate);border:1px solid var(--line);border-radius:4px;
-  padding:12px;margin:8px 0;cursor:pointer}
-.reward b{font-family:var(--serif);font-size:16px;letter-spacing:.06em;display:block;margin-bottom:3px}
-.reward span{font-size:12px;color:var(--dim);line-height:1.7}
-.fact{background:var(--slate);border-left:3px solid var(--gold);padding:9px 11px;margin:7px 0;
-  font-size:12.5px;line-height:1.7;border-radius:0 3px 3px 0}
-.fact b{font-family:var(--serif);font-size:14px;display:block;margin-bottom:2px;letter-spacing:.05em}
-.big{text-align:center;font-family:var(--serif);font-size:30px;letter-spacing:.18em;margin:22px 0 5px}
-@media (prefers-reduced-motion:reduce){.screen{animation:none}}
+.h{background:var(--slate);border:1px solid var(--line);border-radius:3px;padding:9px 5px;
+  text-align:center;cursor:pointer;transition:.12s}
+.h.on{border-color:var(--gold);background:#2a2413}
+.h.used{opacity:.26;pointer-events:none}
+.h b{font-family:var(--serif);font-size:13.5px;display:block;letter-spacing:.02em;line-height:1.25}
+.h i{font-style:normal;font-size:11px;color:var(--gold);display:block;margin-top:3px}
+.h u{text-decoration:none;font-size:10.5px;color:var(--dim);display:block;margin-top:4px;line-height:1.45}
+.lv{background:var(--slate);border:1px solid var(--line);border-radius:3px;padding:12px;
+  margin:7px 0;cursor:pointer}
+.lv.lock{opacity:.32;pointer-events:none}
+.lv b{font-family:var(--serif);font-size:16px;letter-spacing:.06em;display:block}
+.lv span{font-size:11.5px;color:var(--dim);display:block;margin-top:4px}
+.big{text-align:center;font-family:var(--serif);font-size:31px;letter-spacing:.16em;margin:20px 0 6px}
+.fact{background:var(--slate);border-left:3px solid var(--gold);padding:10px 12px;margin:7px 0;
+  font-size:12.5px;line-height:1.8;border-radius:0 3px 3px 0}
+.fact b{font-family:var(--serif);font-size:14px;display:block;margin-bottom:3px;letter-spacing:.05em}
+.err{background:#2a1414;border:1px solid #5a2f2a;border-radius:4px;padding:11px;
+  font-size:12.5px;line-height:1.7;color:#e8b0a6}
 </style>
 </head>
 <body>
 <div class="wrap">
 
 <section id="s-title" class="screen on">
-  <h1 class="logo">千古亂鬥</h1>
-  <div class="sub">登 樓</div>
+  <h1>六格見方</h1>
+  <div class="sub">歷 史 戰 術 解 謎</div>
   <div class="rule"></div>
-  <p class="tagline">帶三位偉人，用他們的十二招，<br>一層一層打上去。</p>
-  <button class="btn main" onclick="G.newRun()">開始登樓<small>八層，死了從頭來</small></button>
-  <button class="btn" onclick="G.go('rule')">怎麼玩<small>三十秒看懂</small></button>
-  <p class="hint" style="text-align:center;margin-top:18px">
-    二十四位史書有載的偉人，九十六招真實事蹟。<br>沒有立繪的人物，由程式即時畫成水墨。</p>
+  <p class="hint">
+    敵人要衝進「城」。<b style="color:#e8e0cf">你要撐過規定的回合數。</b><br><br>
+    每一位偉人有一個獨門絕活，<b style="color:var(--gold)">一關只能用一次</b>。<br>
+    敵人下一步走哪，箭頭直接畫在地上——<b style="color:#e8e0cf">沒有運氣，全是算的。</b>
+  </p>
+  <button class="btn main" onclick="G.menu()">開始<small>五關，每關三十秒到三分鐘</small></button>
+  <button class="btn" onclick="G.go('who')">八位偉人<small>他們各自會什麼</small></button>
+  <p class="hint" style="text-align:center;font-size:11.5px;margin-top:12px">
+    立體場景全部由程式堆成，零模型檔。
+  </p>
 </section>
 
-<section id="s-rule" class="screen">
-  <div class="topbar"><span>怎麼玩</span><button onclick="G.go('title')">返回</button></div>
+<section id="s-who" class="screen">
+  <div class="topbar"><span>八位偉人</span><button onclick="G.go('title')">返回</button></div>
   <div class="rule"></div>
-  <p class="hint"><b style="color:var(--gold);font-family:var(--serif);font-size:15px">一　組隊</b><br>
-  六個人選三個，他們的四招合起來十二張牌就是你的牌庫。</p>
-  <p class="hint"><b style="color:var(--gold);font-family:var(--serif);font-size:15px">二　打牌</b><br>
-  每回合抽三張選一張。<b style="color:var(--danger)">敵人下一招寫在他頭上</b>——標紅的重擊不擋會很痛。</p>
-  <p class="hint"><b style="color:var(--gold);font-family:var(--serif);font-size:15px">三　變強</b><br>
-  打贏一層三選一：換新偉人、強化一張牌、或回血。第八層打贏通關。</p>
-  <div class="rule"></div>
-  <p class="hint">護盾留著不會消失。削弱整場有效。<b style="color:var(--gold)">通關率約三成</b>，死了很正常。</p>
+  <div id="whoList"></div>
+  <p class="hint">收錄標準：史書有記載、留下的東西讓後人受益。侵略者、屠殺者、神話人物不收。</p>
   <button class="btn main" onclick="G.go('title')">知道了</button>
 </section>
 
-<section id="s-pick" class="screen">
-  <div class="topbar"><span id="pickHead">選三位偉人</span><button onclick="G.go('title')">放棄</button></div>
-  <p class="hint" id="pickHint">六個人選三個。會打的、會擋的、會回血的最好都有一個。</p>
-  <div class="heroes" id="pickGrid"></div>
-  <button class="btn go" id="pickGo" style="display:none" onclick="G.startRun()">就這三個，出發</button>
-</section>
-
-<section id="s-battle" class="screen">
-  <div class="topbar"><span id="floorTxt">第一層</span><button onclick="G.quit()">放棄這局</button></div>
-  <div class="tower" id="tower"></div>
-  <canvas id="stage" width="540" height="360"></canvas>
-  <div class="bars">
-    <div>
-      <div class="nm" id="mName">我方</div>
-      <div class="bar"><i id="mBar" style="width:100%;background:var(--jade)"></i></div>
-      <div class="hpn" id="mHp"></div>
-    </div>
-    <div style="text-align:right">
-      <div class="nm" id="eName">—</div>
-      <div class="bar"><i id="eBar" style="width:100%;background:var(--cinnabar);margin-left:auto"></i></div>
-      <div class="hpn" id="eHp"></div>
-    </div>
-  </div>
-  <div class="intent" id="intent"><span class="what" id="iWhat">—</span><span class="num" id="iNum"></span></div>
-  <div class="hand" id="hand"></div>
-</section>
-
-<section id="s-reward" class="screen">
-  <div class="topbar"><span id="rewardTitle">打贏了</span><span id="rewardHp"></span></div>
+<section id="s-menu" class="screen">
+  <div class="topbar"><span>選關卡</span><button onclick="G.go('title')">返回</button></div>
   <div class="rule"></div>
-  <div id="rewardBox"></div>
+  <div id="lvList"></div>
 </section>
 
-<section id="s-recruit" class="screen">
-  <div class="topbar"><span>招募新偉人</span><button onclick="G.backReward()">算了</button></div>
-  <p class="hint">選一個加入。</p>
-  <div class="heroes" id="recruitGrid"></div>
-  <div id="recruitStep2" style="display:none">
-    <div class="rule"></div><p class="hint">誰離隊？他的四張牌會被抽掉。</p>
-    <div class="heroes" id="leaveGrid"></div>
+<section id="s-play" class="screen">
+  <div class="topbar"><span id="lvName">—</span><span id="turnTxt" style="color:var(--gold)"></span><button onclick="G.menu()">放棄</button></div>
+  <div class="turnbar" id="turnbar"></div>
+  <div id="view"><div id="loading">正在搭建場景⋯⋯</div></div>
+  <div class="say" id="say">選一位偉人</div>
+  <div class="tipline" id="tip"></div>
+  <div class="heroes" id="heroes"></div>
+  <button class="btn" onclick="G.pass()">這回合什麼都不做</button>
+  <div style="display:flex;gap:7px">
+    <button class="btn" style="margin:0" onclick="G.start(G.lv)">重來這關</button>
   </div>
-</section>
-
-<section id="s-upgrade" class="screen">
-  <div class="topbar"><span>強化一張牌</span><button onclick="G.backReward()">算了</button></div>
-  <p class="hint">選一張，效果永久 +35%（這一局有效）。</p>
-  <div class="hand" id="upGrid"></div>
 </section>
 
 <section id="s-end" class="screen">
   <div class="big" id="endTxt">—</div>
   <p class="hint" id="endSub" style="text-align:center"></p>
   <div class="rule"></div>
-  <p class="hint" style="text-align:center;color:var(--gold);font-family:var(--serif);letter-spacing:.1em">這一局你帶過的人</p>
-  <div id="endFacts"></div>
-  <button class="btn main" onclick="G.newRun()">再登一次</button>
-  <button class="btn" onclick="G.go('title')">回首頁</button>
+  <div id="facts"></div>
+  <button class="btn go" id="nextBtn" style="display:none">下一關</button>
+  <button class="btn main" id="retryBtn">再解一次</button>
+  <button class="btn" onclick="G.menu()">回關卡表</button>
 </section>
 
 </div>
-
-<script src="heroes.js?v=1"></script>
 <script>
-/* ============================================================
-   千古亂鬥・登樓（水墨版）
-   規則與數值跟上一版一字不改（已通過兩萬局無頭驗證：
-   通關率 29.9%、無必勝組合），這一版只換掉「畫面」那一層。
-   所有人物與特效都是 Canvas 算出來的，零圖檔。
-   ============================================================ */
-const CFG = {
-  FLOORS:8, HAND:3, TEAM:3, PICK_POOL:6,
-  HP_BASE:95, HP_PER_DEF:3,
-  HIT_K:1.5, BRAIN_K:1.25, DEF_CUT:2, MIN_DMG:3,
-  WEAK_K:2, HEAVY:1.8,
-  ENEMY_HP_BASE:22, ENEMY_HP_PER_DEF:3,
-  ENEMY_HP_SCALE:0.08, ENEMY_PW_SCALE:0.02,
-  FLOOR_HEAL:0.25, HEAL_PCT:0.28, UPGRADE:1.35,
-  JOB_COLOR:{'武將':'#b5342b','軍師':'#5b7fb5','君王':'#8a6d3b','科學家':'#2f8f74',
-    '醫者':'#3f9aa8','航海家':'#4a6fa5','文人':'#8e5ba6','工匠':'#8a7b4a'},
-  KIND:{hit:'攻擊',brain:'智取',guard:'護盾',heal:'治療',weak:'削弱'}
+/* ══════════════════════════════════════════════
+   六格見方　規則引擎（純邏輯，沒有任何畫面）
+   這一份會原封不動內嵌進遊戲檔，確保「驗證的」與「玩到的」是同一套
+   ══════════════════════════════════════════════ */
+
+// ---- 八位偉人，每人一個「只能用地圖表示」的獨門招 ----
+const HERO_DB = {
+  imhotep:   {n:'印和闐',   j:'工匠',   s:'階梯金字塔', t:'cell',
+    d:'指定一格，永久變成牆',
+    f:'他蓋了世界第一座金字塔，後來埃及人乾脆把他當成神來拜。'},
+  huatuo:    {n:'華佗',     j:'醫者',   s:'麻沸散',     t:'enemy',
+    d:'指定一個敵人，睡兩回合',
+    f:'他用麻沸散讓病人睡著再開刀，是最早的麻醉紀錄之一。'},
+  zhugeliang:{n:'諸葛亮',   j:'軍師',   s:'空城計',     t:'cell',
+    d:'指定一格，兩回合內敵人不敢靠近它的上下左右',
+    f:'他大開城門獨自撫琴，司馬懿疑心有埋伏，帶兵撤了。'},
+  zhangheng: {n:'張衡',     j:'科學家', s:'地動儀',     t:'none',
+    d:'大地一震，所有敵人被震退一格',
+    f:'他做的地動儀，在洛陽就偵測到幾百公里外的地震。'},
+  zhangfei:  {n:'張飛',     j:'武將',   s:'當陽怒吼',   t:'cell',
+    d:'指定一格，旁邊的敵人被嚇退兩格',
+    f:'長坂坡上他一個人斷後，曹操大軍沒人敢上前。'},
+  zhenghe:   {n:'鄭和',     j:'航海家', s:'寶船遠航',   t:'enemy',
+    d:'指定一個敵人，把他送到離城最遠的地方',
+    f:'他的船隊有兩百多艘船，比哥倫布早了將近一百年出海。'},
+  libai:     {n:'李白',     j:'文人',   s:'斗酒百篇',   t:'enemy',
+    d:'指定一個敵人，灌醉他，兩回合往反方向走',
+    f:'杜甫寫他：喝一斗酒能作一百首詩，醉倒在長安的酒店裡。'},
+  elizabeth1:{n:'伊莉莎白一世', j:'君王', s:'女王詔令', t:'cell',
+    d:'指定一格，第一個踏進去的敵人停一回合',
+    f:'她一輩子不結婚，說「我已經嫁給英格蘭了」。'}
 };
 
-/* ══════════ 立繪圖片 ══════════
-   ① 有圖用圖，沒圖自動退回水墨人形
-   ② 白底會自動去背（從四邊往內洪水填充，只吃掉連到邊界的白，人物身上的白留著）
-   ③ 用到才載（懶載入），不會一開場就抓二十四張
-   ══════════════════════════════ */
-const ART = (() => {
-  const cache = {};                 // id -> {state:'load'|'ok'|'fail', cv}
-  const MAXH = 420;                 // 內部處理的最大高度，太大沒必要也吃記憶體
-  const WHITE = 236;                // 多白才算背景
+// ---- 五個關卡 ----
+// map: . 空地  # 牆  C 城
+const LEVELS = [
+  { id:1, name:'長坂坡',  turns:5,
+    map:['......','.####.','C.....','.####.','......','......'],
+    enemies:[{x:4,y:2},{x:1,y:5}],
+    heroes:['imhotep','huatuo','zhugeliang'],
+    tip:'走廊只有一條，堵住它。' },
+  { id:2, name:'醉臥長安', turns:6,
+    map:['..#...','..#...','C.....','..#...','.....#','......'],
+    enemies:[{x:3,y:2},{x:2,y:5}],
+    heroes:['libai','huatuo','elizabeth1'],
+    tip:'灌醉的人會往反方向走，等於倒退。' },
+  { id:3, name:'八陣圖',  turns:6,
+    map:['......','.#.#..','C.....','.#.#..','......','......'],
+    enemies:[{x:4,y:2},{x:5,y:0},{x:4,y:5}],
+    heroes:['zhugeliang','zhangheng','elizabeth1'],
+    tip:'空城計擋兩回合，地動儀把所有人一起震退。' },
+  { id:4, name:'洛陽城下', turns:5,
+    map:['......','..##..','C.....','..##..','......','......'],
+    enemies:[{x:3,y:2},{x:0,y:5},{x:5,y:1}],
+    heroes:['zhangheng','imhotep','zhangfei'],
+    tip:'地動儀能一次震退所有人。' },
+  { id:5, name:'寶船入港', turns:6,
+    map:['......','.#..#.','C.....','.#..#.','......','......'],
+    enemies:[{x:2,y:2},{x:4,y:4},{x:4,y:0}],
+    heroes:['zhenghe','zhugeliang','imhotep'],
+    tip:'寶船能把一個人整個丟到天邊。' }
+];
 
-  // 從四邊往內把「連得到邊界的近白色」變透明
-  function stripWhite(cv){
-    const g = cv.getContext('2d', {willReadFrequently:true});
-    const w = cv.width, h = cv.height;
-    const im = g.getImageData(0,0,w,h), d = im.data;
-    const seen = new Uint8Array(w*h);
-    const q = new Int32Array(w*h);
-    let head = 0, tail = 0;
-    const push = (x,y) => {
-      if(x<0||y<0||x>=w||y>=h) return;
-      const i = y*w+x; if(seen[i]) return;
-      const p = i*4;
-      if(d[p+3] < 8){ seen[i]=1; q[tail++]=i; return; }           // 本來就透明也算背景
-      if(d[p]<WHITE || d[p+1]<WHITE || d[p+2]<WHITE) return;      // 不夠白，停
-      seen[i]=1; d[p+3]=0; q[tail++]=i;
+// ══════════ 引擎 ══════════
+function makeEngine(level){
+  const W=6, H=6;
+  const key=(x,y)=>y*W+x;
+  let city=null;
+  level.map.forEach((row,y)=>row.split('').forEach((c,x)=>{ if(c==='C') city={x,y}; }));
+
+  function fresh(){
+    return {
+      grid: level.map.map(r=>r.split('').map(c=>c==='#'?'#':'.')),
+      es: level.enemies.map((e,i)=>({x:e.x,y:e.y,i, sleep:0, drunk:0, stop:0})),
+      fear:null, fearLeft:0,     // 空城計
+      decree:null,               // 女王詔令
+      turn:0, over:null
     };
-    for(let x=0;x<w;x++){ push(x,0); push(x,h-1); }
-    for(let y=0;y<h;y++){ push(0,y); push(w-1,y); }
-    while(head < tail){
-      const i = q[head++], x = i%w, y = (i/w)|0;
-      push(x+1,y); push(x-1,y); push(x,y+1); push(x,y-1);
+  }
+  const isWall=(g,x,y)=> x<0||y<0||x>=W||y>=H||g[y][x]==='#';
+
+  function distFrom(g, tx, ty, avoid){
+    const q=[[tx,ty]], d={}; d[key(tx,ty)]=0;
+    while(q.length){
+      const [x,y]=q.shift();
+      [[1,0],[-1,0],[0,1],[0,-1]].forEach(([dx,dy])=>{
+        const nx=x+dx, ny=y+dy;
+        if(isWall(g,nx,ny)) return;
+        if(avoid && avoid.has(key(nx,ny))) return;
+        if(d[key(nx,ny)]!==undefined) return;
+        d[key(nx,ny)]=d[key(x,y)]+1; q.push([nx,ny]);
+      });
     }
-    g.putImageData(im,0,0);
+    return d;
   }
-
-  // 這張圖本來就去背了嗎？（看四個角是不是已經透明）
-  function alreadyCut(cv){
-    const g = cv.getContext('2d', {willReadFrequently:true});
-    const w = cv.width, h = cv.height;
-    const pts = [[1,1],[w-2,1],[1,h-2],[w-2,h-2]];
-    let clear = 0;
-    for(const [x,y] of pts){ if(g.getImageData(x,y,1,1).data[3] < 20) clear++; }
-    return clear >= 3;      // 四角至少三個是透明 → 已經去過背，別再動它
-  }
-  function process(img){
-    const scale = Math.min(1, MAXH/img.naturalHeight);
-    const cv = document.createElement('canvas');
-    cv.width  = Math.max(1, Math.round(img.naturalWidth*scale));
-    cv.height = Math.max(1, Math.round(img.naturalHeight*scale));
-    const g = cv.getContext('2d', {willReadFrequently:true});
-    g.drawImage(img,0,0,cv.width,cv.height);
-    // 只有「白底沒去背」的圖才需要挖背景。
-    // 已經透明的圖硬去背會把人物身上的白（盔甲反光、毛皮亮部）一起吃掉，變成一片空白。
-    try { if(!alreadyCut(cv)) stripWhite(cv); } catch(e){ /* 讀不到像素就用原圖 */ }
-    return cv;
-  }
-
-  // iPhone 存檔常常給出 .PNG 大寫、或被轉成 jpg，
-  // 所以這裡把常見的副檔名依序試一輪，找到能載的就用，
-  // 讓 Kris 不必為了副檔名大小寫傷腦筋。
-  const EXTS = ['.png','.PNG','.jpg','.JPG','.jpeg','.JPEG','.webp','.WEBP'];
-  function load(id){
-    if(cache[id]) return cache[id];
-    const rec = { state:'load', cv:null };
-    cache[id] = rec;
-    let k = 0;
-    const tryNext = () => {
-      if(k >= EXTS.length){ rec.state = 'fail'; return; }   // 全部試完都沒有，退回水墨
-      const img = new Image();
-      const ext = EXTS[k++];
-      img.onload  = ()=>{ try{ rec.cv = process(img); rec.state='ok'; fire(); }catch(e){ tryNext(); } };
-      img.onerror = tryNext;
-      img.src = 'img/' + id + ext;    // 檔名就是角色代號
-    };
-    tryNext();
-    return rec;
-  }
-  // 用到誰才載誰
-  function want(list){ (Array.isArray(list)?list:[list]).forEach(h=>h&&load(h.id)); }
-  const subs = [];
-  function onReady(fn){ subs.push(fn); }
-  function fire(){ subs.forEach(f=>{ try{ f(); }catch(e){} }); }
-  function get(id){ const r = cache[id]; return (r && r.state==='ok') ? r.cv : null; }
-  return { want, get, load, onReady };
-})();
-
-/* ══════════ 水墨繪製工具 ══════════ */
-const IK = {
-  // 有粗細變化的墨線：起筆重、收筆輕
-  stroke(g,pts,w,alpha,col){
-    g.save(); g.strokeStyle=col; g.lineCap='round'; g.lineJoin='round';
-    for(let i=1;i<pts.length;i++){
-      const t=i/pts.length;
-      g.globalAlpha=(alpha===undefined?1:alpha)*(0.5+0.5*(1-t));
-      g.lineWidth=w*(1-t*0.7)+1;
-      g.beginPath(); g.moveTo(pts[i-1][0],pts[i-1][1]); g.lineTo(pts[i][0],pts[i][1]); g.stroke();
+  function fearSet(st){
+    const a=new Set();
+    if(st.fearLeft>0 && st.fear){
+      [[1,0],[-1,0],[0,1],[0,-1],[0,0]].forEach(([dx,dy])=>{
+        const nx=st.fear.x+dx, ny=st.fear.y+dy;
+        if(nx<0||ny<0||nx>=W||ny>=H) return;
+        if(nx===city.x&&ny===city.y) return;    // 城本身不受影響
+        a.add(key(nx,ny));
+      });
     }
-    g.restore();
+    return a;
+  }
+  // 敵人這一步要走哪（drunk 的話往遠離城的方向）
+  function nextStep(st, e){
+    const avoid=fearSet(st);
+    const d=distFrom(st.grid, city.x, city.y, avoid);
+    const here=d[key(e.x,e.y)];
+    let best=null, bv = e.drunk>0 ? -1 : 1e9;
+    [[1,0],[-1,0],[0,1],[0,-1]].forEach(([dx,dy])=>{
+      const nx=e.x+dx, ny=e.y+dy;
+      if(isWall(st.grid,nx,ny)) return;
+      if(avoid.has(key(nx,ny))) return;
+      if(st.es.some(o=>o!==e && o.x===nx && o.y===ny)) return;   // 不重疊
+      const v=d[key(nx,ny)];
+      if(v===undefined) return;
+      if(e.drunk>0 ? v>bv : v<bv){ bv=v; best={x:nx,y:ny}; }
+    });
+    if(e.drunk>0 && best && here!==undefined && bv<=here) return null;  // 醉了但無路可退就不動
+    return best;
+  }
+
+  // 把一個敵人往遠離 (fx,fy) 的方向推 n 格
+  function push(st, e, fx, fy, n){
+    for(let s=0;s<n;s++){
+      const dx=Math.sign(e.x-fx), dy=Math.sign(e.y-fy);
+      const cand=[];
+      if(dx) cand.push({x:e.x+dx,y:e.y});
+      if(dy) cand.push({x:e.x,y:e.y+dy});
+      if(!dx&&!dy) cand.push({x:e.x+1,y:e.y},{x:e.x-1,y:e.y},{x:e.x,y:e.y+1},{x:e.x,y:e.y-1});
+      let moved=false;
+      for(const c of cand){
+        if(isWall(st.grid,c.x,c.y)) continue;
+        if(c.x===city.x&&c.y===city.y) continue;
+        if(st.es.some(o=>o!==e&&o.x===c.x&&o.y===c.y)) continue;
+        e.x=c.x; e.y=c.y; moved=true; break;
+      }
+      if(!moved) break;
+    }
+  }
+
+  // 出招
+  function act(st, a){
+    if(!a) return true;
+    const h=HERO_DB[a.id];
+    if(!h) return false;
+    if(h.t==='cell'){
+      if(a.x===city.x&&a.y===city.y) return false;
+      if(st.grid[a.y][a.x]==='#') return false;
+      if(a.id!=='zhangfei' && a.id!=='elizabeth1' && st.es.some(e=>e.x===a.x&&e.y===a.y)) return false;
+    }
+    if(h.t==='enemy'){
+      const e=st.es[a.i];
+      if(!e || e.sleep>0) return false;
+    }
+    switch(a.id){
+      case 'imhotep':    st.grid[a.y][a.x]='#'; break;
+      case 'huatuo':     st.es[a.i].sleep=2; break;
+      case 'zhugeliang': st.fear={x:a.x,y:a.y}; st.fearLeft=2; break;
+      case 'zhangheng':  st.es.forEach(e=>{ if(e.sleep===0) push(st,e,city.x,city.y,1); }); break;
+      case 'zhangfei':   st.es.forEach(e=>{
+                           if(Math.abs(e.x-a.x)+Math.abs(e.y-a.y)<=1) push(st,e,a.x,a.y,2);
+                         }); break;
+      case 'zhenghe': {
+        const e=st.es[a.i];
+        const d=distFrom(st.grid, city.x, city.y, null);
+        let far=null, fv=-1;
+        for(let y=0;y<H;y++)for(let x=0;x<W;x++){
+          if(isWall(st.grid,x,y)) continue;
+          if(st.es.some(o=>o!==e&&o.x===x&&o.y===y)) continue;
+          const v=d[key(x,y)];
+          if(v!==undefined && v>fv){ fv=v; far={x,y}; }
+        }
+        if(far){ e.x=far.x; e.y=far.y; }
+        break;
+      }
+      case 'libai':      st.es[a.i].drunk=2; break;
+      case 'elizabeth1': st.decree={x:a.x,y:a.y}; break;
+    }
+    return true;
+  }
+
+  // 敵人行動一次
+  function enemyPhase(st){
+    if(st.fearLeft>0) st.fearLeft--;
+    for(const e of st.es){
+      if(e.stop>0){ e.stop--; continue; }
+      if(e.sleep>0){ e.sleep--; continue; }
+      const n=nextStep(st,e);
+      if(n){ e.x=n.x; e.y=n.y; }
+      if(e.drunk>0) e.drunk--;
+      if(st.decree && e.x===st.decree.x && e.y===st.decree.y){ e.stop=1; st.decree=null; }
+      if(e.x===city.x && e.y===city.y) return false;   // 城破
+    }
+    return true;
+  }
+
+  function run(actions){
+    const st=fresh();
+    for(let t=0;t<level.turns;t++){
+      if(!act(st, actions[t])) return {win:false, illegal:true};
+      if(!enemyPhase(st)) return {win:false};
+      st.turn++;
+    }
+    return {win:true};
+  }
+
+  // 這一關這回合所有合法的出招（給窮舉與 UI 用）
+  function options(st, remaining){
+    const out=[null];
+    remaining.forEach(id=>{
+      const h=HERO_DB[id];
+      if(h.t==='none'){ out.push({id}); return; }
+      if(h.t==='enemy'){ st.es.forEach((e,i)=>{ if(e.sleep===0) out.push({id,i}); }); return; }
+      for(let y=0;y<H;y++)for(let x=0;x<W;x++){
+        if(st.grid[y][x]==='#') continue;
+        if(x===city.x&&y===city.y) continue;
+        if(id!=='zhangfei'&&id!=='elizabeth1'&&st.es.some(e=>e.x===x&&e.y===y)) continue;
+        out.push({id,x,y});
+      }
+    });
+    return out;
+  }
+
+  return { W,H,city,fresh,isWall,distFrom,fearSet,nextStep,act,enemyPhase,run,options,level };
+}
+
+
+
+/* ══════════ 立體場景（Three.js，基本幾何堆成，零模型檔）══════════ */
+const V = {
+  ok:false, T:null, scene:null, cam:null, ren:null, ray:null,
+  tiles:[], walls:{}, enemies:[], heroes:{}, marks:{}, ghostGroup:null,
+  hi:[], anims:[], puffs:[], rings:[], shake:0, _last:0, _loop:0,
+
+  async boot(){
+    if(this.ok) return true;
+    const CDNS=[
+      'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
+      'https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js',
+      'https://unpkg.com/three@0.128.0/build/three.min.js'
+    ];
+    for(const url of CDNS){
+      try{
+        await new Promise((res,rej)=>{ const sc=document.createElement('script');
+          sc.src=url; sc.onload=res; sc.onerror=()=>rej(0); document.head.appendChild(sc); });
+        if(window.THREE){ this.T=window.THREE; break; }
+      }catch(e){}
+    }
+    if(!this.T) return false;
+    this.build(); this.ok=true; return true;
   },
-  // 飛白：乾筆掉下來的小墨點
-  splat(g,x,y,n,r,col,a){
-    g.save(); g.fillStyle=col;
+
+  build(){
+    const T=this.T, host=document.getElementById('view');
+    const w=host.clientWidth||360, h=host.clientHeight||340;
+    this.scene=new T.Scene();
+    this.scene.background=new T.Color(0x11141b);
+    this.scene.fog=new T.Fog(0x11141b, 14, 32);
+    this.cam=new T.PerspectiveCamera(40, w/h, 0.1, 100);
+    this.camHome={x:0.5,y:10.2,z:9.6};
+    this.cam.position.set(this.camHome.x,this.camHome.y,this.camHome.z);
+    this.cam.lookAt(0.2,0,0.5);
+    this.ren=new T.WebGLRenderer({antialias:true});
+    this.ren.setPixelRatio(Math.min(2,window.devicePixelRatio||1));
+    this.ren.setSize(w,h);
+    this.ren.shadowMap.enabled=true; this.ren.shadowMap.type=T.PCFSoftShadowMap;
+    host.innerHTML=''; host.appendChild(this.ren.domElement);
+    this.ray=new T.Raycaster();
+    this.scene.add(new T.AmbientLight(0xd9d2c0,0.7));
+    const dir=new T.DirectionalLight(0xfff4dd,1.0);
+    dir.position.set(-6,11.5,7); dir.castShadow=true; dir.shadow.mapSize.set(1024,1024);
+    const c=dir.shadow.camera; c.left=-9;c.right=9;c.top=9;c.bottom=-9;c.near=1;c.far=32;
+    this.scene.add(dir);
+    const rim=new T.DirectionalLight(0x9fb6d8,0.34); rim.position.set(7,4,-7); this.scene.add(rim);
+    const base=new T.Mesh(new T.BoxGeometry(6.9,0.5,9.2), this.mat(0x2a2f3a,.95));
+    base.position.set(-0.3,-0.35,0.6); base.receiveShadow=true; this.scene.add(base);
+    this.tileGroup=new T.Group(); this.scene.add(this.tileGroup);
+    this.objGroup=new T.Group();  this.scene.add(this.objGroup);
+    this.fxGroup=new T.Group();   this.scene.add(this.fxGroup);
+  },
+  mat(col,r,e){ return new this.T.MeshStandardMaterial({color:col,roughness:r===undefined?.75:r,emissive:e||0x000000}); },
+  pos(x,y){ return {x:x-2.5, z:y-2.5}; },
+
+  /* ---------- 人物：剪影＋信物，一眼認得出是誰 ---------- */
+  makeFigure(cfg){
+    const T=this.T, g=new T.Group();
+    const robe=new T.Mesh(new T.CylinderGeometry(0.19,0.36,0.78,10), this.mat(cfg.robe,.85));
+    robe.position.y=0.39; robe.castShadow=true; g.add(robe);
+    const sh=new T.Mesh(new T.CylinderGeometry(0.26,0.24,0.12,10), this.mat(cfg.robe2||cfg.robe,.8));
+    sh.position.y=0.82; sh.castShadow=true; g.add(sh);
+    const head=new T.Mesh(new T.SphereGeometry(0.16,14,12), this.mat(cfg.skin||0xd9b48a,.65));
+    head.position.y=1.03; head.castShadow=true; g.add(head);
+
+    switch(cfg.hat){
+      case 'tall':{ const b=new T.Mesh(new T.BoxGeometry(0.34,0.27,0.3), this.mat(0x2c3140,.9));
+        b.position.y=1.25; b.castShadow=true; g.add(b); break; }
+      case 'bun':{ const b=new T.Mesh(new T.SphereGeometry(0.09,10,8), this.mat(0x1c1a18,.9));
+        b.position.set(0,1.19,-0.02); g.add(b); break; }
+      case 'collar':{ const t=new T.Mesh(new T.TorusGeometry(0.2,0.045,8,16), this.mat(0xc9a227,.35));
+        t.position.y=0.9; t.rotation.x=Math.PI/2; t.castShadow=true; g.add(t); break; }
+      case 'cap':{ const c2=new T.Mesh(new T.CylinderGeometry(0.17,0.19,0.11,10), this.mat(0x2f3a33,.9));
+        c2.position.y=1.17; c2.castShadow=true; g.add(c2); break; }
+      case 'warhelm':{
+        const hm=new T.Mesh(new T.ConeGeometry(0.21,0.24,8), this.mat(0x54595f,.45));
+        hm.position.y=1.16; hm.castShadow=true; g.add(hm);
+        const pl=new T.Mesh(new T.ConeGeometry(0.055,0.26,6), this.mat(0xd6402f,.6,0x3a0d08));
+        pl.position.y=1.4; g.add(pl);
+        [-1,1].forEach(s=>{ const wg=new T.Mesh(new T.BoxGeometry(0.13,0.05,0.16), this.mat(0xc9a227,.4));
+          wg.position.set(s*0.2,1.1,0); wg.rotation.z=s*0.4; g.add(wg); });
+        break; }
+      case 'official':{ const b=new T.Mesh(new T.BoxGeometry(0.44,0.13,0.26), this.mat(0x1e2836,.85));
+        b.position.y=1.2; b.castShadow=true; g.add(b);
+        const t2=new T.Mesh(new T.BoxGeometry(0.2,0.14,0.2), this.mat(0x1e2836,.85));
+        t2.position.y=1.3; g.add(t2); break; }
+      case 'band':{ const b=new T.Mesh(new T.TorusGeometry(0.155,0.028,6,14), this.mat(0x8a3b3b,.8));
+        b.position.y=1.09; b.rotation.x=Math.PI/2; g.add(b);
+        const tail=new T.Mesh(new T.BoxGeometry(0.03,0.24,0.02), this.mat(0x8a3b3b,.8));
+        tail.position.set(0,0.98,-0.15); g.add(tail); break; }
+      case 'crown':{
+        const rf=new T.Mesh(new T.TorusGeometry(0.24,0.07,8,18), this.mat(0xf4efe2,.9));
+        rf.position.y=0.9; rf.rotation.x=Math.PI/2; rf.castShadow=true; g.add(rf);
+        const cr=new T.Mesh(new T.CylinderGeometry(0.155,0.155,0.07,10), this.mat(0xc9a227,.3));
+        cr.position.y=1.18; g.add(cr);
+        for(let i=0;i<5;i++){ const sp=new T.Mesh(new T.ConeGeometry(0.035,0.12,5), this.mat(0xc9a227,.3));
+          const a=i/5*6.283; sp.position.set(Math.cos(a)*0.12,1.27,Math.sin(a)*0.12); g.add(sp); }
+        break; }
+    }
+    if(cfg.beard){ const b=new T.Mesh(new T.ConeGeometry(cfg.bigBeard?0.13:0.095,cfg.bigBeard?0.32:0.25,8), this.mat(cfg.beard,.9));
+      b.position.set(0,cfg.bigBeard?0.88:0.9,0.13); b.rotation.x=Math.PI; g.add(b); }
+
+    const prop=new T.Group(); prop.position.set(0.3,0.72,0.06); g.add(prop);
+    switch(cfg.prop){
+      case 'rod':{ const r=new T.Mesh(new T.CylinderGeometry(0.032,0.032,1.15,8), this.mat(0xb08a4a,.7));
+        r.position.y=0.28; r.castShadow=true; prop.add(r);
+        const k=new T.Mesh(new T.BoxGeometry(0.16,0.16,0.06), this.mat(0xc9a227,.35));
+        k.position.y=0.86; prop.add(k); break; }
+      case 'gourd': case 'winejug':{
+        const col=cfg.prop==='gourd'?0x3f9aa8:0xa8763f;
+        const a1=new T.Mesh(new T.SphereGeometry(0.15,12,10), this.mat(col,.6)); prop.add(a1);
+        const a2=new T.Mesh(new T.SphereGeometry(0.1,12,10), this.mat(col,.6)); a2.position.y=0.16; prop.add(a2);
+        const cap=new T.Mesh(new T.CylinderGeometry(0.05,0.06,0.07,8), this.mat(0x8a6a3a,.8)); cap.position.y=0.27; prop.add(cap);
+        break; }
+      case 'fan':{ const f=new T.Mesh(new T.CircleGeometry(0.26,16,0,Math.PI), this.mat(0xf0ead9,.9));
+        f.position.y=0.22; f.rotation.y=Math.PI/2; prop.add(f);
+        const f2=f.clone(); f2.rotation.y=-Math.PI/2; prop.add(f2);
+        const st=new T.Mesh(new T.CylinderGeometry(0.028,0.028,0.3,6), this.mat(0x6b5a3a,.8)); st.position.y=0.02; prop.add(st);
+        break; }
+      case 'armilla':{ const core=new T.Mesh(new T.SphereGeometry(0.08,10,8), this.mat(0xc9a227,.3,0x3a2c06));
+        core.position.y=0.2; prop.add(core);
+        [[0,0,0],[Math.PI/2,0,0],[0,0,Math.PI/2]].forEach(([rx,ry,rz])=>{
+          const t=new T.Mesh(new T.TorusGeometry(0.19,0.018,6,20), this.mat(0x9a7f3a,.5));
+          t.position.y=0.2; t.rotation.set(rx,ry,rz); prop.add(t); });
+        const st=new T.Mesh(new T.CylinderGeometry(0.025,0.025,0.24,6), this.mat(0x6b5a3a,.8)); prop.add(st);
+        break; }
+      case 'snakespear':{ const sp=new T.Mesh(new T.CylinderGeometry(0.035,0.035,1.3,6), this.mat(0x4a3520,.85));
+        sp.position.y=0.3; sp.castShadow=true; prop.add(sp);
+        for(let i=0;i<3;i++){ const w=new T.Mesh(new T.BoxGeometry(0.1,0.07,0.03), this.mat(0xc0c4cb,.3));
+          w.position.set(i%2?0.05:-0.05, 1.02+i*0.09, 0); w.rotation.z=(i%2?1:-1)*0.5; prop.add(w); }
+        const tip=new T.Mesh(new T.ConeGeometry(0.07,0.2,6), this.mat(0xd2d6dd,.25)); tip.position.y=1.36; prop.add(tip);
+        break; }
+      case 'sail':{ const m2=new T.Mesh(new T.CylinderGeometry(0.03,0.03,1.2,6), this.mat(0x6b5334,.85));
+        m2.position.y=0.32; prop.add(m2);
+        const sl=new T.Mesh(new T.PlaneGeometry(0.42,0.62), new T.MeshStandardMaterial({color:0xe8dfc8,roughness:.9,side:this.T.DoubleSide}));
+        sl.position.set(0.2,0.5,0); prop.add(sl);
+        const hull=new T.Mesh(new T.BoxGeometry(0.4,0.1,0.16), this.mat(0x7a5a34,.8)); hull.position.y=-0.24; prop.add(hull);
+        break; }
+      case 'scepter':{ const st=new T.Mesh(new T.CylinderGeometry(0.028,0.028,0.85,8), this.mat(0xc9a227,.3));
+        st.position.y=0.2; st.castShadow=true; prop.add(st);
+        const orb=new T.Mesh(new T.SphereGeometry(0.09,12,10), this.mat(0xe8dfc8,.4,0x3a3520)); orb.position.y=0.68; prop.add(orb);
+        const cr=new T.Mesh(new T.ConeGeometry(0.05,0.1,5), this.mat(0xc9a227,.3)); cr.position.y=0.8; prop.add(cr);
+        break; }
+    }
+    g.userData.prop=prop; g.userData.head=head; g.userData.robe=robe;
+    return g;
+  },
+
+  FIG:{
+    imhotep:   {robe:0xe4dcc6,robe2:0xc9a227,skin:0xb98b5e,hat:'collar',  prop:'rod'},
+    huatuo:    {robe:0x2f4a6b,robe2:0x24384f,skin:0xd9b48a,hat:'bun',     prop:'gourd',   beard:0xdad4c6},
+    zhugeliang:{robe:0xf0ead9,robe2:0xd8cfb6,skin:0xd9b48a,hat:'tall',    prop:'fan',     beard:0x2a2622},
+    zhangheng: {robe:0x3a5a4a,robe2:0x2c4438,skin:0xd9b48a,hat:'cap',     prop:'armilla', beard:0x3a332c},
+    zhangfei:  {robe:0x8f2820,robe2:0x6b1d17,skin:0xc98f6a,hat:'warhelm', prop:'snakespear', beard:0x1a1614, bigBeard:1},
+    zhenghe:   {robe:0x2b4a7a,robe2:0x203a60,skin:0xd9b48a,hat:'official',prop:'sail'},
+    libai:     {robe:0xdcd2bd,robe2:0xc4b89e,skin:0xd9b48a,hat:'band',    prop:'winejug', beard:0x3a332c},
+    elizabeth1:{robe:0xf4efe2,robe2:0xc9a227,skin:0xe8c9a8,hat:'crown',   prop:'scepter'}
+  },
+
+  reset(level, st){
+    const T=this.T;
+    [this.tileGroup,this.objGroup,this.fxGroup].forEach(G=>{ while(G.children.length) G.remove(G.children[0]); });
+    this.tiles=[]; this.walls={}; this.enemies=[]; this.heroes={}; this.marks={};
+    this.hi=[]; this.anims=[]; this.puffs=[]; this.rings=[]; this.ghostGroup=null;
+    let city=null;
+    level.map.forEach((r,y)=>r.split('').forEach((c,x)=>{ if(c==='C') city={x,y}; }));
+    const tileGeo=new T.BoxGeometry(0.92,0.14,0.92);
+    for(let y=0;y<6;y++)for(let x=0;x<6;x++){
+      const p=this.pos(x,y), isC=(x===city.x&&y===city.y);
+      const m=new T.Mesh(tileGeo, this.mat(isC?0x6b5a24:0xd9d0bb,.9));
+      m.position.set(p.x,0,p.z); m.receiveShadow=true; m.userData={x,y};
+      this.tileGroup.add(m); this.tiles.push(m);
+      if(level.map[y][x]==='#') this.addWall(x,y,false);
+    }
+    const g=new T.Group(), p=this.pos(city.x,city.y);
+    const gm=new T.MeshStandardMaterial({color:0xc9a227,roughness:.42,metalness:.28});
+    [[-0.3,0.5,0.2,0.9,0.2],[0.3,0.5,0.2,0.9,0.2],[0,1.02,0.92,0.18,0.3]].forEach(([px,py,sx,sy,sz])=>{
+      const b=new T.Mesh(new T.BoxGeometry(sx,sy,sz),gm); b.position.set(px,py,0); b.castShadow=true; g.add(b); });
+    g.position.set(p.x,0,p.z); this.objGroup.add(g);
+    // 三位偉人站在城後面
+    level.heroes.forEach((id,i)=>{
+      const f=this.makeFigure(this.FIG[id]||this.FIG.imhotep);
+      f.position.set(-4.0, 0, (i-1)*1.1+0.3);
+      f.rotation.y=Math.PI/2;
+      f.userData.home={x:f.position.x,z:f.position.z};
+      this.objGroup.add(f); this.heroes[id]=f;
+    });
+    st.es.forEach(e=>this.addEnemy(e));
+  },
+
+  heroAct(id, then){
+    const f=this.heroes[id];
+    if(!f){ then&&then(); return; }
+    const home=f.userData.home, prop=f.userData.prop;
+    this.anims.push({t:0,dur:540,fn:(k)=>{
+      const e=Math.sin(k*Math.PI);
+      f.position.x=home.x+e*0.8; f.position.y=e*0.1;
+      prop.rotation.z=-e*1.2;
+      if(k>=1){ f.position.x=home.x; f.position.y=0; prop.rotation.z=0; }
+    }});
+    setTimeout(()=>then&&then(), 300);
+  },
+
+  addWall(x,y,built){
+    const T=this.T, p=this.pos(x,y), g=new T.Group();
+    if(built){
+      const m=this.mat(0xc9a86a,.85);
+      for(let i=0;i<4;i++){ const s=0.86-i*0.18;
+        const b=new T.Mesh(new T.BoxGeometry(s,0.24,s),m);
+        b.position.y=0.12+i*0.24; b.castShadow=true; b.receiveShadow=true; g.add(b); }
+      const cap=new T.Mesh(new T.TetrahedronGeometry(0.16), this.mat(0xc9a227,.35));
+      cap.position.y=1.06; cap.rotation.y=Math.PI/4; g.add(cap);
+      g.scale.y=0.01;
+      this.anims.push({t:0,dur:720,fn:(k)=>{ const e=1-Math.pow(1-k,3);
+        g.scale.y=0.01+e*0.99; g.rotation.y=(1-e)*0.6; }});
+      this.dust(p.x,p.z,26,0xc9a86a); this.shake=Math.max(this.shake,0.3);
+    }else{
+      const b=new T.Mesh(new T.BoxGeometry(0.9,0.62,0.9), this.mat(0x2b2f38,1));
+      b.position.y=0.31; b.castShadow=true; b.receiveShadow=true; g.add(b);
+    }
+    g.position.set(p.x,0,p.z); this.objGroup.add(g); this.walls[y*6+x]=g;
+  },
+
+  dust(x,z,n,col,high){
+    const T=this.T;
     for(let i=0;i<n;i++){
-      const ang=Math.random()*6.283, d=Math.random()*r;
-      g.globalAlpha=(a===undefined?1:a)*(0.12+Math.random()*0.45);
-      g.beginPath(); g.arc(x+Math.cos(ang)*d,y+Math.sin(ang)*d,Math.random()*2.6+0.5,0,6.283); g.fill();
+      const s=new T.Mesh(new T.SphereGeometry(0.06+Math.random()*0.07,6,5),
+        new T.MeshBasicMaterial({color:col,transparent:true,opacity:.75}));
+      const a=Math.random()*6.283, r=Math.random()*0.45;
+      s.position.set(x+Math.cos(a)*r,(high||0.12)+Math.random()*0.2,z+Math.sin(a)*r);
+      this.fxGroup.add(s);
+      this.puffs.push({m:s,vx:Math.cos(a)*0.035,vy:0.02+Math.random()*0.05,vz:Math.sin(a)*0.035,life:1});
     }
-    g.restore();
   },
-  // 固定亂數：同一個 id 永遠長同一個樣子
-  rng(seed){ let r=seed; return ()=>((r=(r*9301+49297)%233280)/233280); },
-  seedOf(str){ let h=0; for(let i=0;i<str.length;i++) h=(h*31+str.charCodeAt(i))%99991; return h+7; },
-
-  /* 一個偉人的水墨人形
-     face: 1 面向右, -1 面向左
-     lunge: 0~1 前傾（出招時） */
-  figure(g,cx,cy,s,hero,opt){
-    const o=opt||{}, face=o.face||1, lunge=o.lunge||0, col=o.col||'#201c18', a=o.alpha===undefined?1:o.alpha;
-    // 有立繪就畫立繪，沒有才用程式畫的水墨人形
-    const pic = ART.get(hero.id);
-    if(pic){ IK.picture(g,cx,cy,s,pic,face,lunge,a); return; }
-    const rn=IK.rng(IK.seedOf(hero.id));
-    const jc=CFG.JOB_COLOR[hero.job]||'#888';
-    const L=lunge*14*face;
-    g.save(); g.translate(L,-lunge*4);
-    // 腿：先畫，等一下會被袍子蓋掉上半截，只露出小腿
-    IK.stroke(g,[[cx-2*s,cy+20*s],[cx+face*(11+rn()*6)*s,cy+70*s]],8*s,a*.9,col);
-    IK.stroke(g,[[cx+2*s,cy+20*s],[cx-face*(9+rn()*6)*s,cy+70*s]],8*s,a*.9,col);
-    // 袍身：一整塊上窄下寬的墨團，這樣才有份量，不是火柴人
-    g.save(); g.globalAlpha=a*.92; g.fillStyle=col;
-    g.beginPath();
-    g.moveTo(cx-13*s,cy-40*s);
-    g.quadraticCurveTo(cx-20*s,cy-2*s,cx-29*s,cy+52*s);
-    g.quadraticCurveTo(cx,cy+62*s,cx+29*s,cy+52*s);
-    g.quadraticCurveTo(cx+20*s,cy-2*s,cx+13*s,cy-40*s);
-    g.closePath(); g.fill();
-    // 衣褶
-    g.globalAlpha=a*.3; g.strokeStyle='#e6ddcb'; g.lineWidth=2.4*s;
-    g.beginPath(); g.moveTo(cx-6*s,cy-24*s); g.lineTo(cx-12*s,cy+46*s); g.stroke();
-    g.beginPath(); g.moveTo(cx+7*s,cy-24*s); g.lineTo(cx+13*s,cy+46*s); g.stroke();
-    g.restore();
-    // 肩線
-    IK.stroke(g,[[cx-15*s,cy-37*s],[cx+15*s,cy-37*s]],7.5*s,a*.9,col);
-    // 頭
-    g.save(); g.globalAlpha=a*.92; g.fillStyle=col;
-    g.beginPath(); g.ellipse(cx+face*3*s,cy-56*s,13*s,15*s,0,0,6.283); g.fill(); g.restore();
-    // 手臂：出招那隻往前伸
-    const reach=(20+rn()*8+lunge*18)*s;
-    IK.stroke(g,[[cx+face*8*s,cy-30*s],[cx+face*(8+reach),cy-(6+rn()*12)*s-lunge*10*s]],7.5*s,a*.95,col);
-    IK.stroke(g,[[cx-face*8*s,cy-28*s],[cx-face*(16+rn()*8)*s,cy+(4+rn()*10)*s]],7.5*s,a*.95,col);
-    // 職業信物（用職業色，讓八種職業一眼分得出來）
-    IK.prop(g,cx,cy,s,hero.job,face,jc,a,lunge);
-    // 下襬飛白
-    IK.splat(g,cx,cy+50*s,10,24*s,col,a*.8);
-    g.restore();
+  ring(x,z,col,maxR){
+    const T=this.T;
+    const m=new T.Mesh(new T.RingGeometry(0.2,0.32,32),
+      new T.MeshBasicMaterial({color:col,transparent:true,opacity:.85,side:T.DoubleSide}));
+    m.rotation.x=-Math.PI/2; m.position.set(x,0.12,z);
+    this.fxGroup.add(m); this.rings.push({m,r:0.2,max:maxR||3.2});
   },
 
-  /* 畫立繪：來源圖一律假設「面向右」，面向左時左右翻轉 */
-  picture(g,cx,cy,s,img,face,lunge,a){
-    const H = 150*s;                                  // 人物在畫面上的高度（跟程序人形視覺大小對齊）
-    const iw = img.naturalWidth  || img.width;    // Image 用 natural*，canvas 用 width/height
-    const ih = img.naturalHeight || img.height;
-    if(!iw || !ih) return;                         // 尺寸拿不到就什麼都不畫，交給呼叫端
-    const W = H * (iw/ih);
-    g.save();
-    g.globalAlpha = a;
-    g.translate(cx + lunge*14*face, cy - lunge*4 + 6*s);
-    if(face < 0) g.scale(-1,1);                       // 敵人面向左
-    g.drawImage(img, -W/2, -H*0.62, W, H);   // 往上挪，讓腳踩在同一條地平線
-    g.restore();
-    // 腳邊補一點飛白，讓立繪跟水墨背景接得起來
-    IK.splat(g,cx,cy+62*s,8,26*s,'#201c18',a*0.35);
+  addEnemy(e){
+    const T=this.T;
+    const g=this.makeFigure({robe:0xb5342b,robe2:0x8f2820,skin:0xc98f6a,hat:'helm2',prop:'spear2'});
+    // 士兵的盔與矛（跟偉人明顯不同）
+    const helm=new T.Mesh(new T.ConeGeometry(0.2,0.26,8), this.mat(0x6b6f78,.5));
+    helm.position.y=1.16; helm.castShadow=true; g.add(helm);
+    const plume=new T.Mesh(new T.ConeGeometry(0.05,0.22,6), this.mat(0xd6402f,.6,0x2a0a06));
+    plume.position.y=1.38; g.add(plume);
+    const sp=new T.Mesh(new T.CylinderGeometry(0.03,0.03,1.25,6), this.mat(0x6b5334,.85));
+    sp.position.set(0.3,1.02,0.06); g.userData.prop.add(sp); sp.position.set(0,0.3,0);
+    const tip=new T.Mesh(new T.ConeGeometry(0.08,0.24,6), this.mat(0xa9adb5,.35));
+    tip.position.y=1.02; g.userData.prop.add(tip);
+    const ar=new T.Group();
+    const shaft=new T.Mesh(new T.BoxGeometry(0.09,0.09,0.4), this.mat(0xe2564a,.5,0x5a1a14));
+    shaft.position.z=-0.22; ar.add(shaft);
+    const at=new T.Mesh(new T.ConeGeometry(0.15,0.28,4), this.mat(0xe2564a,.5,0x5a1a14));
+    at.position.z=-0.54; at.rotation.x=-Math.PI/2; ar.add(at);
+    ar.position.y=1.62; g.add(ar);
+    const p=this.pos(e.x,e.y); g.position.set(p.x,0,p.z);
+    this.objGroup.add(g);
+    this.enemies.push({g,arrow:ar,ref:e,zzz:null,drunkFx:null});
   },
 
-  /* 八種職業各有一個信物，這是「一眼認出他是誰」的關鍵 */
-  prop(g,cx,cy,s,job,face,col,a,lunge){
-    g.save(); g.strokeStyle=col; g.fillStyle=col; g.globalAlpha=a*.9;
-    g.lineCap='round'; g.lineWidth=4*s;
-    const hx=cx+face*(20+lunge*16)*s, hy=cy-18*s-lunge*8*s;   // 手的位置（貼著身體）
-    if(job==='武將'){            // 長矛
-      g.lineWidth=5*s; g.beginPath();
-      g.moveTo(hx-face*10*s,hy+40*s); g.lineTo(hx+face*16*s,hy-52*s); g.stroke();
-      g.beginPath(); g.moveTo(hx+face*16*s,hy-52*s); g.lineTo(hx+face*10*s,hy-40*s);
-      g.lineTo(hx+face*22*s,hy-40*s); g.closePath(); g.fill();
-    } else if(job==='軍師'){     // 羽扇
-      g.beginPath(); g.moveTo(hx,hy);
-      g.arc(hx,hy-14*s,15*s,0.5,Math.PI-0.5); g.closePath(); g.globalAlpha=a*.55; g.fill();
-      g.globalAlpha=a*.9; g.lineWidth=3*s; g.beginPath();
-      g.moveTo(hx,hy); g.lineTo(hx,hy+16*s); g.stroke();
-    } else if(job==='君王'){     // 冠冕
-      g.lineWidth=3.4*s;
-      g.beginPath(); g.moveTo(cx-15*s,cy-66*s); g.lineTo(cx-15*s,cy-77*s);
-      g.lineTo(cx-6*s,cy-70*s); g.lineTo(cx+3*s,cy-80*s); g.lineTo(cx+12*s,cy-70*s);
-      g.lineTo(cx+19*s,cy-77*s); g.lineTo(cx+19*s,cy-66*s); g.closePath();
-      g.globalAlpha=a*.85; g.fill();
-    } else if(job==='科學家'){   // 渾儀（同心圓環）
-      g.lineWidth=2.6*s; g.globalAlpha=a*.85;
-      g.beginPath(); g.arc(hx,hy,15*s,0,6.283); g.stroke();
-      g.beginPath(); g.ellipse(hx,hy,15*s,6*s,0.5,0,6.283); g.stroke();
-      g.beginPath(); g.ellipse(hx,hy,6*s,15*s,0.5,0,6.283); g.stroke();
-    } else if(job==='醫者'){     // 藥葫蘆
-      g.globalAlpha=a*.8;
-      g.beginPath(); g.arc(hx,hy+8*s,11*s,0,6.283); g.fill();
-      g.beginPath(); g.arc(hx,hy-7*s,7*s,0,6.283); g.fill();
-      g.globalAlpha=a; g.lineWidth=3*s;
-      g.beginPath(); g.moveTo(hx-5*s,hy-14*s); g.lineTo(hx+5*s,hy-14*s); g.stroke();
-    } else if(job==='航海家'){   // 帆
-      g.globalAlpha=a*.55;
-      g.beginPath(); g.moveTo(hx,hy-30*s); g.lineTo(hx+face*22*s,hy+4*s);
-      g.lineTo(hx,hy+14*s); g.closePath(); g.fill();
-      g.globalAlpha=a; g.lineWidth=3.4*s;
-      g.beginPath(); g.moveTo(hx,hy-34*s); g.lineTo(hx,hy+22*s); g.stroke();
-    } else if(job==='文人'){     // 展開的卷軸
-      g.globalAlpha=a*.5;
-      g.fillRect(hx-face*4*s,hy-12*s,face*30*s,22*s);
-      g.globalAlpha=a; g.lineWidth=3.6*s;
-      g.beginPath(); g.moveTo(hx-face*4*s,hy-15*s); g.lineTo(hx-face*4*s,hy+13*s); g.stroke();
-      g.beginPath(); g.moveTo(hx+face*26*s,hy-15*s); g.lineTo(hx+face*26*s,hy+13*s); g.stroke();
-    } else {                     // 工匠：曲尺與槌
-      g.lineWidth=4.4*s;
-      g.beginPath(); g.moveTo(hx-face*12*s,hy-14*s); g.lineTo(hx+face*12*s,hy-14*s);
-      g.lineTo(hx+face*12*s,hy+12*s); g.stroke();
-      g.globalAlpha=a*.85; g.fillRect(hx+face*4*s,hy+12*s,face*16*s,9*s);
+  syncEnemies(st, tween){
+    st.es.forEach((e,i)=>{
+      const o=this.enemies[i]; if(!o) return;
+      const to=this.pos(e.x,e.y);
+      if(tween){
+        const from={x:o.g.position.x,z:o.g.position.z};
+        if(Math.abs(from.x-to.x)>0.01||Math.abs(from.z-to.z)>0.01){
+          const far=Math.abs(from.x-to.x)+Math.abs(from.z-to.z)>1.6;
+          this.anims.push({t:0,dur:far?620:400,fn:(k)=>{
+            const ee=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;
+            o.g.position.x=from.x+(to.x-from.x)*ee;
+            o.g.position.z=from.z+(to.z-from.z)*ee;
+            o.g.position.y=Math.sin(k*Math.PI)*(far?1.4:0.14);
+            if(k>=1) o.g.position.y=0;
+          }});
+        }
+      } else { o.g.position.set(to.x,0,to.z); }
+      // 睡著
+      if(e.sleep>0 && !o.zzz) this.sleepFx(i,true);
+      if(e.sleep===0 && o.zzz) this.sleepFx(i,false);
+      // 喝醉
+      if(e.drunk>0 && !o.drunkFx) this.drunkFx(i,true);
+      if(e.drunk===0 && o.drunkFx) this.drunkFx(i,false);
+      o.arrow.visible = e.sleep===0;
+    });
+  },
+  sleepFx(i,on){
+    const T=this.T, o=this.enemies[i]; if(!o) return;
+    if(on){
+      this.anims.push({t:0,dur:640,fn:(k)=>{ const e=1-Math.pow(1-k,3);
+        o.g.rotation.z=e*Math.PI*0.44; }});
+      const zg=new T.Group();
+      for(let n=0;n<3;n++){
+        const z=new T.Mesh(new T.BoxGeometry(0.14,0.035,0.02),
+          new T.MeshBasicMaterial({color:0x6fd0b0,transparent:true,opacity:.9}));
+        z.position.set(0.1*n,1.5+n*0.22,0); z.rotation.z=0.5; zg.add(z);
+      }
+      o.g.add(zg); o.zzz=zg;
+    }else{
+      this.anims.push({t:0,dur:420,fn:(k)=>{ const e=1-Math.pow(1-k,3);
+        o.g.rotation.z=(1-e)*Math.PI*0.44; }});
+      if(o.zzz){ o.g.remove(o.zzz); o.zzz=null; }
     }
-    g.restore();
+  },
+  drunkFx(i,on){
+    const T=this.T, o=this.enemies[i]; if(!o) return;
+    if(on){
+      const g=new T.Group();
+      for(let n=0;n<3;n++){
+        const b=new T.Mesh(new T.SphereGeometry(0.07,8,6),
+          new T.MeshBasicMaterial({color:0xd8a0e0,transparent:true,opacity:.7}));
+        b.position.set(Math.cos(n*2.1)*0.22,1.45,Math.sin(n*2.1)*0.22); g.add(b);
+      }
+      o.g.add(g); o.drunkFx=g;
+      this.anims.push({t:0,dur:99999,fn:()=>{ if(o.drunkFx) o.drunkFx.rotation.y+=0.05; }});
+    }else if(o.drunkFx){ o.g.remove(o.drunkFx); o.drunkFx=null; }
+  },
+  setArrow(i,dx,dy,show){
+    const o=this.enemies[i]; if(!o) return;
+    o.arrow.visible=!!show; if(!show) return;
+    o.arrow.rotation.y=Math.atan2(-dx,-dy);
+  },
+
+  showGhost(cells,center){
+    const T=this.T; this.clearGhost();
+    const g=new T.Group();
+    const mat=new T.MeshStandardMaterial({color:0x9b6bb5,transparent:true,opacity:.3,roughness:.35,emissive:0x35174a});
+    cells.forEach(k=>{ const x=k%6,y=(k/6)|0,p=this.pos(x,y);
+      const b=new T.Mesh(new T.BoxGeometry(0.9,1.7,0.9),mat); b.position.set(p.x,0.85,p.z); g.add(b); });
+    const p=this.pos(center.x,center.y);
+    const qin=new T.Mesh(new T.BoxGeometry(0.62,0.09,0.2), this.mat(0xc9a227,.4,0x4a3a08));
+    qin.position.set(p.x,1.9,p.z); g.add(qin);
+    for(let i=0;i<4;i++){ const s=new T.Mesh(new T.BoxGeometry(0.58,0.012,0.012),
+      new T.MeshBasicMaterial({color:0xffe9a8,transparent:true,opacity:.85}));
+      s.position.set(p.x,1.97,p.z-0.06+i*0.04); g.add(s); }
+    g.scale.y=0.01;
+    this.anims.push({t:0,dur:600,fn:(k)=>{ g.scale.y=0.01+(1-Math.pow(1-k,3))*0.99; }});
+    this.dust(p.x,p.z,20,0xb98fd0,0.4);
+    this.objGroup.add(g); this.ghostGroup=g; this.shake=Math.max(this.shake,0.18);
+  },
+  clearGhost(){ if(this.ghostGroup){ this.objGroup.remove(this.ghostGroup); this.ghostGroup=null; } },
+
+  addMark(x,y){
+    const T=this.T, p=this.pos(x,y), g=new T.Group();
+    const base=new T.Mesh(new T.CylinderGeometry(0.3,0.34,0.08,12), this.mat(0xc9a227,.3,0x3a2c06));
+    base.position.y=0.13; g.add(base);
+    const seal=new T.Mesh(new T.BoxGeometry(0.26,0.34,0.06), this.mat(0xc9a227,.3,0x4a3808));
+    seal.position.y=0.36; g.add(seal);
+    g.position.set(p.x,0,p.z); g.scale.setScalar(0.01);
+    this.anims.push({t:0,dur:460,fn:(k)=>{ const e=1-Math.pow(1-k,3); g.scale.setScalar(0.01+e*0.99);
+      g.rotation.y=e*Math.PI*2; }});
+    this.objGroup.add(g); this.marks[y*6+x]=g;
+    this.dust(p.x,p.z,14,0xe8d59a,0.3);
+  },
+  clearMarks(){ Object.values(this.marks).forEach(m=>this.objGroup.remove(m)); this.marks={}; },
+
+  highlight(list){
+    const T=this.T;
+    this.hi.forEach(m=>this.tileGroup.remove(m)); this.hi=[];
+    list.forEach(({x,y})=>{ const p=this.pos(x,y);
+      const m=new T.Mesh(new T.BoxGeometry(0.94,0.02,0.94),
+        new T.MeshBasicMaterial({color:0xc9a227,transparent:true,opacity:.5}));
+      m.position.set(p.x,0.09,p.z); this.tileGroup.add(m); this.hi.push(m); });
+  },
+
+  pick(ev){
+    if(!this.ok) return null;
+    const r=this.ren.domElement.getBoundingClientRect();
+    const v=new this.T.Vector2(((ev.clientX-r.left)/r.width)*2-1, -((ev.clientY-r.top)/r.height)*2+1);
+    this.ray.setFromCamera(v,this.cam);
+    const hit=this.ray.intersectObjects(this.tiles,false);
+    return hit.length?hit[0].object.userData:null;
+  },
+
+  loop(now){
+    if(!this.ok) return;
+    requestAnimationFrame(t=>this.loop(t));
+    const dt=this._last?Math.min(60,now-this._last):16; this._last=now;
+    this.anims=this.anims.filter(a=>{ a.t+=dt; const k=Math.min(1,a.t/a.dur); a.fn(k); return k<1; });
+    this.puffs=this.puffs.filter(p=>{
+      p.m.position.x+=p.vx; p.m.position.y+=p.vy; p.m.position.z+=p.vz;
+      p.vy-=0.0016; p.life-=0.022; p.m.material.opacity=Math.max(0,p.life*0.75);
+      p.m.scale.multiplyScalar(1.012);
+      if(p.life<=0){ this.fxGroup.remove(p.m); return false; } return true; });
+    this.rings=this.rings.filter(r=>{
+      r.r+=0.16; const k=r.r/r.max;
+      r.m.scale.setScalar(r.r/0.26); r.m.material.opacity=Math.max(0,0.85*(1-k));
+      if(k>=1){ this.fxGroup.remove(r.m); return false; } return true; });
+    if(this.shake>0.002){
+      this.cam.position.x=this.camHome.x+(Math.random()-.5)*this.shake;
+      this.cam.position.z=this.camHome.z+(Math.random()-.5)*this.shake;
+      this.cam.lookAt(0.2,0,0.5); this.shake*=0.87;
+    }
+    this.ren.render(this.scene,this.cam);
+  },
+  resize(){
+    if(!this.ok) return;
+    const host=document.getElementById('view');
+    this.cam.aspect=host.clientWidth/host.clientHeight;
+    this.cam.updateProjectionMatrix(); this.ren.setSize(host.clientWidth,host.clientHeight);
   }
 };
+window.addEventListener('resize',()=>V.resize());
 
-/* ══════════ 音效（Web Audio 合成，零音檔）══════════ */
-const SFX=(()=>{
-  let ac=null;
+/* ══════════ 音效 ══════════ */
+const S=(()=>{let ac=null;
   const ok=()=>{try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();
     if(ac.state==='suspended')ac.resume();return 1}catch(e){return 0}};
   const t=(f,d,ty,v)=>{if(!ok())return;const o=ac.createOscillator(),g=ac.createGain();
     o.type=ty||'sine';o.frequency.value=f;g.gain.setValueAtTime(0,ac.currentTime);
-    g.gain.linearRampToValueAtTime(v||.13,ac.currentTime+.008);
+    g.gain.linearRampToValueAtTime(v||.12,ac.currentTime+.008);
     g.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+d);
     o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+d);};
-  const noise=(d,v,freq)=>{if(!ok())return;const n=ac.sampleRate*d,b=ac.createBuffer(1,n,ac.sampleRate),c=b.getChannelData(0);
+  const noise=(d,v,f)=>{if(!ok())return;const n=ac.sampleRate*d,b=ac.createBuffer(1,n,ac.sampleRate),c=b.getChannelData(0);
     for(let i=0;i<n;i++)c[i]=(Math.random()*2-1)*(1-i/n);
-    const src=ac.createBufferSource();src.buffer=b;
-    const f=ac.createBiquadFilter();f.type='bandpass';f.frequency.value=freq||1700;
-    const g=ac.createGain();g.gain.value=v||.14;
-    src.connect(f);f.connect(g);g.connect(ac.destination);src.start();};
+    const src=ac.createBufferSource();src.buffer=b;const fl=ac.createBiquadFilter();
+    fl.type='bandpass';fl.frequency.value=f||500;const g=ac.createGain();g.gain.value=v;
+    src.connect(fl);fl.connect(g);g.connect(ac.destination);src.start();};
   return{
     tap:()=>t(520,.06,'triangle',.08),
-    slash:()=>{noise(.15,.19,2000);t(190,.1,'square',.09)},
-    brain:()=>{t(720,.14,'triangle',.1);setTimeout(()=>t(1080,.18,'sine',.09),70)},
-    guard:()=>{noise(.12,.1,600);t(300,.2,'sine',.1)},
-    heal:()=>{t(520,.11,'sine',.09);setTimeout(()=>t(790,.16,'sine',.08),80)},
-    weak:()=>t(200,.22,'sawtooth',.07),
-    heavy:()=>{noise(.3,.24,900);t(85,.3,'sawtooth',.16)},
-    hurt:()=>{noise(.14,.14,1100);t(150,.13,'square',.1)},
-    win:()=>{[523,659,784].forEach((f,i)=>setTimeout(()=>t(f,.22,'triangle',.11),i*105))},
-    lose:()=>{[400,300,220,150].forEach((f,i)=>setTimeout(()=>t(f,.24,'square',.1),i*130))},
-    clear:()=>{[523,659,784,1046,1318].forEach((f,i)=>setTimeout(()=>t(f,.3,'triangle',.12),i*125))}
+    imhotep:()=>{noise(.5,.2,260);[110,140,170,200].forEach((f,i)=>setTimeout(()=>t(f,.2,'square',.1),i*110))},
+    huatuo:()=>{t(440,.16,'sine',.1);setTimeout(()=>t(260,.3,'sine',.09),110);setTimeout(()=>t(170,.4,'sine',.07),260)},
+    zhugeliang:()=>{noise(.35,.12,900);[620,780,930].forEach((f,i)=>setTimeout(()=>t(f,.22,'triangle',.08),i*90))},
+    zhangheng:()=>{noise(.7,.26,120);[70,90,110].forEach((f,i)=>setTimeout(()=>t(f,.4,'sawtooth',.14),i*90))},
+    zhangfei:()=>{noise(.55,.3,700);[180,140,110].forEach((f,i)=>setTimeout(()=>t(f,.3,'square',.15),i*70))},
+    zhenghe:()=>{noise(.6,.18,420);[300,400,520,660].forEach((f,i)=>setTimeout(()=>t(f,.26,'triangle',.1),i*95))},
+    libai:()=>{[520,470,600,430].forEach((f,i)=>setTimeout(()=>t(f,.24,'sine',.1),i*130))},
+    elizabeth1:()=>{[784,988].forEach((f,i)=>setTimeout(()=>t(f,.3,'triangle',.11),i*140));noise(.3,.1,1500)},
+    step:()=>noise(.08,.09,340),
+    win:()=>{[523,659,784,1046].forEach((f,i)=>setTimeout(()=>t(f,.28,'triangle',.12),i*118))},
+    lose:()=>{noise(.5,.2,180);[400,300,220,150].forEach((f,i)=>setTimeout(()=>t(f,.26,'square',.1),i*140))}
   };
-})();
-
-/* ══════════ 卡牌數值（與無頭驗證同一套算式）══════════ */
-function cardEffect(c,enemyDef){
-  const v=c.val*c.up;
-  if(c.type==='hit')   return {kind:'dmg',  v:Math.max(CFG.MIN_DMG,Math.round(c.hero.atk*CFG.HIT_K*v)-Math.floor(enemyDef/CFG.DEF_CUT))};
-  if(c.type==='brain') return {kind:'dmg',  v:Math.max(CFG.MIN_DMG,Math.round(c.hero.int*CFG.BRAIN_K*v)-Math.floor(enemyDef/CFG.DEF_CUT))};
-  if(c.type==='guard') return {kind:'shield',v:Math.round(v)};
-  if(c.type==='heal')  return {kind:'heal', v:Math.round(v)};
-  return {kind:'weak', v:Math.round(v*CFG.WEAK_K)};
-}
-const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;};
-
-/* ══════════ 舞台：所有角色與特效都畫在這裡 ══════════ */
-const ST=(()=>{
-  const cv=document.getElementById('stage'), g=cv.getContext('2d');
-  const W=540,H=360;
-  let fx=[], shake=0, running=false;
-  const anim={ me:{lunge:0,hurt:0,idx:0}, en:{lunge:0,hurt:0,dead:0} };
-
-  function start(){ if(running)return; running=true; loop(); }
-  function stop(){ running=false; }
-  function reset(){ fx=[]; shake=0; anim.en.dead=0; anim.en.hurt=0; anim.me.hurt=0; }
-
-  // 五種招式各有各的墨色特效
-  function cast(kind,from,to,heavy){
-    const x0=from==='me'?150:400, x1=to==='me'?150:400, y=190;
-    if(kind==='dmg'){
-      fx.push({t:0,dur:.14,draw(p,g){        // 筆鋒橫掃
-        g.save(); g.globalAlpha=(1-p)*.9; g.strokeStyle='#201c18'; g.lineCap='round';
-        g.lineWidth=17*(1-p)+3;
-        const d=x1>x0?1:-1;
-        g.beginPath(); g.moveTo(x1-d*150+d*p*90,y-95);
-        g.quadraticCurveTo(x1,y+10,x1-d*150+d*p*90,y+95); g.stroke(); g.restore();
-      }});
-      for(let i=0;i<(heavy?46:30);i++) fx.push({t:0,dur:.03,px:x1,py:y,
-        vx:(Math.random()-.5)*(heavy?24:17),vy:(Math.random()-.5)*20-3,
-        r:Math.random()*4.5+1.4,grav:.55});
-      shake=heavy?18:11;
-    } else if(kind==='shield'){
-      fx.push({t:0,dur:.045,draw(p,g){       // 墨圈護體
-        g.save(); g.globalAlpha=(1-p)*.9; g.strokeStyle='#2c5f9e';
-        g.lineWidth=5*(1-p)+1.5;
-        g.beginPath(); g.arc(x0,y,40+p*46,0,6.283); g.stroke();
-        g.globalAlpha=(1-p)*.3; g.lineWidth=14*(1-p);
-        g.beginPath(); g.arc(x0,y,40+p*30,0,6.283); g.stroke(); g.restore();
-      }});
-    } else if(kind==='heal'){
-      for(let i=0;i<26;i++) fx.push({t:0,dur:.022,px:x0+(Math.random()-.5)*70,py:y+60,
-        vx:(Math.random()-.5)*1.6,vy:-2.2-Math.random()*2.6,r:Math.random()*3.4+1.4,
-        grav:-.02,col:'#1f7a54'});
-    } else if(kind==='weak'){
-      for(let i=0;i<30;i++) fx.push({t:0,dur:.02,px:x1+(Math.random()-.5)*50,py:y-40,
-        vx:(Math.random()-.5)*3.2,vy:1.6+Math.random()*2.6,r:Math.random()*4+1.2,
-        grav:.05,col:'#6b3a80'});
-    } else if(kind==='ripple'){
-      for(let k=0;k<3;k++) fx.push({t:-k*0.35,dur:.03,draw(p,g){ // 金色波紋＝智取
-        if(p<0)return; g.save(); g.globalAlpha=(1-p)*.85; g.strokeStyle='#a8801a';
-        g.lineWidth=5*(1-p)+1;
-        g.beginPath(); g.arc(x1,y,20+p*130,0,6.283); g.stroke(); g.restore();
-      }});
-      shake=8;
-    }
-  }
-  function lunge(who){ anim[who].lunge=1; }
-  function hurt(who,heavy){ anim[who].hurt=1; shake=Math.max(shake,heavy?18:10); }
-  function die(){ anim.en.dead=0.001; }
-
-  function loop(){
-    if(!running)return;
-    const sx=(Math.random()-.5)*shake, sy=(Math.random()-.5)*shake;
-    shake*=.85; if(shake<.4)shake=0;
-    g.clearRect(0,0,W,H);
-    g.save(); g.translate(sx,sy);
-    // 遠山
-    g.save(); g.globalAlpha=.13; g.fillStyle='#5a5348';
-    g.beginPath(); g.moveTo(0,275); g.quadraticCurveTo(150,165,290,265);
-    g.quadraticCurveTo(410,195,540,275); g.lineTo(540,360); g.lineTo(0,360); g.fill(); g.restore();
-    // 地平線
-    g.save(); g.globalAlpha=.22; g.strokeStyle='#5a5348'; g.lineWidth=1.5;
-    g.beginPath(); g.moveTo(20,300); g.lineTo(520,300); g.stroke(); g.restore();
-
-    const me=G.activeHero(), en=G.E&&G.E.ref;
-    // 我方：出戰的那位站前面，另外兩位淡淡站在後面
-    if(G.team&&G.team.length){
-      G.team.forEach((h,i)=>{
-        if(h===me)return;
-        IK.figure(g,42+i*46,318,0.34,h,{face:1,alpha:.3});
-      });
-      if(me) IK.figure(g,165,196,1.3,me,{face:1,lunge:anim.me.lunge,
-        alpha:1,col:anim.me.hurt>.1?'#a33228':'#201c18'});
-    }
-    // 敵方
-    if(en&&anim.en.dead<1){
-      const a=anim.en.dead?1-anim.en.dead:1;
-      IK.figure(g,392,196,1.4,en,{face:-1,lunge:anim.en.lunge,alpha:a,
-        col:anim.en.hurt>.1?'#a33228':'#201c18'});
-      if(anim.en.dead){ IK.splat(g,400,215,26,70*anim.en.dead,'#201c18',1-anim.en.dead); }
-    }
-    // 特效
-    fx=fx.filter(p=>{
-      p.t+=p.dur;
-      if(p.draw){ if(p.t>1)return false; p.draw(Math.max(0,p.t),g); return true; }
-      if(p.t>1)return false;
-      p.px+=p.vx; p.py+=p.vy; p.vy+=p.grav; p.r*=.985;
-      g.save(); g.globalAlpha=Math.max(0,1-p.t); g.fillStyle=p.col||'#201c18';
-      g.beginPath(); g.arc(p.px,p.py,p.r,0,6.283); g.fill(); g.restore();
-      return true;
-    });
-    g.restore();
-    anim.me.lunge*=.82; anim.en.lunge*=.82;
-    anim.me.hurt*=.86; anim.en.hurt*=.86;
-    if(anim.en.dead) anim.en.dead=Math.min(1,anim.en.dead+0.035);
-    requestAnimationFrame(loop);
-  }
-  // 小頭像：選人畫面用
-  function portrait(canvas,hero){
-    const c=canvas.getContext('2d');
-    c.clearRect(0,0,canvas.width,canvas.height);
-    IK.figure(c,canvas.width/2,canvas.height*0.52,canvas.width/150,hero,{face:1,alpha:.95});
-  }
-  return { start,stop,reset,cast,lunge,hurt,die,portrait };
 })();
 
 /* ══════════ 遊戲流程 ══════════ */
 const G={
-  team:[],deck:[],draw:[],disc:[],hand:[],
-  P:null,E:null,floor:1,met:[],picked:[],pool:[],newcomer:null,active:null,busy:false,
-
+  lv:0, E:null, st:null, sel:null, left:[], busy:false, cleared:0,
   el(id){return document.getElementById(id)},
-  activeHero(){ return this.active || (this.team&&this.team[0]) || null; },
-  go(n){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
-    this.el('s-'+n).classList.add('on');
-    n==='battle'?ST.start():ST.stop(); window.scrollTo(0,0); },
-  quit(){ ST.stop(); this.go('title'); },
+  go(n){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+    this.el('s-'+n).classList.add('on'); window.scrollTo(0,0);
+    if(n==='play') setTimeout(()=>V.resize(),50);},
 
-  /* --- 選人 --- */
-  newRun(){
-    SFX.tap();
-    this.pool=shuffle(HEROES.list).slice(0,CFG.PICK_POOL);
-    ART.want(this.pool);
-    this.picked=[]; this.renderPick(); this.go('pick');
-  },
-  heroCard(h,sel,onclick,showSkills){
-    const d=document.createElement('div');
-    d.className='hcard'+(sel?' sel':'');
-    const cvs=document.createElement('canvas'); cvs.width=150; cvs.height=150;
-    d.appendChild(cvs);
-    const info=document.createElement('div');
-    info.innerHTML='<div class="n2">'+h.name+'</div><div class="j2">'+h.job+'</div>'+
-      '<div class="s2">攻'+h.atk+' 防'+h.def+' 智'+h.int+'</div>'+
-      '<div class="k2">'+(showSkills?h.skills.map(s=>s.n).join('<br>'):h.skills.map(s=>CFG.KIND[s.type]).join('・'))+'</div>';
-    d.appendChild(info);
-    d.onclick=onclick;
-    ST.portrait(cvs,h);
-    ART.onReady(()=>ST.portrait(cvs,h));   // 立繪載好會自動重畫這一格
-    return d;
-  },
-  renderPick(){
-    const box=this.el('pickGrid'); box.innerHTML='';
-    this.pool.forEach(h=>{
-      box.appendChild(this.heroCard(h,this.picked.includes(h),()=>{
-        SFX.tap();
-        const k=this.picked.indexOf(h);
-        if(k>=0)this.picked.splice(k,1);
-        else if(this.picked.length<CFG.TEAM)this.picked.push(h);
-        this.renderPick();
-      },false));
-    });
-    this.el('pickGo').style.display=this.picked.length===CFG.TEAM?'block':'none';
-    this.el('pickHead').textContent='已選 '+this.picked.length+' / '+CFG.TEAM;
-  },
-  startRun(){
-    SFX.tap();
-    this.team=this.picked.slice(); this.met=this.team.slice(); this.active=this.team[0];
-    this.deck=[];
-    this.team.forEach(h=>h.skills.forEach(s=>this.deck.push({hero:h,n:s.n,type:s.type,val:s.val,up:1})));
-    this.P={hp:0,max:0,def:0,shield:0};
-    this.recalcHP(true); this.floor=1; this.startFloor();
-  },
-  recalcHP(full){
-    const sum=this.team.reduce((a,h)=>a+h.def,0);
-    this.P.max=CFG.HP_BASE+sum*CFG.HP_PER_DEF;
-    this.P.def=Math.round(sum/CFG.TEAM);
-    if(full)this.P.hp=this.P.max;
-    this.P.hp=Math.min(this.P.hp,this.P.max);
-  },
-
-  /* --- 一層 --- */
-  startFloor(){
-    const cand=HEROES.list.filter(h=>!this.team.includes(h));
-    const eh=cand[Math.random()*cand.length|0];
-    if(!this.met.includes(eh))this.met.push(eh);
-    const hpMul=1+CFG.ENEMY_HP_SCALE*(this.floor-1);
-    const pwMul=1+CFG.ENEMY_PW_SCALE*(this.floor-1);
-    const hp=Math.round((CFG.ENEMY_HP_BASE+eh.def*CFG.ENEMY_HP_PER_DEF)*hpMul);
-    const atks=eh.skills.filter(s=>s.type==='hit'||s.type==='brain');
-    const heavy=atks.length?atks.reduce((a,b)=>b.val>a.val?b:a):null;
-    ART.want(this.team.concat([eh]));
-    this.E={ref:eh,hp,max:hp,def:eh.def,idx:0,shield:0,heavy,
-      atk:eh.atk*pwMul,int:eh.int*pwMul,atk0:eh.atk*pwMul,int0:eh.int*pwMul};
-    this.P.shield=0; this.busy=false;
-    this.draw=shuffle(this.deck); this.disc=[]; this.hand=[];
-    ST.reset(); this.go('battle'); this.newTurn();
-  },
-  intent(){
-    const s=this.E.ref.skills[this.E.idx%4];
-    const hv=(this.E.heavy&&s===this.E.heavy)?CFG.HEAVY:1;
-    if(s.type==='hit')   return {type:'hit',n:s.n,heavy:hv>1,v:Math.max(CFG.MIN_DMG,Math.round(this.E.atk*CFG.HIT_K*s.val*hv)-Math.floor(this.P.def/CFG.DEF_CUT))};
-    if(s.type==='brain') return {type:'brain',n:s.n,heavy:hv>1,v:Math.max(CFG.MIN_DMG,Math.round(this.E.int*CFG.BRAIN_K*s.val*hv)-Math.floor(this.P.def/CFG.DEF_CUT))};
-    if(s.type==='guard') return {type:'guard',n:s.n,v:Math.round(s.val)};
-    if(s.type==='heal')  return {type:'heal',n:s.n,v:Math.round(s.val)};
-    return {type:'weak',n:s.n,v:Math.round(s.val)};
-  },
-  newTurn(){
-    this.hand=[];
-    while(this.hand.length<CFG.HAND){
-      if(!this.draw.length){this.draw=shuffle(this.disc);this.disc=[];if(!this.draw.length)break;}
-      this.hand.push(this.draw.pop());
-    }
-    this.busy=false; this.render();
-  },
-  render(){
-    const E=this.E,P=this.P,it=this.intent();
-    this.el('floorTxt').textContent='第 '+this.floor+' 層　／　共 '+CFG.FLOORS+' 層';
-    const tw=this.el('tower'); tw.innerHTML='';
-    for(let i=1;i<=CFG.FLOORS;i++){const d=document.createElement('i');
-      if(i<this.floor)d.className='done';else if(i===this.floor)d.className='now';tw.appendChild(d);}
-    this.el('eName').textContent=E.ref.name+'　'+E.ref.job;
-    this.el('eBar').style.width=Math.max(0,E.hp/E.max*100)+'%';
-    this.el('eHp').textContent=Math.max(0,E.hp)+' / '+E.max+(E.shield?'　盾 '+E.shield:'');
-    this.el('mName').textContent=this.team.map(h=>h.name).join('・');
-    this.el('mBar').style.width=Math.max(0,P.hp/P.max*100)+'%';
-    this.el('mHp').textContent=Math.max(0,P.hp)+' / '+P.max+(P.shield?'　盾 '+P.shield:'');
-    const box=this.el('intent');
-    box.className='intent'+((it.type==='hit'||it.type==='brain')?(it.heavy?' heavy':' atk'):'');
-    this.el('iWhat').innerHTML='下一招　'+it.n+(it.heavy?'<span class="tag">重擊</span>':'');
-    this.el('iNum').textContent=(it.type==='hit'||it.type==='brain')?'-'+it.v
-      :it.type==='guard'?'盾+'+it.v:it.type==='heal'?'回+'+it.v:'削'+it.v;
-    const hb=this.el('hand'); hb.innerHTML='';
-    this.hand.forEach((c,i)=>{
-      const e=cardEffect(c,E.def);
-      const cls=e.kind==='dmg'?'dmg':e.kind==='shield'?'shd':e.kind==='heal'?'hea':'wk';
+  menu(){
+    const box=this.el('lvList'); box.innerHTML='';
+    LEVELS.forEach((L,i)=>{
+      const lock = i>this.cleared;
       const d=document.createElement('div');
-      d.className='card '+cls+(this.busy?' locked':'');
-      d.style.setProperty('--jb',CFG.JOB_COLOR[c.hero.job]||'#777');
-      d.innerHTML=(c.up>1?'<div class="up">+</div>':'')+
-        '<div class="from">'+c.hero.name+'</div><div class="sn">'+c.n+'</div>'+
-        '<div><div class="eff">'+e.v+'</div><div class="kind">'+CFG.KIND[c.type]+'</div></div>';
-      d.onclick=()=>this.play(i);
-      hb.appendChild(d);
+      d.className='lv'+(lock?' lock':'');
+      d.innerHTML='<b>第 '+L.id+' 關　'+L.name+'</b>'+
+        '<span>'+L.turns+' 回合　'+L.enemies.length+' 個敵人　'+
+        L.heroes.map(h=>HERO_DB[h].n).join('・')+'</span>';
+      if(!lock) d.onclick=()=>this.start(i);
+      box.appendChild(d);
     });
+    this.go('menu');
   },
 
-  /* --- 出牌：先演，再結算 --- */
-  play(i){
-    if(this.busy)return; this.busy=true;
-    const c=this.hand[i],E=this.E,P=this.P,e=cardEffect(c,E.def);
-    this.active=c.hero;            // 誰的牌，誰上場
-    ST.lunge('me');
-    if(e.kind==='dmg'){
-      c.type==='brain'?(ST.cast('ripple','me','en'),SFX.brain()):(ST.cast('dmg','me','en'),SFX.slash());
-      let d=e.v; if(E.shield>0){const a=Math.min(E.shield,d);E.shield-=a;d-=a;}
-      E.hp-=d; ST.hurt('en',false);
-    } else if(e.kind==='shield'){ P.shield+=e.v; ST.cast('shield','me','me'); SFX.guard(); }
-    else if(e.kind==='heal'){ P.hp=Math.min(P.max,P.hp+e.v); ST.cast('heal','me','me'); SFX.heal(); }
-    else { E.atk=Math.max(E.atk0/2,E.atk-e.v); E.int=Math.max(E.int0/2,E.int-e.v);
-           ST.cast('weak','me','en'); SFX.weak(); }
-    this.hand.forEach(x=>this.disc.push(x)); this.hand=[];
-    this.render();
-    if(E.hp<=0){ ST.die(); setTimeout(()=>this.winFloor(),820); return; }
-    setTimeout(()=>this.enemyTurn(),620);
+  async start(i){
+    S.tap(); this.lv=i;
+    this.go('play');
+    const ok=await V.boot();
+    if(!ok){ document.getElementById('view').innerHTML=
+      '<div id="loading"><div class="err">3D 引擎載不起來，可能是網路被擋。</div></div>'; return; }
+    V.resize();
+    const L=LEVELS[i];
+    this.E=makeEngine(L);
+    this.st=this.E.fresh();
+    this.left=L.heroes.slice();
+    this.sel=null; this.busy=false;
+    V.reset(L,this.st);
+    if(!V._loop){ V._loop=1; requestAnimationFrame(t=>V.loop(t)); }
+    this.el('lvName').textContent='第 '+L.id+' 關　'+L.name;
+    this.el('tip').textContent=L.tip;
+    this.say('選一位偉人，或直接跳過這回合');
+    this.refresh();
   },
+  say(t){ this.el('say').textContent=t; },
+
+  refresh(){
+    const L=LEVELS[this.lv], st=this.st;
+    const box=this.el('heroes'); box.innerHTML='';
+    L.heroes.forEach(id=>{
+      const h=HERO_DB[id], used=!this.left.includes(id);
+      const d=document.createElement('div');
+      d.className='h'+(this.sel===id?' on':'')+(used?' used':'');
+      d.innerHTML='<b>'+h.n+'</b><i>'+h.s+'</i><u>'+h.d+'</u>';
+      if(!used) d.onclick=()=>{ if(this.busy)return; S.tap();
+        this.sel=this.sel===id?null:id;
+        if(this.sel && h.t==='none'){ this.use({id}); return; }
+        this.say(this.sel?(h.t==='enemy'?'點一個敵人':'點地上的一格'):'選一位偉人');
+        this.refresh(); };
+      box.appendChild(d);
+    });
+    const tb=this.el('turnbar'); tb.innerHTML='';
+    for(let i=0;i<L.turns;i++){ const e=document.createElement('i');
+      if(i<st.turn)e.className='done'; else if(i===st.turn)e.className='now'; tb.appendChild(e); }
+    this.el('turnTxt').textContent='第 '+(st.turn+1)+' / '+L.turns+' 回合';
+    // 箭頭
+    st.es.forEach((e,i)=>{
+      if(e.sleep>0||e.stop>0){ V.setArrow(i,0,0,false); return; }
+      const n=this.E.nextStep(st,e);
+      if(n) V.setArrow(i,n.x-e.x,n.y-e.y,true); else V.setArrow(i,0,0,false);
+    });
+    // 可點的格子
+    if(this.sel){
+      const h=HERO_DB[this.sel], list=[];
+      this.E.options(st,[this.sel]).forEach(o=>{
+        if(!o) return;
+        if(h.t==='enemy'){ const e=st.es[o.i]; list.push({x:e.x,y:e.y}); }
+        else if(o.x!==undefined) list.push({x:o.x,y:o.y});
+      });
+      V.highlight(list);
+    } else V.highlight([]);
+  },
+
+  tapCell(x,y){
+    if(this.busy||!this.sel) return;
+    const h=HERO_DB[this.sel];
+    if(h.t==='enemy'){
+      const i=this.st.es.findIndex(e=>e.x===x&&e.y===y&&e.sleep===0);
+      if(i<0){ this.say('要點在敵人身上'); return; }
+      this.use({id:this.sel,i}); return;
+    }
+    const legal=this.E.options(this.st,[this.sel]).some(o=>o&&o.x===x&&o.y===y);
+    if(!legal){ this.say('那一格不行'); return; }
+    this.use({id:this.sel,x,y});
+  },
+
+  use(a){
+    const h=HERO_DB[a.id], st=this.st;
+    this.busy=true; this.left=this.left.filter(z=>z!==a.id); this.sel=null;
+    V.highlight([]);
+    this.say(h.n+' 使出　'+h.s);
+    const before=st.es.map(e=>({x:e.x,y:e.y}));
+    V.heroAct(a.id, ()=>{
+      this.E.act(st,a);
+      S[a.id] && S[a.id]();
+      // 各招的專屬演出
+      if(a.id==='imhotep') V.addWall(a.x,a.y,true);
+      if(a.id==='zhugeliang') V.showGhost([...this.E.fearSet(st)],{x:a.x,y:a.y});
+      if(a.id==='elizabeth1') V.addMark(a.x,a.y);
+      if(a.id==='zhangheng'){ const p=V.pos(this.E.city.x,this.E.city.y);
+        V.ring(p.x,p.z,0x8fd0b0,5.5); V.shake=0.42; }
+      if(a.id==='zhangfei'){ const p=V.pos(a.x,a.y);
+        V.ring(p.x,p.z,0xe2564a,3.0); V.dust(p.x,p.z,30,0xe0b0a0,0.3); V.shake=0.4; }
+      if(a.id==='zhenghe'){ const e=st.es[a.i]; const p=V.pos(e.x,e.y);
+        V.dust(p.x,p.z,24,0xa8c8e8,0.5); }
+      if(a.id==='libai'){ const e=st.es[a.i]; const p=V.pos(e.x,e.y);
+        V.dust(p.x,p.z,20,0xd8a0e0,0.7); }
+      V.syncEnemies(st,true);
+      setTimeout(()=>this.enemyTurn(), 900);
+    });
+  },
+  pass(){ if(this.busy)return; S.tap(); this.sel=null; this.busy=true;
+    V.highlight([]); this.say('按兵不動');
+    setTimeout(()=>this.enemyTurn(),350); },
+
   enemyTurn(){
-    const E=this.E,P=this.P,it=this.intent(); this.E.idx++;
-    ST.lunge('en');
-    if(it.type==='hit'||it.type==='brain'){
-      let d=it.v,blocked=0;
-      if(P.shield>0){blocked=Math.min(P.shield,d);P.shield-=blocked;d-=blocked;}
-      P.hp-=d;
-      it.type==='brain'?ST.cast('ripple','en','me'):ST.cast('dmg','en','me',it.heavy);
-      ST.hurt('me',it.heavy); it.heavy?SFX.heavy():SFX.hurt();
-    } else if(it.type==='guard'){ E.shield+=it.v; ST.cast('shield','en','en'); SFX.guard(); }
-    else if(it.type==='heal'){ E.hp=Math.min(E.max,E.hp+it.v); ST.cast('heal','en','en'); SFX.heal(); }
-    else { P.def=Math.max(1,P.def-it.v); ST.cast('weak','en','me'); SFX.weak(); }
-    this.render();
-    if(P.hp<=0){ setTimeout(()=>this.lose(),700); return; }
-    setTimeout(()=>this.newTurn(),480);
+    const st=this.st;
+    const alive=this.E.enemyPhase(st);
+    if(st.fearLeft===0) V.clearGhost();
+    if(!st.decree) V.clearMarks();
+    V.syncEnemies(st,true);
+    S.step();
+    setTimeout(()=>{
+      this.busy=false;
+      if(!alive){ this.end(false); return; }
+      st.turn++;
+      if(st.turn>=LEVELS[this.lv].turns){ this.end(true); return; }
+      this.say('選一位偉人，或直接跳過這回合');
+      this.refresh();
+    }, 700);
   },
 
-  /* --- 獎勵 --- */
-  winFloor(){
-    SFX.win(); ST.stop();
-    const before=this.P.hp;
-    this.P.hp=Math.min(this.P.max,this.P.hp+Math.round(this.P.max*CFG.FLOOR_HEAL));
-    if(this.floor>=CFG.FLOORS){this.clearGame();return;}
-    this.el('rewardTitle').textContent='打贏第 '+this.floor+' 層';
-    this.el('rewardHp').textContent='回血 +'+(this.P.hp-before)+'　'+this.P.hp+' / '+this.P.max;
-    this.renderReward(); this.go('reward');
-  },
-  renderReward(){
-    const box=this.el('rewardBox'); box.innerHTML='';
-    [{t:'招募新偉人',d:'換一個人進隊伍，帶來四張新牌，牌庫會大改。',f:()=>this.openRecruit()},
-     {t:'強化一張牌',d:'挑一張牌效果永久 +35%，牌庫變精不變大。',f:()=>this.openUpgrade()},
-     {t:'休息回血',d:'恢復 '+Math.round(CFG.HEAL_PCT*100)+'% 最大血量。撐不下去就選這個。',
-      f:()=>{SFX.heal();this.P.hp=Math.min(this.P.max,this.P.hp+Math.round(this.P.max*CFG.HEAL_PCT));this.nextFloor();}}
-    ].forEach(o=>{const d=document.createElement('div');d.className='reward';
-      d.innerHTML='<b>'+o.t+'</b><span>'+o.d+'</span>';
-      d.onclick=()=>{SFX.tap();o.f();};box.appendChild(d);});
-  },
-  backReward(){SFX.tap();this.newcomer=null;this.el('recruitStep2').style.display='none';this.go('reward');},
-  openRecruit(){
-    const cand=shuffle(HEROES.list.filter(h=>!this.team.includes(h))).slice(0,3);
-    ART.want(cand); this.newcomer=null;
-    const box=this.el('recruitGrid');box.innerHTML='';
-    cand.forEach(h=>{
-      const d=this.heroCard(h,false,()=>{
-        SFX.tap(); this.newcomer=h;
-        if(!this.met.includes(h))this.met.push(h);
-        [...box.children].forEach(x=>x.classList.remove('sel'));
-        d.classList.add('sel'); this.renderLeave();
-      },true);
-      box.appendChild(d);
-    });
-    this.el('recruitStep2').style.display='none'; this.go('recruit');
-  },
-  renderLeave(){
-    const box=this.el('leaveGrid');box.innerHTML='';
-    this.team.forEach(h=>{
-      box.appendChild(this.heroCard(h,false,()=>{
-        SFX.tap();
-        this.team=this.team.map(x=>x===h?this.newcomer:x);
-        this.deck=this.deck.filter(c=>c.hero!==h);
-        this.newcomer.skills.forEach(s=>this.deck.push({hero:this.newcomer,n:s.n,type:s.type,val:s.val,up:1}));
-        if(this.active===h)this.active=this.team[0];
-        this.recalcHP(false); this.newcomer=null; this.nextFloor();
-      },true));
-    });
-    this.el('recruitStep2').style.display='block';
-  },
-  openUpgrade(){
-    const box=this.el('upGrid');box.innerHTML='';
-    this.deck.forEach(c=>{
-      const e=cardEffect(c,10);
-      const cls=e.kind==='dmg'?'dmg':e.kind==='shield'?'shd':e.kind==='heal'?'hea':'wk';
-      const d=document.createElement('div');d.className='card '+cls;
-      d.style.setProperty('--jb',CFG.JOB_COLOR[c.hero.job]||'#777');
-      d.innerHTML=(c.up>1?'<div class="up">+</div>':'')+
-        '<div class="from">'+c.hero.name+'</div><div class="sn">'+c.n+'</div>'+
-        '<div><div class="eff">'+e.v+'</div><div class="kind">'+CFG.KIND[c.type]+'</div></div>';
-      d.onclick=()=>{SFX.win();c.up*=CFG.UPGRADE;this.nextFloor();};
-      box.appendChild(d);
-    });
-    this.go('upgrade');
-  },
-  nextFloor(){this.floor++;this.startFloor();},
-
-  /* --- 結束 --- */
-  lose(){
-    SFX.lose(); ST.stop();
-    this.el('endTxt').textContent='倒 在 第 '+this.floor+' 層';
-    this.el('endTxt').style.color='var(--cinnabar)';
-    this.el('endSub').textContent='被 '+this.E.ref.name+' 擋下來了。八層走了 '+(this.floor-1)+' 層。';
-    this.renderFacts(); this.go('end');
-  },
-  clearGame(){
-    SFX.clear(); ST.stop();
-    this.el('endTxt').textContent='登 頂';
-    this.el('endTxt').style.color='var(--gold)';
-    this.el('endSub').textContent='八層全破，剩餘血量 '+this.P.hp+' / '+this.P.max+'。';
-    this.renderFacts(); this.go('end');
-  },
-  renderFacts(){
-    const box=this.el('endFacts');box.innerHTML='';
-    this.met.forEach(h=>{
-      const d=document.createElement('div');d.className='fact';
-      d.innerHTML='<b>'+h.name+'</b>'+h.fact+
-        '<div style="color:var(--dim);font-size:11px;margin-top:4px">'+h.job+'　'+h.era+'　'+h.region+
-        (h.conf==='低'?'　（年代為推測）':'')+'</div>';
-      box.appendChild(d);
-    });
+  end(win){
+    S[win?'win':'lose'](); V.shake=win?0.12:0.45;
+    const L=LEVELS[this.lv];
+    if(win && this.lv+1>this.cleared) this.cleared=this.lv+1;
+    this.el('endTxt').textContent=win?'守 住 了':'城 破 了';
+    this.el('endTxt').style.color=win?'var(--gold)':'var(--cinnabar)';
+    this.el('endSub').textContent=win
+      ? ('第 '+L.id+' 關「'+L.name+'」過了。')
+      : ('敵人衝進城了。'+L.tip);
+    const box=this.el('facts'); box.innerHTML='';
+    if(win) L.heroes.forEach(id=>{ const h=HERO_DB[id];
+      const d=document.createElement('div'); d.className='fact';
+      d.innerHTML='<b>'+h.n+'・'+h.s+'</b>'+h.f; box.appendChild(d); });
+    const nx=this.el('nextBtn');
+    if(win && this.lv+1<LEVELS.length){ nx.style.display='block'; nx.onclick=()=>this.start(this.lv+1); }
+    else nx.style.display='none';
+    this.el('retryBtn').onclick=()=>this.start(this.lv);
+    setTimeout(()=>this.go('end'),650);
   }
 };
-
-window.addEventListener('load',()=>{
-  if(typeof HEROES==='undefined'||!HEROES.list||!HEROES.list.length){
-    document.body.innerHTML='<div style="padding:40px;color:#e8e0cf;font-family:sans-serif">'+
-      '<h2>找不到 heroes.js</h2><p>請確認 heroes.js 和 index.html 在同一個資料夾。</p></div>';
-  }
+document.getElementById('view').addEventListener('click',ev=>{
+  const c=V.pick(ev); if(c) G.tapCell(c.x,c.y);
 });
 document.addEventListener('gesturestart',e=>e.preventDefault());
-let lt=0;
-document.addEventListener('touchend',e=>{const n=Date.now();if(n-lt<320)e.preventDefault();lt=n;},{passive:false});
+
+// 偉人清單
+(function(){
+  const box=document.getElementById('whoList');
+  Object.keys(HERO_DB).forEach(id=>{
+    const h=HERO_DB[id];
+    const d=document.createElement('div'); d.className='fact';
+    d.innerHTML='<b>'+h.n+'　'+h.j+'　'+h.s+'</b>'+h.d+'<br><span style="color:var(--dim)">'+h.f+'</span>';
+    box.appendChild(d);
+  });
+})();
 </script>
 </body>
 </html>
