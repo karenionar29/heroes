@@ -47,8 +47,8 @@ h1.logo{font-family:var(--serif);font-size:clamp(32px,10.5vw,50px);letter-spacin
 .tower i.done{background:var(--jade)}.tower i.now{background:var(--gold)}
 
 /* 舞台 */
-#stage{display:block;width:100%;border-radius:4px;background:#0d1016;
-  border:1px solid var(--line);touch-action:none}
+#stage{display:block;width:100%;border-radius:4px;background:#e6ddcb;
+  border:1px solid #3a3f4d;touch-action:none;box-shadow:inset 0 0 40px rgba(120,100,70,.18)}
 .bars{display:flex;gap:10px;margin-top:7px}
 .bars>div{flex:1;min-width:0}
 .nm{font-family:var(--serif);font-size:15px;letter-spacing:.05em}
@@ -89,7 +89,7 @@ h1.logo{font-family:var(--serif);font-size:clamp(32px,10.5vw,50px);letter-spacin
 .hcard{background:var(--slate);border:1px solid var(--line);border-radius:3px;
   padding:6px 4px 8px;text-align:center;cursor:pointer;position:relative}
 .hcard.sel{border-color:var(--gold);background:#241f11}
-.hcard canvas{display:block;width:100%;height:auto}
+.hcard canvas{display:block;width:100%;height:auto;background:#e6ddcb;border-radius:2px}
 .hcard .n2{font-family:var(--serif);font-size:14px;margin-top:2px;letter-spacing:.04em}
 .hcard .j2{font-size:10px;color:var(--dim);letter-spacing:.06em}
 .hcard .s2{font-size:10px;color:var(--dim);margin-top:3px;font-variant-numeric:tabular-nums}
@@ -250,6 +250,15 @@ const ART = (() => {
     g.putImageData(im,0,0);
   }
 
+  // 這張圖本來就去背了嗎？（看四個角是不是已經透明）
+  function alreadyCut(cv){
+    const g = cv.getContext('2d', {willReadFrequently:true});
+    const w = cv.width, h = cv.height;
+    const pts = [[1,1],[w-2,1],[1,h-2],[w-2,h-2]];
+    let clear = 0;
+    for(const [x,y] of pts){ if(g.getImageData(x,y,1,1).data[3] < 20) clear++; }
+    return clear >= 3;      // 四角至少三個是透明 → 已經去過背，別再動它
+  }
   function process(img){
     const scale = Math.min(1, MAXH/img.naturalHeight);
     const cv = document.createElement('canvas');
@@ -257,7 +266,9 @@ const ART = (() => {
     cv.height = Math.max(1, Math.round(img.naturalHeight*scale));
     const g = cv.getContext('2d', {willReadFrequently:true});
     g.drawImage(img,0,0,cv.width,cv.height);
-    try { stripWhite(cv); } catch(e){ /* 跨來源讀不到像素就算了，直接用原圖 */ }
+    // 只有「白底沒去背」的圖才需要挖背景。
+    // 已經透明的圖硬去背會把人物身上的白（盔甲反光、毛皮亮部）一起吃掉，變成一片空白。
+    try { if(!alreadyCut(cv)) stripWhite(cv); } catch(e){ /* 讀不到像素就用原圖 */ }
     return cv;
   }
 
@@ -318,7 +329,7 @@ const IK = {
      face: 1 面向右, -1 面向左
      lunge: 0~1 前傾（出招時） */
   figure(g,cx,cy,s,hero,opt){
-    const o=opt||{}, face=o.face||1, lunge=o.lunge||0, col=o.col||'#e8e0cf', a=o.alpha===undefined?1:o.alpha;
+    const o=opt||{}, face=o.face||1, lunge=o.lunge||0, col=o.col||'#201c18', a=o.alpha===undefined?1:o.alpha;
     // 有立繪就畫立繪，沒有才用程式畫的水墨人形
     const pic = ART.get(hero.id);
     if(pic){ IK.picture(g,cx,cy,s,pic,face,lunge,a); return; }
@@ -326,13 +337,24 @@ const IK = {
     const jc=CFG.JOB_COLOR[hero.job]||'#888';
     const L=lunge*14*face;
     g.save(); g.translate(L,-lunge*4);
-    // 袍身
-    IK.stroke(g,[[cx,cy-38*s],[cx+face*4*s,cy],[cx-face*3*s,cy+36*s]],13*s,a,col);
-    IK.stroke(g,[[cx-9*s,cy-14*s],[cx-13*s,cy+34*s]],7*s,a*.7,col);
-    IK.stroke(g,[[cx+9*s,cy-14*s],[cx+13*s,cy+34*s]],7*s,a*.7,col);
+    // 袍身：一整塊上窄下寬的墨團，這樣才有份量，不是火柴人
+    g.save(); g.globalAlpha=a*.88; g.fillStyle=col;
+    g.beginPath();
+    g.moveTo(cx-12*s,cy-40*s);
+    g.quadraticCurveTo(cx-19*s,cy-4*s,cx-27*s,cy+48*s);
+    g.quadraticCurveTo(cx,cy+58*s,cx+27*s,cy+48*s);
+    g.quadraticCurveTo(cx+19*s,cy-4*s,cx+12*s,cy-40*s);
+    g.closePath(); g.fill();
+    // 衣褶
+    g.globalAlpha=a*.35; g.strokeStyle='#e6ddcb'; g.lineWidth=2.2*s;
+    g.beginPath(); g.moveTo(cx-6*s,cy-24*s); g.lineTo(cx-11*s,cy+42*s); g.stroke();
+    g.beginPath(); g.moveTo(cx+7*s,cy-24*s); g.lineTo(cx+12*s,cy+42*s); g.stroke();
+    g.restore();
+    // 肩線
+    IK.stroke(g,[[cx-14*s,cy-36*s],[cx+14*s,cy-36*s]],7*s,a*.9,col);
     // 頭
-    g.save(); g.strokeStyle=col; g.globalAlpha=a*.92; g.lineWidth=4.2*s;
-    g.beginPath(); g.ellipse(cx+face*3*s,cy-52*s,14*s,16*s,0,0,6.283); g.stroke(); g.restore();
+    g.save(); g.globalAlpha=a*.9; g.fillStyle=col;
+    g.beginPath(); g.ellipse(cx+face*3*s,cy-54*s,13*s,15*s,0,0,6.283); g.fill(); g.restore();
     // 手臂：出招那隻往前伸
     const reach=(22+rn()*10+lunge*20)*s;
     IK.stroke(g,[[cx,cy-25*s],[cx+face*reach,cy-(4+rn()*16)*s-lunge*10*s]],7.5*s,a*.95,col);
@@ -343,7 +365,7 @@ const IK = {
     // 職業信物（用職業色，讓八種職業一眼分得出來）
     IK.prop(g,cx,cy,s,hero.job,face,jc,a,lunge);
     // 下襬飛白
-    IK.splat(g,cx,cy+38*s,10,24*s,col,a);
+    IK.splat(g,cx,cy+50*s,10,24*s,col,a*.8);
     g.restore();
   },
 
@@ -358,7 +380,7 @@ const IK = {
     g.drawImage(img, -W/2, -H*0.56, W, H);
     g.restore();
     // 腳邊補一點飛白，讓立繪跟水墨背景接得起來
-    IK.splat(g,cx,cy+62*s,8,26*s,'#e8e0cf',a*0.5);
+    IK.splat(g,cx,cy+62*s,8,26*s,'#201c18',a*0.35);
   },
 
   /* 八種職業各有一個信物，這是「一眼認出他是誰」的關鍵 */
@@ -472,7 +494,7 @@ const ST=(()=>{
     const x0=from==='me'?150:400, x1=to==='me'?150:400, y=190;
     if(kind==='dmg'){
       fx.push({t:0,dur:.14,draw(p,g){        // 筆鋒橫掃
-        g.save(); g.globalAlpha=(1-p)*.95; g.strokeStyle='#e8e0cf'; g.lineCap='round';
+        g.save(); g.globalAlpha=(1-p)*.9; g.strokeStyle='#201c18'; g.lineCap='round';
         g.lineWidth=17*(1-p)+3;
         const d=x1>x0?1:-1;
         g.beginPath(); g.moveTo(x1-d*150+d*p*90,y-95);
@@ -484,7 +506,7 @@ const ST=(()=>{
       shake=heavy?18:11;
     } else if(kind==='shield'){
       fx.push({t:0,dur:.045,draw(p,g){       // 墨圈護體
-        g.save(); g.globalAlpha=(1-p)*.85; g.strokeStyle='#8fb4e8';
+        g.save(); g.globalAlpha=(1-p)*.9; g.strokeStyle='#2c5f9e';
         g.lineWidth=5*(1-p)+1.5;
         g.beginPath(); g.arc(x0,y,40+p*46,0,6.283); g.stroke();
         g.globalAlpha=(1-p)*.3; g.lineWidth=14*(1-p);
@@ -493,14 +515,14 @@ const ST=(()=>{
     } else if(kind==='heal'){
       for(let i=0;i<26;i++) fx.push({t:0,dur:.022,px:x0+(Math.random()-.5)*70,py:y+60,
         vx:(Math.random()-.5)*1.6,vy:-2.2-Math.random()*2.6,r:Math.random()*3.4+1.4,
-        grav:-.02,col:'#7fd0a8'});
+        grav:-.02,col:'#1f7a54'});
     } else if(kind==='weak'){
       for(let i=0;i<30;i++) fx.push({t:0,dur:.02,px:x1+(Math.random()-.5)*50,py:y-40,
         vx:(Math.random()-.5)*3.2,vy:1.6+Math.random()*2.6,r:Math.random()*4+1.2,
-        grav:.05,col:'#c9a0d8'});
+        grav:.05,col:'#6b3a80'});
     } else if(kind==='ripple'){
       for(let k=0;k<3;k++) fx.push({t:-k*0.35,dur:.03,draw(p,g){ // 金色波紋＝智取
-        if(p<0)return; g.save(); g.globalAlpha=(1-p)*.8; g.strokeStyle='#c9a227';
+        if(p<0)return; g.save(); g.globalAlpha=(1-p)*.85; g.strokeStyle='#a8801a';
         g.lineWidth=5*(1-p)+1;
         g.beginPath(); g.arc(x1,y,20+p*130,0,6.283); g.stroke(); g.restore();
       }});
@@ -518,11 +540,11 @@ const ST=(()=>{
     g.clearRect(0,0,W,H);
     g.save(); g.translate(sx,sy);
     // 遠山
-    g.save(); g.globalAlpha=.1; g.fillStyle='#e8e0cf';
+    g.save(); g.globalAlpha=.13; g.fillStyle='#5a5348';
     g.beginPath(); g.moveTo(0,275); g.quadraticCurveTo(150,165,290,265);
     g.quadraticCurveTo(410,195,540,275); g.lineTo(540,360); g.lineTo(0,360); g.fill(); g.restore();
     // 地平線
-    g.save(); g.globalAlpha=.18; g.strokeStyle='#e8e0cf'; g.lineWidth=1.5;
+    g.save(); g.globalAlpha=.22; g.strokeStyle='#5a5348'; g.lineWidth=1.5;
     g.beginPath(); g.moveTo(20,300); g.lineTo(520,300); g.stroke(); g.restore();
 
     const me=G.activeHero(), en=G.E&&G.E.ref;
@@ -533,14 +555,14 @@ const ST=(()=>{
         IK.figure(g,58+i*30,236,0.52,h,{face:1,alpha:.24});
       });
       if(me) IK.figure(g,150,205,1.0,me,{face:1,lunge:anim.me.lunge,
-        alpha:1,col:anim.me.hurt>.1?'#e8a49a':'#e8e0cf'});
+        alpha:1,col:anim.me.hurt>.1?'#a33228':'#201c18'});
     }
     // 敵方
     if(en&&anim.en.dead<1){
       const a=anim.en.dead?1-anim.en.dead:1;
       IK.figure(g,400,205,1.18,en,{face:-1,lunge:anim.en.lunge,alpha:a,
-        col:anim.en.hurt>.1?'#e8a49a':'#e8e0cf'});
-      if(anim.en.dead){ IK.splat(g,400,215,26,70*anim.en.dead,'#e8e0cf',1-anim.en.dead); }
+        col:anim.en.hurt>.1?'#a33228':'#201c18'});
+      if(anim.en.dead){ IK.splat(g,400,215,26,70*anim.en.dead,'#201c18',1-anim.en.dead); }
     }
     // 特效
     fx=fx.filter(p=>{
@@ -548,7 +570,7 @@ const ST=(()=>{
       if(p.draw){ if(p.t>1)return false; p.draw(Math.max(0,p.t),g); return true; }
       if(p.t>1)return false;
       p.px+=p.vx; p.py+=p.vy; p.vy+=p.grav; p.r*=.985;
-      g.save(); g.globalAlpha=Math.max(0,1-p.t); g.fillStyle=p.col||'#e8e0cf';
+      g.save(); g.globalAlpha=Math.max(0,1-p.t); g.fillStyle=p.col||'#201c18';
       g.beginPath(); g.arc(p.px,p.py,p.r,0,6.283); g.fill(); g.restore();
       return true;
     });
