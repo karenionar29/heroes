@@ -340,31 +340,31 @@ const IK = {
     const jc=CFG.JOB_COLOR[hero.job]||'#888';
     const L=lunge*14*face;
     g.save(); g.translate(L,-lunge*4);
+    // 腿：先畫，等一下會被袍子蓋掉上半截，只露出小腿
+    IK.stroke(g,[[cx-2*s,cy+20*s],[cx+face*(11+rn()*6)*s,cy+70*s]],8*s,a*.9,col);
+    IK.stroke(g,[[cx+2*s,cy+20*s],[cx-face*(9+rn()*6)*s,cy+70*s]],8*s,a*.9,col);
     // 袍身：一整塊上窄下寬的墨團，這樣才有份量，不是火柴人
-    g.save(); g.globalAlpha=a*.88; g.fillStyle=col;
+    g.save(); g.globalAlpha=a*.92; g.fillStyle=col;
     g.beginPath();
-    g.moveTo(cx-12*s,cy-40*s);
-    g.quadraticCurveTo(cx-19*s,cy-4*s,cx-27*s,cy+48*s);
-    g.quadraticCurveTo(cx,cy+58*s,cx+27*s,cy+48*s);
-    g.quadraticCurveTo(cx+19*s,cy-4*s,cx+12*s,cy-40*s);
+    g.moveTo(cx-13*s,cy-40*s);
+    g.quadraticCurveTo(cx-20*s,cy-2*s,cx-29*s,cy+52*s);
+    g.quadraticCurveTo(cx,cy+62*s,cx+29*s,cy+52*s);
+    g.quadraticCurveTo(cx+20*s,cy-2*s,cx+13*s,cy-40*s);
     g.closePath(); g.fill();
     // 衣褶
-    g.globalAlpha=a*.35; g.strokeStyle='#e6ddcb'; g.lineWidth=2.2*s;
-    g.beginPath(); g.moveTo(cx-6*s,cy-24*s); g.lineTo(cx-11*s,cy+42*s); g.stroke();
-    g.beginPath(); g.moveTo(cx+7*s,cy-24*s); g.lineTo(cx+12*s,cy+42*s); g.stroke();
+    g.globalAlpha=a*.3; g.strokeStyle='#e6ddcb'; g.lineWidth=2.4*s;
+    g.beginPath(); g.moveTo(cx-6*s,cy-24*s); g.lineTo(cx-12*s,cy+46*s); g.stroke();
+    g.beginPath(); g.moveTo(cx+7*s,cy-24*s); g.lineTo(cx+13*s,cy+46*s); g.stroke();
     g.restore();
     // 肩線
-    IK.stroke(g,[[cx-14*s,cy-36*s],[cx+14*s,cy-36*s]],7*s,a*.9,col);
+    IK.stroke(g,[[cx-15*s,cy-37*s],[cx+15*s,cy-37*s]],7.5*s,a*.9,col);
     // 頭
-    g.save(); g.globalAlpha=a*.9; g.fillStyle=col;
-    g.beginPath(); g.ellipse(cx+face*3*s,cy-54*s,13*s,15*s,0,0,6.283); g.fill(); g.restore();
+    g.save(); g.globalAlpha=a*.92; g.fillStyle=col;
+    g.beginPath(); g.ellipse(cx+face*3*s,cy-56*s,13*s,15*s,0,0,6.283); g.fill(); g.restore();
     // 手臂：出招那隻往前伸
-    const reach=(22+rn()*10+lunge*20)*s;
-    IK.stroke(g,[[cx,cy-25*s],[cx+face*reach,cy-(4+rn()*16)*s-lunge*10*s]],7.5*s,a*.95,col);
-    IK.stroke(g,[[cx,cy-21*s],[cx-face*(20+rn()*10)*s,cy+(3+rn()*14)*s]],7.5*s,a*.95,col);
-    // 腿
-    IK.stroke(g,[[cx,cy+28*s],[cx+face*(14+rn()*9)*s,cy+72*s]],8.5*s,a*.95,col);
-    IK.stroke(g,[[cx,cy+28*s],[cx-face*(12+rn()*9)*s,cy+72*s]],8.5*s,a*.95,col);
+    const reach=(20+rn()*8+lunge*18)*s;
+    IK.stroke(g,[[cx+face*8*s,cy-30*s],[cx+face*(8+reach),cy-(6+rn()*12)*s-lunge*10*s]],7.5*s,a*.95,col);
+    IK.stroke(g,[[cx-face*8*s,cy-28*s],[cx-face*(16+rn()*8)*s,cy+(4+rn()*10)*s]],7.5*s,a*.95,col);
     // 職業信物（用職業色，讓八種職業一眼分得出來）
     IK.prop(g,cx,cy,s,hero.job,face,jc,a,lunge);
     // 下襬飛白
@@ -374,7 +374,7 @@ const IK = {
 
   /* 畫立繪：來源圖一律假設「面向右」，面向左時左右翻轉 */
   picture(g,cx,cy,s,img,face,lunge,a){
-    const H = 178*s;                                  // 人物在畫面上的高度
+    const H = 150*s;                                  // 人物在畫面上的高度（跟程序人形視覺大小對齊）
     const iw = img.naturalWidth  || img.width;    // Image 用 natural*，canvas 用 width/height
     const ih = img.naturalHeight || img.height;
     if(!iw || !ih) return;                         // 尺寸拿不到就什麼都不畫，交給呼叫端
@@ -383,7 +383,7 @@ const IK = {
     g.globalAlpha = a;
     g.translate(cx + lunge*14*face, cy - lunge*4 + 6*s);
     if(face < 0) g.scale(-1,1);                       // 敵人面向左
-    g.drawImage(img, -W/2, -H*0.56, W, H);
+    g.drawImage(img, -W/2, -H*0.62, W, H);   // 往上挪，讓腳踩在同一條地平線
     g.restore();
     // 腳邊補一點飛白，讓立繪跟水墨背景接得起來
     IK.splat(g,cx,cy+62*s,8,26*s,'#201c18',a*0.35);
@@ -393,7 +393,7 @@ const IK = {
   prop(g,cx,cy,s,job,face,col,a,lunge){
     g.save(); g.strokeStyle=col; g.fillStyle=col; g.globalAlpha=a*.9;
     g.lineCap='round'; g.lineWidth=4*s;
-    const hx=cx+face*(24+lunge*20)*s, hy=cy-12*s-lunge*10*s;   // 手的位置
+    const hx=cx+face*(20+lunge*16)*s, hy=cy-18*s-lunge*8*s;   // 手的位置（貼著身體）
     if(job==='武將'){            // 長矛
       g.lineWidth=5*s; g.beginPath();
       g.moveTo(hx-face*10*s,hy+40*s); g.lineTo(hx+face*16*s,hy-52*s); g.stroke();
@@ -558,15 +558,15 @@ const ST=(()=>{
     if(G.team&&G.team.length){
       G.team.forEach((h,i)=>{
         if(h===me)return;
-        IK.figure(g,58+i*30,236,0.52,h,{face:1,alpha:.24});
+        IK.figure(g,42+i*46,318,0.34,h,{face:1,alpha:.3});
       });
-      if(me) IK.figure(g,150,205,1.0,me,{face:1,lunge:anim.me.lunge,
+      if(me) IK.figure(g,165,196,1.3,me,{face:1,lunge:anim.me.lunge,
         alpha:1,col:anim.me.hurt>.1?'#a33228':'#201c18'});
     }
     // 敵方
     if(en&&anim.en.dead<1){
       const a=anim.en.dead?1-anim.en.dead:1;
-      IK.figure(g,400,205,1.18,en,{face:-1,lunge:anim.en.lunge,alpha:a,
+      IK.figure(g,392,196,1.4,en,{face:-1,lunge:anim.en.lunge,alpha:a,
         col:anim.en.hurt>.1?'#a33228':'#201c18'});
       if(anim.en.dead){ IK.splat(g,400,215,26,70*anim.en.dead,'#201c18',1-anim.en.dead); }
     }
