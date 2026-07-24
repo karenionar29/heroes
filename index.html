@@ -215,6 +215,68 @@ const CFG = {
   KIND:{hit:'攻擊',brain:'智取',guard:'護盾',heal:'治療',weak:'削弱'}
 };
 
+/* ══════════ 立繪圖片 ══════════
+   ① 有圖用圖，沒圖自動退回水墨人形
+   ② 白底會自動去背（從四邊往內洪水填充，只吃掉連到邊界的白，人物身上的白留著）
+   ③ 用到才載（懶載入），不會一開場就抓二十四張
+   ══════════════════════════════ */
+const ART = (() => {
+  const cache = {};                 // id -> {state:'load'|'ok'|'fail', cv}
+  const MAXH = 420;                 // 內部處理的最大高度，太大沒必要也吃記憶體
+  const WHITE = 236;                // 多白才算背景
+
+  // 從四邊往內把「連得到邊界的近白色」變透明
+  function stripWhite(cv){
+    const g = cv.getContext('2d', {willReadFrequently:true});
+    const w = cv.width, h = cv.height;
+    const im = g.getImageData(0,0,w,h), d = im.data;
+    const seen = new Uint8Array(w*h);
+    const q = new Int32Array(w*h);
+    let head = 0, tail = 0;
+    const push = (x,y) => {
+      if(x<0||y<0||x>=w||y>=h) return;
+      const i = y*w+x; if(seen[i]) return;
+      const p = i*4;
+      if(d[p+3] < 8){ seen[i]=1; q[tail++]=i; return; }           // 本來就透明也算背景
+      if(d[p]<WHITE || d[p+1]<WHITE || d[p+2]<WHITE) return;      // 不夠白，停
+      seen[i]=1; d[p+3]=0; q[tail++]=i;
+    };
+    for(let x=0;x<w;x++){ push(x,0); push(x,h-1); }
+    for(let y=0;y<h;y++){ push(0,y); push(w-1,y); }
+    while(head < tail){
+      const i = q[head++], x = i%w, y = (i/w)|0;
+      push(x+1,y); push(x-1,y); push(x,y+1); push(x,y-1);
+    }
+    g.putImageData(im,0,0);
+  }
+
+  function process(img){
+    const scale = Math.min(1, MAXH/img.naturalHeight);
+    const cv = document.createElement('canvas');
+    cv.width  = Math.max(1, Math.round(img.naturalWidth*scale));
+    cv.height = Math.max(1, Math.round(img.naturalHeight*scale));
+    const g = cv.getContext('2d', {willReadFrequently:true});
+    g.drawImage(img,0,0,cv.width,cv.height);
+    try { stripWhite(cv); } catch(e){ /* 跨來源讀不到像素就算了，直接用原圖 */ }
+    return cv;
+  }
+
+  function load(id){
+    if(cache[id]) return cache[id];
+    const rec = { state:'load', cv:null };
+    cache[id] = rec;
+    const img = new Image();
+    img.onload  = ()=>{ try{ rec.cv = process(img); rec.state='ok'; }catch(e){ rec.state='fail'; } };
+    img.onerror = ()=>{ rec.state='fail'; };
+    img.src = 'img/' + id + '.png';   // 檔名就是角色代號
+    return rec;
+  }
+  // 用到誰才載誰
+  function want(list){ (Array.isArray(list)?list:[list]).forEach(h=>h&&load(h.id)); }
+  function get(id){ const r = cache[id]; return (r && r.state==='ok') ? r.cv : null; }
+  return { want, get, load };
+})();
+
 /* ══════════ 水墨繪製工具 ══════════ */
 const IK = {
   // 有粗細變化的墨線：起筆重、收筆輕
@@ -247,6 +309,9 @@ const IK = {
      lunge: 0~1 前傾（出招時） */
   figure(g,cx,cy,s,hero,opt){
     const o=opt||{}, face=o.face||1, lunge=o.lunge||0, col=o.col||'#e8e0cf', a=o.alpha===undefined?1:o.alpha;
+    // 有立繪就畫立繪，沒有才用程式畫的水墨人形
+    const pic = ART.get(hero.id);
+    if(pic){ IK.picture(g,cx,cy,s,pic,face,lunge,a); return; }
     const rn=IK.rng(IK.seedOf(hero.id));
     const jc=CFG.JOB_COLOR[hero.job]||'#888';
     const L=lunge*14*face;
@@ -270,6 +335,20 @@ const IK = {
     // 下襬飛白
     IK.splat(g,cx,cy+38*s,10,24*s,col,a);
     g.restore();
+  },
+
+  /* 畫立繪：來源圖一律假設「面向右」，面向左時左右翻轉 */
+  picture(g,cx,cy,s,img,face,lunge,a){
+    const H = 178*s;                                  // 人物在畫面上的高度
+    const W = H * (img.naturalWidth/img.naturalHeight);
+    g.save();
+    g.globalAlpha = a;
+    g.translate(cx + lunge*14*face, cy - lunge*4 + 6*s);
+    if(face < 0) g.scale(-1,1);                       // 敵人面向左
+    g.drawImage(img, -W/2, -H*0.56, W, H);
+    g.restore();
+    // 腳邊補一點飛白，讓立繪跟水墨背景接得起來
+    IK.splat(g,cx,cy+62*s,8,26*s,'#e8e0cf',a*0.5);
   },
 
   /* 八種職業各有一個信物，這是「一眼認出他是誰」的關鍵 */
@@ -494,6 +573,7 @@ const G={
   newRun(){
     SFX.tap();
     this.pool=shuffle(HEROES.list).slice(0,CFG.PICK_POOL);
+    ART.want(this.pool);
     this.picked=[]; this.renderPick(); this.go('pick');
   },
   heroCard(h,sel,onclick,showSkills){
@@ -507,7 +587,7 @@ const G={
       '<div class="k2">'+(showSkills?h.skills.map(s=>s.n).join('<br>'):h.skills.map(s=>CFG.KIND[s.type]).join('・'))+'</div>';
     d.appendChild(info);
     d.onclick=onclick;
-    setTimeout(()=>ST.portrait(cvs,h),0);
+    [0,500,1200,2500].forEach(ms=>setTimeout(()=>ST.portrait(cvs,h),ms));  // 圖片可能晚到，補畫幾次
     return d;
   },
   renderPick(){
@@ -550,6 +630,7 @@ const G={
     const hp=Math.round((CFG.ENEMY_HP_BASE+eh.def*CFG.ENEMY_HP_PER_DEF)*hpMul);
     const atks=eh.skills.filter(s=>s.type==='hit'||s.type==='brain');
     const heavy=atks.length?atks.reduce((a,b)=>b.val>a.val?b:a):null;
+    ART.want(this.team.concat([eh]));
     this.E={ref:eh,hp,max:hp,def:eh.def,idx:0,shield:0,heavy,
       atk:eh.atk*pwMul,int:eh.int*pwMul,atk0:eh.atk*pwMul,int0:eh.int*pwMul};
     this.P.shield=0; this.busy=false;
@@ -664,7 +745,7 @@ const G={
   backReward(){SFX.tap();this.newcomer=null;this.el('recruitStep2').style.display='none';this.go('reward');},
   openRecruit(){
     const cand=shuffle(HEROES.list.filter(h=>!this.team.includes(h))).slice(0,3);
-    this.newcomer=null;
+    ART.want(cand); this.newcomer=null;
     const box=this.el('recruitGrid');box.innerHTML='';
     cand.forEach(h=>{
       const d=this.heroCard(h,false,()=>{
