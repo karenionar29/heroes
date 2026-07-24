@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#12151c">
+<title>一筆斬・手感原型</title>
+<style>
+:root{--ink:#12151c;--slate:#1d222d;--line:#2c3342;--paper:#e8e0cf;
+  --cinnabar:#b5342b;--gold:#c9a227;--dim:#8b93a4;
+  --serif:"Noto Serif TC","Songti TC",serif;
+  --sans:-apple-system,"PingFang TC","Noto Sans TC",sans-serif}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;overscroll-behavior:none}
+body{background:var(--ink);color:var(--paper);font-family:var(--sans);
+  -webkit-user-select:none;user-select:none;touch-action:none}
+#stage{position:fixed;inset:0;display:block;touch-action:none}
+
+/* 疊在畫布上的 UI */
+.hud{position:fixed;top:0;left:0;right:0;padding:calc(env(safe-area-inset-top) + 10px) 14px 0;
+  display:flex;justify-content:space-between;align-items:flex-start;pointer-events:none;z-index:5}
+.hud .l{font-variant-numeric:tabular-nums}
+.hud .score{font-family:var(--serif);font-size:32px;letter-spacing:.04em;line-height:1}
+.hud .lab{font-size:10px;color:var(--dim);letter-spacing:.24em;margin-bottom:2px}
+.hud .time{font-family:var(--serif);font-size:32px;letter-spacing:.04em;line-height:1;text-align:right}
+.hud .time.low{color:var(--cinnabar)}
+
+.panel{position:fixed;inset:0;display:none;flex-direction:column;align-items:center;
+  justify-content:center;background:rgba(18,21,28,.94);z-index:10;padding:24px;text-align:center}
+.panel.on{display:flex}
+.panel h1{font-family:var(--serif);font-size:clamp(34px,12vw,52px);letter-spacing:.22em;
+  text-indent:.22em;font-weight:600;margin-bottom:6px}
+.panel .sub{color:var(--dim);font-size:12px;letter-spacing:.2em;margin-bottom:22px}
+.panel p{color:var(--dim);font-size:13.5px;line-height:2;max-width:340px;margin-bottom:8px}
+.panel p b{color:var(--paper)}
+.panel .gold{color:var(--gold)}
+.btn{display:block;width:100%;max-width:320px;padding:16px;margin:8px 0;border:1px solid var(--line);
+  background:var(--slate);color:var(--paper);font-family:var(--serif);font-size:18px;
+  letter-spacing:.14em;border-radius:3px;cursor:pointer}
+.btn.main{background:var(--cinnabar);border-color:#8f2820;color:#fff4ec}
+.big{font-family:var(--serif);font-size:64px;letter-spacing:.04em;line-height:1;margin:4px 0 2px;
+  font-variant-numeric:tabular-nums}
+.best{color:var(--gold);font-size:14px;letter-spacing:.1em;margin-bottom:18px}
+.stat{display:flex;gap:26px;margin:14px 0 20px;color:var(--dim);font-size:12px;letter-spacing:.06em}
+.stat b{display:block;font-family:var(--serif);font-size:22px;color:var(--paper);
+  letter-spacing:0;font-variant-numeric:tabular-nums;margin-top:3px}
+</style>
+</head>
+<body>
+<canvas id="stage"></canvas>
+
+<div class="hud">
+  <div class="l"><div class="lab">分　數</div><div class="score" id="hScore">0</div></div>
+  <div class="l"><div class="lab" style="text-align:right">剩　餘</div><div class="time" id="hTime">60</div></div>
+</div>
+
+<div class="panel on" id="p-title">
+  <h1>一筆斬</h1>
+  <div class="sub">六 十 秒 手 感 原 型</div>
+  <p><b>手指按住不放，畫過去。</b><br>筆鋒掃到的墨團會炸開。</p>
+  <p>一筆連著砍越多，<span class="gold">倍率越高</span>。<br>放開手，倍率歸零。</p>
+  <p><span style="color:var(--cinnabar)">朱紅色的印章不能碰</span>，碰到扣三秒。</p>
+  <button class="btn main" onclick="Game.start()">開始</button>
+  <p style="font-size:11.5px;margin-top:14px">沒有關卡、沒有升級、沒有故事。<br>只有一件事：<b>爽不爽。</b></p>
+</div>
+
+<div class="panel" id="p-end">
+  <div class="sub" style="margin-bottom:4px">時 間 到</div>
+  <div class="big" id="eScore">0</div>
+  <div class="best" id="eBest"></div>
+  <div class="stat">
+    <div>最高連斬<b id="eCombo">0</b></div>
+    <div>斬中<b id="eHit">0</b></div>
+    <div>誤觸<b id="eMiss">0</b></div>
+  </div>
+  <button class="btn main" onclick="Game.start()">再來一次</button>
+  <button class="btn" onclick="Game.title()">回首頁</button>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════
+   一筆斬　手感原型
+   設計目標只有一個：每一次輸入都要有很大的反應
+   （震屏、頓幀、噴墨、音高上升、倍率跳出來）
+   ══════════════════════════════════════════════ */
+const CFG = {
+  TIME: 60,              // 一局幾秒
+  SPAWN_START: 62,       // 開場每幾幀生一顆
+  SPAWN_MIN: 20,         // 最密的時候
+  SPAWN_RAMP: 0.000117,  // 變密的速度（要讓整整六十秒都一路變難）
+  TRAIL: 14,             // 筆鋒保留幾個點
+  HIT_STOP: 55,          // 砍中之後畫面凍結幾毫秒（打擊感的關鍵）
+  SHAKE_HIT: 9,          // 砍中震幅
+  SEAL_RATE: 0.16,       // 朱印（不能碰）出現比例
+  SEAL_PENALTY: 3        // 碰到扣幾秒
+};
+
+const cv = document.getElementById('stage');
+const g  = cv.getContext('2d');
+let W = 0, H = 0, DPR = 1;
+function resize(){
+  DPR = Math.min(2, window.devicePixelRatio || 1);
+  W = window.innerWidth; H = window.innerHeight;
+  cv.width = W * DPR; cv.height = H * DPR;
+  cv.style.width = W + 'px'; cv.style.height = H + 'px';
+  g.setTransform(DPR,0,0,DPR,0,0);
+}
+window.addEventListener('resize', resize); resize();
+
+/* ---------- 音效：連斬越高音越高 ---------- */
+const SFX = (()=>{
+  let ac=null;
+  const ok=()=>{try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();
+    if(ac.state==='suspended')ac.resume();return 1}catch(e){return 0}};
+  function noise(d,v,freq,q){
+    if(!ok())return;
+    const n=Math.floor(ac.sampleRate*d), b=ac.createBuffer(1,n,ac.sampleRate), c=b.getChannelData(0);
+    for(let i=0;i<n;i++) c[i]=(Math.random()*2-1)*Math.pow(1-i/n,2);
+    const src=ac.createBufferSource(); src.buffer=b;
+    const f=ac.createBiquadFilter(); f.type='bandpass'; f.frequency.value=freq; f.Q.value=q||1;
+    const gn=ac.createGain(); gn.gain.value=v;
+    src.connect(f); f.connect(gn); gn.connect(ac.destination); src.start();
+  }
+  function tone(f,d,ty,v){
+    if(!ok())return;
+    const o=ac.createOscillator(), gn=ac.createGain();
+    o.type=ty||'sine'; o.frequency.value=f;
+    gn.gain.setValueAtTime(0,ac.currentTime);
+    gn.gain.linearRampToValueAtTime(v,ac.currentTime+.006);
+    gn.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+d);
+    o.connect(gn); gn.connect(ac.destination); o.start(); o.stop(ac.currentTime+d);
+  }
+  return {
+    // 連斬數決定音高，一路往上爬，這是爽感的一半
+    slash(combo){
+      const step = Math.min(combo,14);
+      noise(.11, .17, 1400 + step*260, 1.6);
+      tone(300 + step*46, .09, 'square', .07);
+    },
+    seal(){ noise(.3,.22,300,.7); tone(90,.3,'sawtooth',.14); },
+    start(){ [392,523,659].forEach((f,i)=>setTimeout(()=>tone(f,.2,'triangle',.11),i*90)); },
+    over(){ [523,392,294,196].forEach((f,i)=>setTimeout(()=>tone(f,.26,'triangle',.11),i*140)); },
+    milestone(){ [784,988,1175].forEach((f,i)=>setTimeout(()=>tone(f,.18,'triangle',.1),i*60)); }
+  };
+})();
+
+/* ---------- 遊戲本體 ---------- */
+const Game = {
+  running:false, t:0, frame:0, last:0,
+  score:0, combo:0, maxCombo:0, hits:0, miss:0, timeLeft:CFG.TIME,
+  blobs:[], fx:[], pops:[],
+  trail:[], drawing:false,
+  shake:0, freeze:0, flash:0, redFlash:0,
+  best:0,
+
+  title(){ document.getElementById('p-end').classList.remove('on');
+           document.getElementById('p-title').classList.add('on'); this.running=false; },
+
+  start(){
+    document.getElementById('p-title').classList.remove('on');
+    document.getElementById('p-end').classList.remove('on');
+    this.score=0; this.combo=0; this.maxCombo=0; this.hits=0; this.miss=0;
+    this.timeLeft=CFG.TIME; this.blobs=[]; this.fx=[]; this.pops=[]; this.trail=[];
+    this.shake=0; this.freeze=0; this.flash=0; this.redFlash=0;
+    this.frame=0; this.running=true; this.last=performance.now();
+    SFX.start();
+    requestAnimationFrame(t=>this.loop(t));
+  },
+
+  spawn(){
+    // 生一顆墨團：從邊緣飄進來，慢慢往中間走
+    const edge = Math.random()*4|0;
+    let x,y,vx,vy;
+    const m = 60;
+    if(edge===0){ x=-m; y=Math.random()*H; vx=1; vy=(Math.random()-.5)*1.2; }
+    else if(edge===1){ x=W+m; y=Math.random()*H; vx=-1; vy=(Math.random()-.5)*1.2; }
+    else if(edge===2){ x=Math.random()*W; y=-m; vx=(Math.random()-.5)*1.2; vy=1; }
+    else { x=Math.random()*W; y=H+m; vx=(Math.random()-.5)*1.2; vy=-1; }
+    const speed = 0.9 + Math.random()*0.7 + this.frame*0.00035;
+    const seal = Math.random() < CFG.SEAL_RATE;
+    this.blobs.push({
+      x,y, vx:vx*speed, vy:vy*speed,
+      r: seal ? 22+Math.random()*8 : 24+Math.random()*16,
+      seed: Math.random()*9999|0, seal,
+      spin:(Math.random()-.5)*0.02, rot:Math.random()*6.283, life:0
+    });
+  },
+
+  hit(b){
+    if(b.seal){
+      // 誤觸朱印：扣秒、震大力、紅閃、連斬歸零
+      this.miss++; this.combo=0; this.timeLeft-=CFG.SEAL_PENALTY;
+      this.shake=22; this.redFlash=1; this.freeze=90;
+      SFX.seal();
+      for(let i=0;i<34;i++) this.fx.push(this.particle(b.x,b.y,'#b5342b',7));
+      return;
+    }
+    this.combo++; this.hits++;
+    if(this.combo>this.maxCombo) this.maxCombo=this.combo;
+    const gain = 10*this.combo;
+    this.score += gain;
+    this.shake = Math.min(26, CFG.SHAKE_HIT + this.combo*1.4);
+    this.freeze = CFG.HIT_STOP;
+    this.flash = Math.min(.5, .12 + this.combo*.03);
+    SFX.slash(this.combo);
+    if(this.combo===5||this.combo===10||this.combo===20) SFX.milestone();
+    // 噴墨
+    const n = 16 + Math.min(28, this.combo*3);
+    for(let i=0;i<n;i++) this.fx.push(this.particle(b.x,b.y,'#1e1a16',6+this.combo*.3));
+    // 跳出來的數字
+    this.pops.push({x:b.x, y:b.y, t:0, txt:'+'+gain,
+      sub:this.combo>1?(this.combo+' 連斬'):'', big:Math.min(2.2, .9+this.combo*.09)});
+  },
+  particle(x,y,col,sp){
+    const a=Math.random()*6.283, s=Math.random()*sp+1.5;
+    return {x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,r:Math.random()*5+1.4,a:1,col};
+  },
+
+  /* ---------- 每幀 ---------- */
+  loop(now){
+    if(!this.running) return;
+    let dt = Math.min(48, now-this.last); this.last=now;
+    // 頓幀：砍中的瞬間畫面停住，這是打擊感最重要的一味
+    if(this.freeze>0){ this.freeze-=dt; dt=0; }
+    const k = dt/16.67;
+
+    if(dt>0){
+      this.frame++;
+      this.timeLeft -= dt/1000;
+      if(this.timeLeft<=0){ this.timeLeft=0; this.end(); return; }
+      // 生成速度隨時間變快
+      const rate = Math.max(CFG.SPAWN_MIN, CFG.SPAWN_START - this.frame*CFG.SPAWN_RAMP*100);
+      if(this.frame % Math.round(rate) === 0) this.spawn();
+      if(this.blobs.length < 4 && this.frame%14===0) this.spawn();
+
+      this.blobs.forEach(b=>{ b.x+=b.vx*k; b.y+=b.vy*k; b.rot+=b.spin*k; b.life+=k; });
+      this.blobs = this.blobs.filter(b=> b.x>-140 && b.x<W+140 && b.y>-140 && b.y<H+140);
+
+      this.fx.forEach(p=>{ p.x+=p.vx*k; p.y+=p.vy*k; p.vy+=0.24*k; p.vx*=0.985; p.a-=0.022*k; p.r*=0.99; });
+      this.fx = this.fx.filter(p=>p.a>0);
+      this.pops.forEach(p=>{ p.t+=0.035*k; p.y-=1.1*k; });
+      this.pops = this.pops.filter(p=>p.t<1);
+
+      this.shake *= Math.pow(0.86,k);  if(this.shake<0.3) this.shake=0;
+      this.flash *= Math.pow(0.84,k);
+      this.redFlash *= Math.pow(0.9,k);
+      // 筆鋒殘影會自己變短
+      if(!this.drawing && this.trail.length) this.trail.shift();
+    }
+
+    this.draw();
+    document.getElementById('hScore').textContent = this.score;
+    const tEl = document.getElementById('hTime');
+    tEl.textContent = Math.ceil(this.timeLeft);
+    tEl.className = 'time' + (this.timeLeft<=10?' low':'');
+    requestAnimationFrame(t=>this.loop(t));
+  },
+
+  draw(){
+    const sx=(Math.random()-.5)*this.shake, sy=(Math.random()-.5)*this.shake;
+    // 宣紙底
+    g.fillStyle='#e6ddcb'; g.fillRect(0,0,W,H);
+    g.save(); g.translate(sx,sy);
+    // 遠山，讓畫面不空
+    g.save(); g.globalAlpha=.09; g.fillStyle='#5a5348';
+    g.beginPath(); g.moveTo(-40,H*.72); g.quadraticCurveTo(W*.3,H*.5,W*.58,H*.7);
+    g.quadraticCurveTo(W*.8,H*.55,W+40,H*.72); g.lineTo(W+40,H+40); g.lineTo(-40,H+40); g.fill();
+    g.restore();
+
+    // 墨團
+    this.blobs.forEach(b=>{
+      g.save(); g.translate(b.x,b.y); g.rotate(b.rot);
+      let r=b.seed; const rn=()=>(r=(r*9301+49297)%233280)/233280;
+      if(b.seal){
+        // 朱印：方形紅章，故意長得跟墨團完全不一樣，一眼分得出來
+        g.globalAlpha=.9; g.fillStyle='#b5342b';
+        const s=b.r;
+        g.fillRect(-s,-s,s*2,s*2);
+        g.globalAlpha=1; g.fillStyle='#e6ddcb';
+        g.font='700 '+(s*1.1)+'px "Noto Serif TC",serif';
+        g.textAlign='center'; g.textBaseline='middle';
+        g.fillText('印',0,1);
+      }else{
+        g.globalAlpha=.92; g.fillStyle='#1e1a16';
+        g.beginPath();
+        for(let i=0;i<=16;i++){
+          const a=i/16*6.283, rr=b.r*(0.74+rn()*0.44);
+          const x=Math.cos(a)*rr, y=Math.sin(a)*rr;
+          i?g.lineTo(x,y):g.moveTo(x,y);
+        }
+        g.closePath(); g.fill();
+        // 飛白
+        g.globalAlpha=.35;
+        for(let i=0;i<5;i++){
+          const a=rn()*6.283, d=b.r*(1+rn()*.7);
+          g.beginPath(); g.arc(Math.cos(a)*d,Math.sin(a)*d,rn()*3+.8,0,6.283); g.fill();
+        }
+      }
+      g.restore();
+    });
+
+    // 噴墨粒子
+    this.fx.forEach(p=>{
+      g.globalAlpha=Math.max(0,p.a); g.fillStyle=p.col;
+      g.beginPath(); g.arc(p.x,p.y,p.r,0,6.283); g.fill();
+    });
+    g.globalAlpha=1;
+
+    // 筆鋒：起筆粗、收筆細
+    if(this.trail.length>1){
+      g.save(); g.strokeStyle='#1e1a16'; g.lineCap='round'; g.lineJoin='round';
+      for(let i=1;i<this.trail.length;i++){
+        const t=i/this.trail.length;
+        g.globalAlpha=0.15+0.75*t;
+        g.lineWidth=2+22*t;
+        g.beginPath(); g.moveTo(this.trail[i-1].x,this.trail[i-1].y);
+        g.lineTo(this.trail[i].x,this.trail[i].y); g.stroke();
+      }
+      g.restore();
+    }
+
+    // 跳出來的分數
+    this.pops.forEach(p=>{
+      const e=1-Math.pow(1-p.t,3);
+      g.save(); g.globalAlpha=Math.max(0,1-p.t*p.t);
+      g.translate(p.x,p.y-e*26); g.scale(p.big*(0.8+e*0.3),p.big*(0.8+e*0.3));
+      g.textAlign='center'; g.fillStyle='#1e1a16';
+      g.font='700 20px "Noto Serif TC",serif'; g.fillText(p.txt,0,0);
+      if(p.sub){ g.fillStyle='#b5342b'; g.font='700 13px "Noto Serif TC",serif'; g.fillText(p.sub,0,17); }
+      g.restore();
+    });
+    g.globalAlpha=1;
+    g.restore();
+
+    // 連斬倍率常駐在畫面中央下方
+    if(this.combo>1){
+      g.save(); g.textAlign='center';
+      g.globalAlpha=Math.min(.9,.25+this.combo*.05);
+      g.fillStyle='#b5342b';
+      g.font='700 '+(28+Math.min(30,this.combo*1.6))+'px "Noto Serif TC",serif';
+      g.fillText(this.combo+' 連斬', W/2, H*0.9);
+      g.restore();
+    }
+    // 全畫面閃光
+    if(this.flash>0.01){ g.save(); g.globalAlpha=this.flash; g.fillStyle='#fff'; g.fillRect(0,0,W,H); g.restore(); }
+    if(this.redFlash>0.01){ g.save(); g.globalAlpha=this.redFlash*.45; g.fillStyle='#b5342b'; g.fillRect(0,0,W,H); g.restore(); }
+  },
+
+  end(){
+    this.running=false;
+    if(this.score>this.best) this.best=this.score;
+    document.getElementById('eScore').textContent=this.score;
+    document.getElementById('eBest').textContent='最佳紀錄　'+this.best;
+    document.getElementById('eCombo').textContent=this.maxCombo;
+    document.getElementById('eHit').textContent=this.hits;
+    document.getElementById('eMiss').textContent=this.miss;
+    document.getElementById('p-end').classList.add('on');
+    SFX.over();
+  }
+};
+
+/* ---------- 輸入：手指或滑鼠拖曳 ---------- */
+function pos(e){ return {x:e.clientX, y:e.clientY}; }
+function segHit(p1,p2,b){
+  // 線段與圓的距離，判斷筆鋒有沒有掃到墨團
+  const dx=p2.x-p1.x, dy=p2.y-p1.y;
+  const len2=dx*dx+dy*dy;
+  let t = len2 ? ((b.x-p1.x)*dx + (b.y-p1.y)*dy)/len2 : 0;
+  t = Math.max(0, Math.min(1, t));
+  const cx=p1.x+dx*t, cy=p1.y+dy*t;
+  const d2=(b.x-cx)*(b.x-cx)+(b.y-cy)*(b.y-cy);
+  return d2 < (b.r+14)*(b.r+14);
+}
+cv.addEventListener('pointerdown', e=>{
+  if(!Game.running) return;
+  cv.setPointerCapture(e.pointerId);
+  Game.drawing=true; Game.combo=0; Game.trail=[pos(e)];
+});
+cv.addEventListener('pointermove', e=>{
+  if(!Game.running || !Game.drawing) return;
+  const p=pos(e), prev=Game.trail[Game.trail.length-1];
+  Game.trail.push(p);
+  if(Game.trail.length>CFG.TRAIL) Game.trail.shift();
+  if(!prev) return;
+  // 檢查這一小段有沒有掃到東西
+  for(let i=Game.blobs.length-1;i>=0;i--){
+    const b=Game.blobs[i];
+    if(segHit(prev,p,b)){ Game.blobs.splice(i,1); Game.hit(b); }
+  }
+});
+window.addEventListener('pointerup', ()=>{ Game.drawing=false; Game.combo=0; });
+window.addEventListener('pointercancel', ()=>{ Game.drawing=false; Game.combo=0; });
+document.addEventListener('gesturestart', e=>e.preventDefault());
+document.addEventListener('touchmove', e=>e.preventDefault(), {passive:false});
+</script>
+</body>
+</html>
