@@ -116,7 +116,7 @@ h1.logo{font-family:var(--serif);font-size:clamp(32px,10.5vw,50px);letter-spacin
   <button class="btn main" onclick="G.newRun()">開始登樓<small>八層，死了從頭來</small></button>
   <button class="btn" onclick="G.go('rule')">怎麼玩<small>三十秒看懂</small></button>
   <p class="hint" style="text-align:center;margin-top:18px">
-    二十四位史書有載的偉人，九十六招真實事蹟。<br>人物與特效全部由程式繪製，零圖檔。</p>
+    二十四位史書有載的偉人，九十六招真實事蹟。<br>沒有立繪的人物，由程式即時畫成水墨。</p>
 </section>
 
 <section id="s-rule" class="screen">
@@ -406,9 +406,10 @@ const IK = {
       g.moveTo(hx,hy); g.lineTo(hx,hy+16*s); g.stroke();
     } else if(job==='君王'){     // 冠冕
       g.lineWidth=3.4*s;
-      g.beginPath(); g.moveTo(cx-16*s,cy-64*s); g.lineTo(cx-16*s,cy-76*s);
-      g.lineTo(cx-6*s,cy-68*s); g.lineTo(cx+3*s,cy-79*s); g.lineTo(cx+12*s,cy-68*s);
-      g.lineTo(cx+20*s,cy-76*s); g.lineTo(cx+20*s,cy-64*s); g.stroke();
+      g.beginPath(); g.moveTo(cx-15*s,cy-66*s); g.lineTo(cx-15*s,cy-77*s);
+      g.lineTo(cx-6*s,cy-70*s); g.lineTo(cx+3*s,cy-80*s); g.lineTo(cx+12*s,cy-70*s);
+      g.lineTo(cx+19*s,cy-77*s); g.lineTo(cx+19*s,cy-66*s); g.closePath();
+      g.globalAlpha=a*.85; g.fill();
     } else if(job==='科學家'){   // 渾儀（同心圓環）
       g.lineWidth=2.6*s; g.globalAlpha=a*.85;
       g.beginPath(); g.arc(hx,hy,15*s,0,6.283); g.stroke();
