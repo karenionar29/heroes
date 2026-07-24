@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#12151c">
+<title>偉人合體發明・原型</title>
+<style>
+:root{--ink:#12151c;--slate:#1d222d;--line:#2c3342;--paper:#e8e0cf;
+  --cinnabar:#b5342b;--jade:#2f8f74;--gold:#c9a227;--dim:#8b93a4;
+  --serif:"Noto Serif TC","Songti TC",serif;
+  --sans:-apple-system,"PingFang TC","Noto Sans TC",sans-serif}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%}
+body{background:var(--ink);color:var(--paper);font-family:var(--sans);
+  -webkit-user-select:none;user-select:none;overscroll-behavior:none;
+  padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+.wrap{max-width:520px;margin:0 auto;padding:12px 12px 26px}
+.screen{display:none}.screen.on{display:block}
+h1{font-family:var(--serif);font-size:30px;letter-spacing:.14em;text-align:center;margin:26px 0 4px}
+.sub{text-align:center;color:var(--dim);font-size:12px;letter-spacing:.16em;margin-bottom:18px}
+.rule{height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent);margin:14px 0}
+.btn{display:block;width:100%;padding:15px;margin:9px 0;border:1px solid var(--line);
+  background:var(--slate);color:var(--paper);font-family:var(--serif);font-size:17px;
+  letter-spacing:.1em;border-radius:3px;cursor:pointer;text-align:center}
+.btn.main{background:var(--cinnabar);border-color:#8f2820;color:#fff4ec}
+.btn.go{background:var(--gold);border-color:#9c7d1c;color:#20180a;font-weight:700}
+.btn:disabled{opacity:.35}
+.btn small{display:block;font-family:var(--sans);font-size:12px;letter-spacing:0;color:var(--dim);margin-top:3px}
+.btn.main small{color:rgba(255,255,255,.72)}.btn.go small{color:rgba(32,24,10,.7)}
+.hint{color:var(--dim);font-size:12.5px;line-height:1.8;margin:9px 0}
+.topbar{display:flex;justify-content:space-between;align-items:center;
+  font-size:12px;color:var(--dim);letter-spacing:.08em;margin-bottom:6px}
+
+/* 兩位偉人 */
+.pair{display:flex;gap:9px;align-items:stretch;margin:6px 0 8px}
+.who{flex:1;background:var(--slate);border:1px solid var(--line);border-radius:4px;padding:9px 8px;text-align:center}
+.who b{font-family:var(--serif);font-size:18px;letter-spacing:.06em;display:block}
+.who i{font-style:normal;font-size:11px;color:var(--dim);display:block;margin-top:2px}
+.who .tags{margin-top:6px;display:flex;flex-wrap:wrap;gap:4px;justify-content:center}
+.tag{font-size:11px;background:#2a3140;color:#c6cfdd;padding:2px 7px;border-radius:10px}
+.plus{align-self:center;font-size:22px;color:var(--gold);font-family:var(--serif)}
+.quest{text-align:center;font-family:var(--serif);font-size:18px;letter-spacing:.05em;
+  color:var(--gold);margin:4px 0 8px}
+
+/* 畫布 */
+#pad{display:block;width:100%;background:#fff;border-radius:4px;border:1px solid var(--line);touch-action:none}
+.tools{display:flex;gap:7px;margin-top:8px;align-items:center}
+.tools button{flex:1;padding:9px;background:var(--slate);border:1px solid var(--line);
+  color:var(--paper);border-radius:3px;font-size:13px;font-family:var(--sans);cursor:pointer}
+.tools button.on{border-color:var(--gold);color:var(--gold)}
+.timer{text-align:center;font-size:13px;color:var(--dim);margin-top:7px;font-variant-numeric:tabular-nums}
+.timer b{color:var(--cinnabar);font-size:17px}
+
+/* 判定 */
+.verdict{text-align:center;font-family:var(--serif);font-size:26px;letter-spacing:.12em;margin:16px 0 6px}
+.guess{background:var(--slate);border:1px solid var(--line);border-radius:4px;padding:11px;margin:8px 0}
+.guess .row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:14px}
+.guess .row.top{color:var(--gold);font-family:var(--serif);font-size:17px}
+.guess .row span:last-child{color:var(--dim);font-size:12px;font-variant-numeric:tabular-nums}
+.bar{height:5px;background:#0b0e13;border-radius:3px;overflow:hidden;margin-top:3px}
+.bar i{display:block;height:100%;background:var(--gold)}
+.load{text-align:center;padding:40px 10px}
+.load .big{font-family:var(--serif);font-size:20px;letter-spacing:.1em;margin-bottom:10px}
+.pbar{height:6px;background:#0b0e13;border:1px solid var(--line);border-radius:3px;overflow:hidden;margin:14px 0}
+.pbar i{display:block;height:100%;background:var(--jade);width:0%;transition:width .3s}
+.err{background:#2a1414;border:1px solid #5a2f2a;border-radius:4px;padding:11px;font-size:12.5px;line-height:1.7;color:#e8b0a6}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ═══════ 標題 ═══════ -->
+<section id="s-title" class="screen on">
+  <h1>偉人合體發明</h1>
+  <div class="sub">三 十 秒 原 型</div>
+  <div class="rule"></div>
+  <p class="hint" style="text-align:center">
+    抽兩個偉人 → 你畫出他們合力發明的東西 →<br>
+    <b style="color:var(--gold)">手機上的 AI 當場猜你畫了什麼</b>
+  </p>
+  <p class="hint" style="text-align:center">
+    這不是完整遊戲，只有核心那一下。<br>玩完只要回答：<b style="color:var(--gold)">AI 講出答案那一秒，爽不爽？</b>
+  </p>
+  <button class="btn main" onclick="G.boot()">開始<small>第一次要載 AI，大約 30 秒～2 分鐘</small></button>
+  <p class="hint" style="text-align:center;margin-top:16px">
+    AI 完全在你手機裡跑，圖片不會上傳到任何地方。
+  </p>
+</section>
+
+<!-- ═══════ 載入 ═══════ -->
+<section id="s-load" class="screen">
+  <div class="load">
+    <div class="big" id="loadTxt">正在把 AI 搬進你的手機⋯⋯</div>
+    <div class="pbar"><i id="loadBar"></i></div>
+    <p class="hint" id="loadSub">只有第一次要下載，之後會快很多。</p>
+    <div id="loadErr" style="display:none">
+      <div class="err" id="errTxt"></div>
+      <button class="btn" onclick="G.boot()">再試一次</button>
+      <button class="btn" onclick="G.manualMode()">不等了，用手動判定玩看看<small>先測玩法，AI 之後再修</small></button>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ 出題＋畫 ═══════ -->
+<section id="s-draw" class="screen">
+  <div class="topbar"><span id="modeTag">合體發明</span><button style="background:none;border:none;color:var(--dim);font-size:12px" onclick="G.go('title')">結束</button></div>
+  <div class="pair" id="pair"></div>
+  <div class="quest">他們合力發明了什麼？畫出來</div>
+  <canvas id="pad" width="512" height="384"></canvas>
+  <div class="tools">
+    <button id="b1" onclick="G.brush(4)">細</button>
+    <button id="b2" class="on" onclick="G.brush(9)">中</button>
+    <button id="b3" onclick="G.brush(18)">粗</button>
+    <button onclick="G.undo()">復原</button>
+    <button onclick="G.clear()">清空</button>
+  </div>
+  <div class="timer" id="timer">剩 <b>30</b> 秒</div>
+  <button class="btn go" onclick="G.judge()">畫好了，給 AI 看</button>
+</section>
+
+<!-- ═══════ 判定 ═══════ -->
+<section id="s-result" class="screen">
+  <div class="verdict" id="verdict">⋯⋯</div>
+  <p class="hint" id="verdictSub" style="text-align:center"></p>
+  <div class="guess" id="guessBox"></div>
+  <div id="manualBox" style="display:none">
+    <p class="hint">AI 沒跑起來，你自己誠實選一個：你畫的是什麼？</p>
+    <div id="manualList"></div>
+  </div>
+  <button class="btn main" onclick="G.next()">再來一組</button>
+  <button class="btn" onclick="G.go('title')">結束</button>
+</section>
+
+</div>
+
+<script>
+/* ══════════════════════════════════════════════
+   偉人合體發明　核心原型
+   規則只有一條：
+     你畫的東西，必須同時搭得上「兩個偉人各自的專長」
+   ══════════════════════════════════════════════ */
+
+// 偉人：每人三個專長標籤（這就是你能畫什麼的線索）
+const HEROES = [
+  {n:'魯班',    j:'工匠',   t:['木工','機關','建築']},
+  {n:'達文西',  j:'工匠',   t:['機關','建築','光學']},
+  {n:'印和闐',  j:'工匠',   t:['建築','醫術','石造']},
+  {n:'富蘭克林',j:'科學家', t:['電','光學','文字']},
+  {n:'張衡',    j:'科學家', t:['天文','機關','文字']},
+  {n:'居禮夫人',j:'科學家', t:['光學','醫術','化學']},
+  {n:'華佗',    j:'醫者',   t:['醫術','草藥','水']},
+  {n:'南丁格爾',j:'醫者',   t:['醫術','光學','文字']},
+  {n:'鄭和',    j:'航海家', t:['航海','天文','木工']},
+  {n:'麥哲倫',  j:'航海家', t:['航海','天文','風']},
+  {n:'李白',    j:'文人',   t:['文字','紙','水']},
+  {n:'莎士比亞',j:'文人',   t:['文字','紙','舞台']},
+  {n:'張飛',    j:'武將',   t:['戰鬥','火','力量']},
+  {n:'諸葛亮',  j:'軍師',   t:['機關','天文','文字']},
+  {n:'伊莉莎白一世',j:'君王',t:['王權','航海','舞台']},
+  {n:'漢摩拉比',j:'君王',   t:['王權','石造','文字']}
+];
+
+// 可以畫的東西：label 是給 AI 看的英文，t 是它搭得上哪些專長
+const THINGS = [
+  {en:'a kite',            zh:'風箏',   t:['風','電','紙','天文']},
+  {en:'a ladder',          zh:'梯子',   t:['木工','建築']},
+  {en:'a bridge',          zh:'橋',     t:['建築','木工','石造']},
+  {en:'a wheel',           zh:'輪子',   t:['機關','木工']},
+  {en:'a sailing boat',    zh:'帆船',   t:['航海','木工','風']},
+  {en:'an umbrella',       zh:'雨傘',   t:['紙','水','木工']},
+  {en:'a lamp',            zh:'燈',     t:['電','光學','火']},
+  {en:'a key',             zh:'鑰匙',   t:['機關','王權']},
+  {en:'a clock',           zh:'時鐘',   t:['機關','天文']},
+  {en:'a bell',            zh:'鐘',     t:['機關','王權','建築']},
+  {en:'a hammer',          zh:'鎚子',   t:['木工','建築','力量']},
+  {en:'a sword',           zh:'劍',     t:['戰鬥','王權','力量']},
+  {en:'a book',            zh:'書',     t:['文字','紙','醫術']},
+  {en:'a pencil',          zh:'筆',     t:['文字','紙']},
+  {en:'eyeglasses',        zh:'眼鏡',   t:['光學','醫術','機關']},
+  {en:'a bottle',          zh:'瓶子',   t:['醫術','草藥','化學','水']},
+  {en:'a drum',            zh:'鼓',     t:['戰鬥','舞台']},
+  {en:'an arrow',          zh:'箭',     t:['戰鬥','木工','風']},
+  {en:'a tower',           zh:'塔',     t:['建築','天文','石造']},
+  {en:'a telescope',       zh:'望遠鏡', t:['天文','光學','航海']},
+  {en:'a hot air balloon', zh:'熱氣球', t:['風','火','天文']},
+  {en:'a hand fan',        zh:'扇子',   t:['紙','風','舞台']},
+  {en:'an anchor',         zh:'錨',     t:['航海','機關']},
+  {en:'a compass',         zh:'羅盤',   t:['航海','天文','機關']},
+  {en:'a windmill',        zh:'風車',   t:['機關','風','木工']},
+  {en:'a crown',           zh:'王冠',   t:['王權']},
+  {en:'scissors',          zh:'剪刀',   t:['機關','醫術']},
+  {en:'a candle',          zh:'蠟燭',   t:['火','光學']},
+  {en:'a stethoscope',     zh:'聽診器', t:['醫術','機關']},
+  {en:'a mask',            zh:'面具',   t:['舞台','醫術']},
+  {en:'a bucket',          zh:'水桶',   t:['水','木工']},
+  {en:'a saw',             zh:'鋸子',   t:['木工','力量']}
+];
+
+// 這件東西同時搭得上兩個人嗎？（各要至少一個共同標籤）
+function fits(thing,a,b){
+  const hitA = thing.t.filter(x=>a.t.includes(x));
+  const hitB = thing.t.filter(x=>b.t.includes(x));
+  return (hitA.length && hitB.length) ? {a:hitA[0],b:hitB[0]} : null;
+}
+// 只出「至少有一個答案」的組合，不然玩家怎麼畫都輸
+function pickPair(){
+  for(let i=0;i<300;i++){
+    const a=HEROES[Math.random()*HEROES.length|0];
+    let b=HEROES[Math.random()*HEROES.length|0];
+    if(a===b) continue;
+    const ok=THINGS.filter(t=>fits(t,a,b));
+    if(ok.length>=2) return {a,b,ok};
+  }
+  return {a:HEROES[0],b:HEROES[3],ok:THINGS.filter(t=>fits(t,HEROES[0],HEROES[3]))};
+}
+
+/* ---- 音效 ---- */
+const S=(()=>{let ac=null;
+  const ok=()=>{try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();
+    if(ac.state==='suspended')ac.resume();return 1}catch(e){return 0}};
+  const t=(f,d,ty,v)=>{if(!ok())return;const o=ac.createOscillator(),g=ac.createGain();
+    o.type=ty||'sine';o.frequency.value=f;g.gain.setValueAtTime(0,ac.currentTime);
+    g.gain.linearRampToValueAtTime(v||.13,ac.currentTime+.008);
+    g.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+d);
+    o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+d);};
+  return{tap:()=>t(520,.06,'triangle',.08),
+    tick:()=>t(880,.05,'triangle',.06),
+    win:()=>{[523,659,784,1046].forEach((f,i)=>setTimeout(()=>t(f,.26,'triangle',.12),i*115))},
+    lose:()=>{[380,280,190].forEach((f,i)=>setTimeout(()=>t(f,.22,'square',.1),i*130))}};
+})();
+
+/* ══════════ 主程式 ══════════ */
+const G = {
+  clf:null, manual:false, cur:null, timer:null, left:30,
+  strokes:[], drawing:false, w:9,
+
+  el(id){return document.getElementById(id)},
+  go(n){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+    this.el('s-'+n).classList.add('on');
+    if(n!=='draw'){clearInterval(this.timer);} window.scrollTo(0,0);},
+
+  /* ---- 載入 AI ---- */
+  async boot(){
+    S.tap();
+    if(this.clf||this.manual){ this.next(); return; }
+    this.go('load');
+    this.el('loadErr').style.display='none';
+    this.el('loadBar').style.width='2%';
+    const CDNS=[
+      'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.3.3',
+      'https://unpkg.com/@huggingface/transformers@3.3.3',
+      'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2',
+      'https://unpkg.com/@xenova/transformers@2.17.2'
+    ];
+    let lastErr=null;
+    for(const url of CDNS){
+      try{
+        this.el('loadTxt').textContent='正在把 AI 搬進你的手機⋯⋯';
+        this.el('loadSub').textContent='來源：'+url.split('/npm/')[1];
+        const mod = await import(url);
+        const { pipeline, env } = mod;
+        if(env){ env.allowLocalModels=false; }
+        this.clf = await pipeline('zero-shot-image-classification','Xenova/clip-vit-base-patch32',{
+          progress_callback:(p)=>{
+            if(p && p.progress!=null){
+              this.el('loadBar').style.width=Math.max(2,p.progress)+'%';
+              this.el('loadSub').textContent=(p.file||'')+'　'+Math.round(p.progress)+'%';
+            }
+          }
+        });
+        this.el('loadBar').style.width='100%';
+        this.el('loadTxt').textContent='好了';
+        setTimeout(()=>this.next(),350);
+        return;
+      }catch(e){ lastErr=e; }
+    }
+    this.el('loadTxt').textContent='AI 載不起來';
+    this.el('errTxt').textContent='四個來源都失敗了。可能是網路擋住、或這台裝置記憶體不夠。錯誤訊息：'+(lastErr&&lastErr.message||lastErr);
+    this.el('loadErr').style.display='block';
+  },
+  manualMode(){ S.tap(); this.manual=true; this.next(); },
+
+  /* ---- 出題 ---- */
+  next(){
+    S.tap();
+    this.cur = pickPair();
+    const {a,b}=this.cur;
+    this.el('pair').innerHTML =
+      '<div class="who"><b>'+a.n+'</b><i>'+a.j+'</i><div class="tags">'+a.t.map(x=>'<span class="tag">'+x+'</span>').join('')+'</div></div>'+
+      '<div class="plus">＋</div>'+
+      '<div class="who"><b>'+b.n+'</b><i>'+b.j+'</i><div class="tags">'+b.t.map(x=>'<span class="tag">'+x+'</span>').join('')+'</div></div>';
+    this.el('modeTag').textContent = this.manual ? '合體發明（手動判定）' : '合體發明';
+    this.clear();
+    this.go('draw');
+    this.left=30; this.tick();
+    clearInterval(this.timer);
+    this.timer=setInterval(()=>{
+      this.left--; this.tick();
+      if(this.left<=5&&this.left>0)S.tick();
+      if(this.left<=0){ clearInterval(this.timer); this.judge(); }
+    },1000);
+  },
+  tick(){ this.el('timer').innerHTML='剩 <b>'+Math.max(0,this.left)+'</b> 秒'; },
+
+  /* ---- 畫布 ---- */
+  brush(w){ S.tap(); this.w=w;
+    ['b1','b2','b3'].forEach(id=>this.el(id).classList.remove('on'));
+    this.el(w===4?'b1':w===9?'b2':'b3').classList.add('on'); },
+  clear(){ this.strokes=[]; this.redraw(); },
+  undo(){ S.tap(); this.strokes.pop(); this.redraw(); },
+  redraw(){
+    const cv=this.el('pad'), g=cv.getContext('2d');
+    g.fillStyle='#fff'; g.fillRect(0,0,cv.width,cv.height);
+    g.strokeStyle='#000'; g.lineCap='round'; g.lineJoin='round';
+    this.strokes.forEach(s=>{ g.lineWidth=s.w;
+      g.beginPath(); s.p.forEach((pt,i)=>i?g.lineTo(pt[0],pt[1]):g.moveTo(pt[0],pt[1])); g.stroke(); });
+  },
+
+  /* ---- 判定 ---- */
+  async judge(){
+    clearInterval(this.timer);
+    if(!this.strokes.length){ this.show(null,[]); return; }
+    const {a,b,ok}=this.cur;
+    this.el('verdict').textContent='AI 正在看⋯⋯';
+    this.el('verdictSub').textContent='';
+    this.el('guessBox').innerHTML='';
+    this.el('manualBox').style.display='none';
+    this.go('result');
+
+    if(this.manual || !this.clf){ this.askManual(); return; }
+    try{
+      const url=this.el('pad').toDataURL('image/png');
+      // 候選標籤：這一局搭得上的東西，加上一批干擾項，AI 才不是只能選對的
+      const pool = ok.slice();
+      const extra = THINGS.filter(t=>!pool.includes(t)).sort(()=>Math.random()-.5).slice(0,12);
+      const cands = pool.concat(extra);
+      const labels = cands.map(t=>'a simple black and white doodle of '+t.en);
+      const out = await this.clf(url, labels);
+      const ranked = out.map(r=>{
+        const i = labels.indexOf(r.label);
+        return { thing: cands[i], score: r.score };
+      }).filter(x=>x.thing).sort((x,y)=>y.score-x.score);
+      this.show(ranked[0], ranked.slice(0,4));
+    }catch(e){
+      this.el('verdict').textContent='AI 出錯了';
+      this.el('verdictSub').textContent=String(e.message||e);
+      this.askManual();
+    }
+  },
+  askManual(){
+    const {ok}=this.cur;
+    const pool = ok.concat(THINGS.filter(t=>!ok.includes(t)).sort(()=>Math.random()-.5).slice(0,8));
+    const box=this.el('manualList'); box.innerHTML='';
+    pool.sort(()=>Math.random()-.5).forEach(t=>{
+      const btn=document.createElement('button');
+      btn.className='btn'; btn.textContent=t.zh;
+      btn.onclick=()=>this.show({thing:t,score:1},[]);
+      box.appendChild(btn);
+    });
+    this.el('verdict').textContent='你畫的是⋯⋯？';
+    this.el('manualBox').style.display='block';
+  },
+  show(top,list){
+    this.el('manualBox').style.display='none';
+    const {a,b}=this.cur;
+    if(!top){ this.el('verdict').textContent='什麼都沒畫'; this.el('verdictSub').textContent='下一組再來。'; S.lose(); return; }
+    const m = fits(top.thing,a,b);
+    if(m){
+      this.el('verdict').textContent='✦ '+top.thing.zh+' ✦';
+      this.el('verdictSub').innerHTML='成立！<b style="color:var(--gold)">'+a.n+'的'+m.a+'</b> 加上 <b style="color:var(--gold)">'+b.n+'的'+m.b+'</b>，真的做得出'+top.thing.zh+'。';
+      S.win();
+    }else{
+      this.el('verdict').textContent=top.thing.zh+'？';
+      const wa=top.thing.t.filter(x=>a.t.includes(x)).length;
+      const wb=top.thing.t.filter(x=>b.t.includes(x)).length;
+      this.el('verdictSub').innerHTML='不成立——'+
+        (wa?('<b>'+a.n+'</b>做得到，但'+b.n+'幫不上忙。'):
+         wb?('<b>'+b.n+'</b>做得到，但'+a.n+'幫不上忙。'):
+             '這兩個人誰都沾不上邊。');
+      S.lose();
+    }
+    const box=this.el('guessBox'); box.innerHTML='';
+    if(list.length){
+      box.innerHTML='<div style="font-size:12px;color:var(--dim);margin-bottom:6px;letter-spacing:.08em">AI 的猜測</div>';
+      list.forEach((r,i)=>{
+        const d=document.createElement('div');
+        d.className='row'+(i===0?' top':'');
+        d.innerHTML='<span>'+r.thing.zh+'</span><span>'+(r.score*100).toFixed(0)+'%</span>';
+        box.appendChild(d);
+        const bar=document.createElement('div'); bar.className='bar';
+        bar.innerHTML='<i style="width:'+(r.score*100).toFixed(0)+'%"></i>';
+        box.appendChild(bar);
+      });
+    }
+  }
+};
+
+/* ---- 畫布事件 ---- */
+(function(){
+  const cv=document.getElementById('pad');
+  const pos=e=>{const r=cv.getBoundingClientRect();
+    return [(e.clientX-r.left)/r.width*cv.width,(e.clientY-r.top)/r.height*cv.height];};
+  cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);
+    G.drawing=true; G.strokes.push({w:G.w,p:[pos(e)]}); G.redraw();});
+  cv.addEventListener('pointermove',e=>{if(!G.drawing)return;
+    G.strokes[G.strokes.length-1].p.push(pos(e)); G.redraw();});
+  window.addEventListener('pointerup',()=>{G.drawing=false;});
+  G.redraw();
+})();
+document.addEventListener('gesturestart',e=>e.preventDefault());
+</script>
+</body>
+</html>
