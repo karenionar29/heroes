@@ -86,7 +86,7 @@ h1{font-family:var(--serif);font-size:clamp(30px,10vw,44px);letter-spacing:.2em;
   <button class="btn main" onclick="G.menu()">開始<small>五關，每關三十秒到三分鐘</small></button>
   <button class="btn" onclick="G.go('who')">八位偉人<small>他們各自會什麼</small></button>
   <p class="hint" style="text-align:center;font-size:11.5px;margin-top:12px">
-    立體場景全部由程式堆成，零模型檔。
+    有立繪的偉人會以水墨立牌現身，沒有的由程式即時畫成。
   </p>
 </section>
 
@@ -362,6 +362,91 @@ function makeEngine(level){
 
 
 
+/* ══════════ 立繪載入（有圖用圖，沒圖退回程式畫的人形）══════════
+   ① 白底會自動去背（從四邊往內洪水填充，人物身上的白留著）
+   ② 已經透明的圖不會被誤傷
+   ③ 副檔名大小寫都吃
+   ══════════════════════════════════════════════════════════ */
+const ART = (() => {
+  const cache = {};
+  const MAXH = 512, WHITE = 236;
+  const EXTS = ['.png','.PNG','.jpg','.JPG','.jpeg','.JPEG','.webp','.WEBP'];
+  const subs = [];
+
+  function alreadyCut(cv){
+    const g=cv.getContext('2d',{willReadFrequently:true});
+    const w=cv.width,h=cv.height;
+    let clear=0;
+    [[1,1],[w-2,1],[1,h-2],[w-2,h-2]].forEach(([x,y])=>{
+      if(g.getImageData(x,y,1,1).data[3]<20) clear++;
+    });
+    return clear>=3;
+  }
+  function stripWhite(cv){
+    const g=cv.getContext('2d',{willReadFrequently:true});
+    const w=cv.width,h=cv.height;
+    const im=g.getImageData(0,0,w,h), d=im.data;
+    const seen=new Uint8Array(w*h), q=new Int32Array(w*h);
+    let head=0,tail=0;
+    const push=(x,y)=>{
+      if(x<0||y<0||x>=w||y>=h) return;
+      const i=y*w+x; if(seen[i]) return;
+      const p=i*4;
+      if(d[p+3]<8){ seen[i]=1; q[tail++]=i; return; }
+      if(d[p]<WHITE||d[p+1]<WHITE||d[p+2]<WHITE) return;
+      seen[i]=1; d[p+3]=0; q[tail++]=i;
+    };
+    for(let x=0;x<w;x++){ push(x,0); push(x,h-1); }
+    for(let y=0;y<h;y++){ push(0,y); push(w-1,y); }
+    while(head<tail){ const i=q[head++],x=i%w,y=(i/w)|0;
+      push(x+1,y); push(x-1,y); push(x,y+1); push(x,y-1); }
+    g.putImageData(im,0,0);
+  }
+  // 把圖裁到只剩人物（去掉四周空白），這樣站上棋盤大小才會一致
+  function trim(cv){
+    const g=cv.getContext('2d',{willReadFrequently:true});
+    const w=cv.width,h=cv.height,d=g.getImageData(0,0,w,h).data;
+    let x0=w,y0=h,x1=-1,y1=-1;
+    for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+      if(d[(y*w+x)*4+3]>16){ if(x<x0)x0=x; if(x>x1)x1=x; if(y<y0)y0=y; if(y>y1)y1=y; }
+    }
+    if(x1<0) return cv;
+    const out=document.createElement('canvas');
+    out.width=x1-x0+1; out.height=y1-y0+1;
+    out.getContext('2d').drawImage(cv,-x0,-y0);
+    return out;
+  }
+  function process(img){
+    const scale=Math.min(1,MAXH/img.naturalHeight);
+    const cv=document.createElement('canvas');
+    cv.width=Math.max(1,Math.round(img.naturalWidth*scale));
+    cv.height=Math.max(1,Math.round(img.naturalHeight*scale));
+    cv.getContext('2d',{willReadFrequently:true}).drawImage(img,0,0,cv.width,cv.height);
+    try{ if(!alreadyCut(cv)) stripWhite(cv); return trim(cv); }catch(e){ return cv; }
+  }
+  function load(id){
+    if(cache[id]) return cache[id];
+    const rec={state:'load',cv:null};
+    cache[id]=rec;
+    let k=0;
+    const tryNext=()=>{
+      if(k>=EXTS.length){ rec.state='fail'; return; }
+      const img=new Image(); const ext=EXTS[k++];
+      img.onload=()=>{ try{ rec.cv=process(img); rec.state='ok';
+        subs.forEach(f=>{try{f(id)}catch(e){}}); }catch(e){ tryNext(); } };
+      img.onerror=tryNext;
+      img.src='img/'+id+ext;
+    };
+    tryNext();
+    return rec;
+  }
+  return {
+    want(list){ (Array.isArray(list)?list:[list]).forEach(x=>x&&load(x)); },
+    get(id){ const r=cache[id]; return (r&&r.state==='ok')?r.cv:null; },
+    onReady(fn){ subs.push(fn); }
+  };
+})();
+
 /* ══════════ 立體場景（Three.js，基本幾何堆成，零模型檔）══════════ */
 const V = {
   ok:false, T:null, scene:null, cam:null, ren:null, ray:null,
@@ -433,6 +518,40 @@ const V = {
     const T=this.T;
     const v=pts.map(([x,y])=>new T.Vector2(x,y));
     return new T.Mesh(new T.LatheGeometry(v, seg||14), matr);
+  },
+
+  /* 立牌：把 GPT 生的水墨立繪立在棋盤上
+     相機是固定角度，所以立牌只要朝著相機傾斜就好 */
+  makeBillboard(id, cfg){
+    const T=this.T, cv=ART.get(id);
+    if(!cv) return null;
+    const g=new T.Group();
+    const tex=new T.CanvasTexture(cv);
+    tex.needsUpdate=true;
+    if(T.sRGBEncoding!==undefined) tex.encoding=T.sRGBEncoding;
+    tex.anisotropy=4;
+    const HEIGHT=1.5;
+    const Wd=HEIGHT*(cv.width/cv.height);
+    const mat=new T.MeshBasicMaterial({map:tex,transparent:true,
+      alphaTest:0.35,side:T.DoubleSide,depthWrite:true});
+    const plane=new T.Mesh(new T.PlaneGeometry(Wd,HEIGHT), mat);
+    plane.position.y=HEIGHT/2;
+    plane.castShadow=true;
+    // 相機在 (0,10,9.6) 看向原點 → 立牌往後躺一點，正面才對著鏡頭
+    plane.rotation.x=-0.34;
+    g.add(plane);
+    // 腳下一團影子，讓它「站在」地上而不是漂浮
+    const sh=new T.Mesh(new T.CircleGeometry(Wd*0.34,20),
+      new T.MeshBasicMaterial({color:0x000000,transparent:true,opacity:0.26}));
+    sh.rotation.x=-Math.PI/2; sh.position.y=0.085; g.add(sh);
+    g.userData.billboard=true;
+    g.userData.plane=plane;
+    g.userData.robe=plane;
+    g.userData.shadow=sh;
+    g.userData.phase=Math.random()*6.283;
+    g.userData.baseY=0;
+    g.userData.baseTilt=-0.34;
+    return g;
   },
 
   makeFigure(cfg){
@@ -642,7 +761,7 @@ const V = {
   },
 
   reset(level, st){
-    const T=this.T;
+    const T=this.T; this._level=level;
     [this.tileGroup,this.objGroup,this.fxGroup].forEach(G=>{ while(G.children.length) G.remove(G.children[0]); });
     this.tiles=[]; this.walls={}; this.enemies=[]; this.heroes={}; this.marks={};
     this.hi=[]; this.anims=[]; this.puffs=[]; this.rings=[]; this.ghostGroup=null;
@@ -662,20 +781,63 @@ const V = {
       const b=new T.Mesh(new T.BoxGeometry(sx,sy,sz),gm); b.position.set(px,py,0); b.castShadow=true; g.add(b); });
     g.position.set(p.x,0,p.z); this.objGroup.add(g);
     // 三位偉人站在城後面
+    ART.want(level.heroes.concat(['soldier']));
     level.heroes.forEach((id,i)=>{
-      const f=this.makeFigure(this.FIG[id]||this.FIG.imhotep);
+      const f=this.makeBillboard(id) || this.makeFigure(this.FIG[id]||this.FIG.imhotep);
       f.position.set(-4.0, 0, (i-1)*1.1+0.3);
-      f.rotation.y=Math.PI/2;
+      if(!f.userData.billboard) f.rotation.y=Math.PI/2;
       f.userData.home={x:f.position.x,z:f.position.z};
+      f.userData.hid=id;
       this.objGroup.add(f); this.heroes[id]=f;
     });
     st.es.forEach(e=>this.addEnemy(e));
+    // 圖晚一點才載好 → 自動換成立牌，不用重開遊戲
+    if(!this._sub){ this._sub=1; ART.onReady(()=>this.swapArt()); }
+  },
+
+  swapArt(){
+    if(!this._level) return;
+    Object.keys(this.heroes).forEach(id=>{
+      const old=this.heroes[id];
+      if(!old || old.userData.billboard) return;
+      const nb=this.makeBillboard(id);
+      if(!nb) return;
+      nb.position.copy(old.position); nb.userData.home=old.userData.home;
+      nb.userData.hid=id;
+      this.objGroup.remove(old); this.objGroup.add(nb); this.heroes[id]=nb;
+    });
+    this.enemies.forEach((o,i)=>{
+      if(o.g.userData.billboard) return;
+      const nb=this.makeBillboard('soldier');
+      if(!nb) return;
+      nb.position.copy(o.g.position);
+      const ar=o.arrow; o.g.remove(ar); nb.add(ar);
+      this.objGroup.remove(o.g); this.objGroup.add(nb);
+      o.g=nb;
+    });
   },
 
   heroAct(id, then){
     const f=this.heroes[id];
     if(!f){ then&&then(); return; }
     const u=f.userData, home=u.home;
+    if(u.billboard){
+      // 立牌：往前衝一步、放大、微傾，加一圈光暈
+      const p=u.plane;
+      this.anims.push({t:0,dur:640,fn:(k)=>{
+        const e=Math.sin(k*Math.PI);
+        f.position.x=home.x+e*0.7;
+        u.baseY=e*0.14;
+        p.scale.set(1+e*0.13,1+e*0.13,1);
+        p.rotation.z=Math.sin(k*Math.PI*2)*0.07;
+        p.rotation.x=u.baseTilt-e*0.1;
+        if(k>=1){ f.position.x=home.x; u.baseY=0;
+          p.scale.set(1,1,1); p.rotation.z=0; p.rotation.x=u.baseTilt; }
+      }});
+      this.flash(f.position.x+0.5,1.0,f.position.z,0xffe6b0,1.6);
+      setTimeout(()=>then&&then(),340);
+      return;
+    }
     this.anims.push({t:0,dur:620,fn:(k)=>{
       // 前半段抬手蓄勢，後半段揮下
       const up=Math.min(1,k/0.45), down=Math.max(0,(k-0.45)/0.55);
@@ -698,7 +860,7 @@ const V = {
     const T=this.T, o=this.enemies[i];
     const h=this.heroes['huatuo'];
     if(!o||!h){ done&&done(); return; }
-    const from=new T.Vector3(h.position.x+0.4,1.05,h.position.z);
+    const from=new T.Vector3(h.position.x+0.45,1.1,h.position.z);
     const to=new T.Vector3(o.g.position.x,1.0,o.g.position.z);
     const ball=new T.Group();
     const gd=this.lathe([[0.0,0],[0.13,0.04],[0.11,0.14],[0.06,0.2],[0.08,0.27],[0.05,0.34],[0.0,0.36]],
@@ -785,8 +947,8 @@ const V = {
 
   addEnemy(e){
     const T=this.T;
-    const g=this.makeFigure({robe:0xa82f26,robe2:0x6e1a14,skin:0xc4835c,
-      hat:'helm2',prop:'spear2',hair:0x1c1815});
+    const g=this.makeBillboard('soldier') || this.makeFigure({robe:0xa82f26,robe2:0x6e1a14,
+      skin:0xc4835c,hat:'helm2',prop:'spear2',hair:0x1c1815});
     const ar=new T.Group();
     const shaft=new T.Mesh(new T.BoxGeometry(0.09,0.09,0.4), this.mat(0xe2564a,.5,0x5a1a14));
     shaft.position.z=-0.22; ar.add(shaft);
@@ -813,12 +975,16 @@ const V = {
             o.g.position.x=from.x+(to.x-from.x)*ee;
             o.g.position.z=from.z+(to.z-from.z)*ee;
             u.baseY=far?Math.sin(k*Math.PI)*1.5:Math.abs(Math.sin(k*Math.PI*2))*0.07;
-            o.g.rotation.y=face;
-            // 走路擺手
-            if(u.armR) u.armR.rotation.x=Math.sin(k*Math.PI*2)*0.5;
-            if(u.armL) u.armL.rotation.x=-Math.sin(k*Math.PI*2)*0.5;
+            if(!u.billboard) o.g.rotation.y=face;
+            // 走路擺手（立牌改成左右晃）
+            if(u.billboard){ u.plane.rotation.z=Math.sin(k*Math.PI*4)*0.06; }
+            else {
+              if(u.armR) u.armR.rotation.x=Math.sin(k*Math.PI*2)*0.5;
+              if(u.armL) u.armL.rotation.x=-Math.sin(k*Math.PI*2)*0.5;
+            }
             if(far) o.g.rotation.x=k*6.283;         // 被拋飛時翻滾
             if(k>=1){ u.baseY=0; o.g.rotation.x=0;
+              if(u.billboard) u.plane.rotation.z=0;
               if(u.armR) u.armR.rotation.x=0; if(u.armL) u.armL.rotation.x=0; }
           }});
         }
@@ -836,11 +1002,14 @@ const V = {
     const T=this.T, o=this.enemies[i]; if(!o) return;
     if(on){
       const p={x:o.g.position.x,z:o.g.position.z};
+      const u0=o.g.userData;
       this.anims.push({t:0,dur:700,fn:(k)=>{
         const e=1-Math.pow(1-k,3);
-        o.g.rotation.z=e*Math.PI*0.46;
-        o.g.userData.baseY=-e*0.06;
-        if(o.g.userData.armR) o.g.userData.armR.rotation.x=-e*0.8;
+        if(u0.billboard){ u0.plane.rotation.z=e*Math.PI*0.42;
+          u0.plane.position.y=1.5/2-e*0.42; }
+        else { o.g.rotation.z=e*Math.PI*0.46;
+          if(u0.armR) u0.armR.rotation.x=-e*0.8; }
+        u0.baseY=-e*0.06;
         if(k>=1) this.dust(p.x,p.z,16,0xb8b09c,0.12);
       }});
       const zg=new T.Group();
@@ -851,8 +1020,12 @@ const V = {
       }
       o.g.add(zg); o.zzz=zg;
     }else{
+      const u1=o.g.userData;
       this.anims.push({t:0,dur:420,fn:(k)=>{ const e=1-Math.pow(1-k,3);
-        o.g.rotation.z=(1-e)*Math.PI*0.44; }});
+        if(u1.billboard){ u1.plane.rotation.z=(1-e)*Math.PI*0.42;
+          u1.plane.position.y=1.5/2-(1-e)*0.42; }
+        else o.g.rotation.z=(1-e)*Math.PI*0.44;
+        u1.baseY=-(1-e)*0.06; }});
       if(o.zzz){ o.g.remove(o.zzz); o.zzz=null; }
     }
   },
@@ -977,6 +1150,11 @@ const V = {
       const u=f.userData, ph=u.phase||0;
       const b=Math.sin(this._t*1.6+ph);
       f.position.y=(u.baseY||0)+b*0.012;
+      if(u.billboard){
+        u.plane.scale.set(1+b*0.006,1+b*0.010,1);
+        u.plane.rotation.z=Math.sin(this._t*0.7+ph)*0.012;
+        return;
+      }
       if(u.robe) u.robe.scale.set(1+b*0.008,1-b*0.006,1+b*0.008);
       if(u.head) u.head.rotation.z=Math.sin(this._t*0.9+ph)*0.03;
     };
